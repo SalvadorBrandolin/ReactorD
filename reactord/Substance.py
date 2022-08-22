@@ -12,7 +12,10 @@ class Substance:
     Mw : float
          Molecular weight of the subtance [g / mol].
     """
-    def __init__(self, Name = None, Mw = None, ):
+
+    #ESTA ES LA BRANCH DEVELOPMENT
+
+    def __init__(self, Name = None, Mw = None):
 
         self.Name = Name
         self.Mw = Mw        
