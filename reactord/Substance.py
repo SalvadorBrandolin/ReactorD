@@ -8,7 +8,7 @@ class Substance:
     Parameters
     ----------
     id_database : string, optional
-        ID for the Caleb's thermo library, by default None
+        Name or CAS number of the substance, by default None
     name : string
         Name of the substance, by default None
     mw : float
@@ -65,55 +65,54 @@ class Substance:
         pressure [Pa], viscosity_gas(T) [W/m/K], by default None
     """
 
-
     def __init__(
-            self, name=None, mw=None, Tc=None, Pc=None, 
-            omega=None, h_formation=None, h_formation_ig=None,
+            self, id_database=None, name=None, mw=None, Tc=None, Pc=None, 
+            omega=None, h_formation=None, h_formation_ig=None, 
             g_formation=None, g_formation_ig=None, volume_s_t=None, 
             volume_l_tp=None, volume_g_tp=None, heat_capacity_s_t=None, 
             heat_capacity_l_t=None, heat_capacity_g_t=None,
             thermal_conductivity_l_tp=None, 
             thermal_conductivity_g_tp=None, 
             viscosity_l_tp=None, viscosity_g_tp=None):
+        
+        if id_database is None:
+            #Pure compound properties:
+            self.name = name
+            self.mw = mw
+            self.Tc = Tc
+            self.Pc = Pc
+            self.omega = omega
+            self.h_formation = h_formation
+            self.h_formation_ig = h_formation_ig
+            self.g_formation = g_formation
+            self.g_formation_ig = g_formation_ig
+            #Temperature dependent properties calculation functions:
+            self.volume_s_t = volume_s_t
+            self.volume_l_tp = volume_l_tp
+            self.volume_g_tp = volume_g_tp
+            self.heat_capacity_s_t = heat_capacity_s_t
+            self.heat_capacity_l_t = heat_capacity_l_t
+            self.heat_capacity_g_t = heat_capacity_g_t
+            #self.thermal_conductivity_s_tp = thermal_conductivity_s_tp 
+            self.thermal_conductivity_l_tp = thermal_conductivity_l_tp
+            self.thermal_conductivity_g_tp = thermal_conductivity_g_tp
+            self.viscosity_l_tp = viscosity_l_tp
+            self.viscosity_g_tp = viscosity_g_tp
+        else:
+            self.from_thermo_database(id_database)
 
-        #Pure compound properties:
-        self.name = name
-        self.mw = mw
-        self.Tc = Tc
-        self.Pc = Pc
-        self.omega = omega
-        self.h_formation = h_formation
-        self.h_formation_ig = h_formation_ig
-        self.g_formation = g_formation
-        self.g_formation_ig = g_formation_ig
-
-        #Temperature dependent properties calculation functions:
-        self.volume_s_t = volume_s_t
-        self.volume_l_tp = volume_l_tp
-        self.volume_g_tp = volume_g_tp
-        self.heat_capacity_s_t = heat_capacity_s_t
-        self.heat_capacity_l_t = heat_capacity_l_t
-        self.heat_capacity_g_t = heat_capacity_g_t
-        #self.thermal_conductivity_s_tp = thermal_conductivity_s_tp 
-        self.thermal_conductivity_l_tp = thermal_conductivity_l_tp
-        self.thermal_conductivity_g_tp = thermal_conductivity_g_tp
-        self.viscosity_l_tp = viscosity_l_tp
-        self.viscosity_g_tp = viscosity_g_tp
-
-
-    def from_thermo_database(self, id_database):
-        """Method that creates the Substance object from thermo library. 
-        Cite: Caleb Bell and Contributors (2016-2021). Thermo: Chemical 
-        properties component of Chemical Engineering Design Library 
-        (ChEDL) https://github.com/CalebBell/thermo.
+    def from_thermo_database(self, ID):
+        """Method that use Bell Caleb's thermo library to construct the
+        Substance object. Cite: Caleb Bell and Contributors (2016-2021).
+        Thermo: Chemical properties component of Chemical Engineering 
+        Design Library (ChEDL) https://github.com/CalebBell/thermo.
 
         Parameters
         ----------
-        id_database : string
-            Identification of the substance. Could be name or CAS
-            number.
+        ID : string
+            Name or CAS number of the substance
         """
-        self.chemobj = Chemical(ID = id_database)
+        self.chemobj = Chemical(ID)
 
         #Pure compound properties:
         self.name = self.chemobj.name
@@ -138,47 +137,36 @@ class Substance:
         self.viscosity_l_tp = self.chemobj.ViscosityLiquid
         self.viscosity_g_tp = self.chemobj.ViscosityGas
 
-                                
     def volume_solid(self, T):
         return self.volume_s_t(T)
-
 
     def volume_liquid(self, T, P):
         return self.volume_l_tp(T, P)
 
-
     def volume_gas(self, T, P):
         return self.volume_g_tp(T, P)
-
 
     def heat_capacity_solid(self, T):
         return self.heat_capacity_s_t(T)
 
-
     def heat_capacity_liquid(self, T):
         return self.heat_capacity_l_t(T)
-
 
     def heat_capacity_gas(self, T):
         return self.heat_capacity_g_t(T)
 
-
     #def thermal_conductivity_solid(self, T, P):
-        #Not implemented
+        #Not implemented (not in thermo library)
     #    return self.thermal_conductivity_s_tp(T, P)
-
 
     def thermal_conductivity_liquid(self, T, P):
         return self.thermal_conductivity_l_tp(T, P)  
 
-
     def thermal_conductivity_gas(self, T, P):
         return self.thermal_conductivity_g_tp(T, P)
 
-
     def viscosity_liquid(self, T, P):
         return self.viscosity_l_tp(T, P)
-
 
     def viscosity_gas(self, T, P):
         return self.viscosity_g_tp(T, P) 
