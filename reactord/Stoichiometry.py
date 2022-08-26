@@ -23,8 +23,8 @@ class Stoichiometry:
     the matrix of coefficients must be introduced as:
 
     [[-1 -1 1 2 0] [0 -1 -1 1 0]]
-
     """
+    
     def __init__(self, reactions, total_comp, names=None):
         self.reactions=reactions
         self.total_comp= total_comp
