@@ -102,12 +102,15 @@ Fv = 1
 Ca0 = 1
 
 # Definicion de sistema reactivo
+
+
+#Falta introducir variacion de temperatura de ks
 rs = ReactiveSystem(
     ks=[kr],
     inflows=[Fv, 0],
     reactions=[
-        lambda ks, concentrations: -ks[0] * concentrations[0],
-        lambda ks, concentrations:  ks[0] * concentrations[0],        
+    lambda ks, concentrations: -ks[0] * concentrations[0],
+    lambda ks, concentrations:  ks[0] * concentrations[0],        
     ]
 )
 
