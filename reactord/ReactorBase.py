@@ -48,6 +48,3 @@ class PDEReactorBase(PDEBase):
 
     def solve(self):
         return None
-    
-    def outputs(self):
-        return None
