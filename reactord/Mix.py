@@ -1,0 +1,86 @@
+import numpy as np
+
+class Mix:
+    """ Set up of the initial conditions in the reactor."""
+    
+    def __init__(self, substance_list, phase):
+        self.substances= substance_list
+        self.phase= phase.lower()
+        
+    def concentrations(self, moles, T, P):
+        """" Reaction volume given moles of each compound, T and P.
+        Volumes are supposed to be aditive.
+
+        Parameters:
+        moles: float
+            moles of each substance
+        T: float
+            Temperature [K]
+        P: float
+           Total Pressure [Pa]
+        Vol: float 
+            Total volume of the mixture [m^3]
+        """
+        self.moles = np.array(moles)
+        Vol = 0
+        if self.phase == 'liquid':                        
+            for i,substance in enumerate (self.substances):
+                Vol = Vol + substance.volume_liquid(T, P) * self.moles[i]
+        elif self.phase == 'gas':
+            for i,substance in enumerate (self.substances):
+                Vol = Vol + substance.volume_gas(T, P) * self.moles[i]
+        self.conc= self.moles / Vol    #concentrations in moles/m^3
+        return self.conc
+      
+    def mol_frac(self, moles):
+        """Molar fractions calculator. 
+        zi are the molar fractions"""
+        self.moles= np.array(moles)
+        self.total_moles= sum (self.moles)
+        self.zi= self.moles / self.total_moles
+        return self.zi
+
+    def partial_P(self, moles, P):
+        """Partial Pressure calculations using molar fractions and total pressure.
+        zi are the molar fractions"""
+        self.moles= np.array(moles)
+        self.zi= self.mol_frac(self.moles)
+        self.Pp= self.zi * P
+        return self.Pp
+
+    def partial_P_2_conc (self, Pp, T):
+        R= 8.31446261815324 # J/mol.K
+        self.Pp= np.array(Pp)
+        self.conc= self.Pp /(R*T) # mol/m^3
+        return self.conc
+
+    def Set_concentrations(self,concentrations):
+        return np.array(concentrations)
+
+    def __str__ (self):
+        string=(f"The mixture is in {self.phase} phase and " 
+                f"contains the following {len(self.substances)} components:\n")
+        for i,substance in enumerate (self.substances):
+            string = string + substance.name + "\n"     
+        return string
+        """Observaciones: Quise hacer que devuelva un listado de concentraciones,
+        fracciones molares y presiones parciales cuando hacemos el print del
+        objeto, pero para eso tendría que calcular todo eso dentro de la funcion
+        __str__. Como los argumentos de las funciones implicadas NO son atributos
+        de la clase Mix, no lo puedo hacer (mejor dicho, no sé como hacerlo, si es
+        que se puede) 
+        """
+
+
+      
+
+
+        
+
+
+        
+
+
+                
+
+          

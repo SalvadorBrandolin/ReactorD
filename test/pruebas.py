@@ -1,6 +1,6 @@
-#from thermo import chemical
-#from Substance import Substance
-#from Stoichiometry import Stoichiometry
+from thermo import chemical
+from Substance import Substance
+from Stoichiometry import Stoichiometry
 
 #Estequieometria = Stoichiometry(3,4,['hidrolisis', 'oxidacion', 'combustion'])
 

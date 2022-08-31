@@ -44,9 +44,7 @@ class Mix:
         self.molar_frac= molar_frac
         self.total_moles= total_moles
         self.concentrations= concentrations
-        
-        #AGREGAR UNA COMPROBACION DE QUE LA SUMA DE Xi<=1
-        
+                      
         if self.concentrations == None:
             self.concentrations= np.zeros(len(self.component_list))
         if self.Par_p == None:
@@ -54,6 +52,8 @@ class Mix:
         if self.moles == None:
             self.moles=np.zeros(len(self.component_list))
         
+        #AGREGAR UNA COMPROBACION DE QUE LA SUMA DE Xi<=1
+
         #Concentrations given initial moles and volume:
         #if self.volume != None and self.moles != None:
         if self.volume !=None and ~any(self.moles):            
@@ -64,9 +64,9 @@ class Mix:
                 self.concentrations[idx]= self.moles[idx] / self.volume
                 #print(idx, component, self.concentrations[idx])
 
-        #Concentrations given total moles, volume and molar fractions: !!!!!!!!!!!!!!!!!!!!!!!!!
+        #Concentrations given total moles, volume and molar fractions: 
         if self.total_moles != None and self.molar_frac != None and self.volume != None:
-            ### SUMA DE FRACCIONES MOLARE sum(self.molar_frac)<=1.0
+            ### SUMA DE FRACCIONES MOLARES sum(self.molar_frac)<=1.0
             for idx, component in enumerate (self.component_list):
                 if self.volume <= 0:
                     print ("Volume must be different from zero")
