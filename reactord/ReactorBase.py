@@ -118,7 +118,8 @@ class ReactorBase:
             for i,(fin, fout) in enumerate(zip(self._f_in, self._f_out)):
                 if fin == 'var' and fout == 'var':
                     raise Exception("Not border conditions given for "
-                                    f"{self._mix[i].name}'s molar flow")
+                                    f"{self._mix.substances[i].name}'s molar" 
+                                    "flow")
         
         if self._thermal_operation == 'non-isothermal':
             if self._t_in == 'var' and self._t_out == 'var':
@@ -132,7 +133,8 @@ class ReactorBase:
                 if n0 == 'var' and nf == 'var':
                         raise Exception("Not border conditions given for "
                                         "initial or final reactor's molar "
-                                        f"load of: {self._mix[i].name}")
+                                        "load of:" 
+                                        f"{self._mix.substances[i].name}")
         
         if self._thermal_operation == 'non-isothermal':
             if self._t_initial == 'var' and self._t_final == 'var':
