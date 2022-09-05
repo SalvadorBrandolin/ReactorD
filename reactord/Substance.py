@@ -1,6 +1,6 @@
 from thermo.chemical import Chemical
 
-#c
+
 class Substance:
     """Substance object class
 
