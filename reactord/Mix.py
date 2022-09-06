@@ -7,7 +7,7 @@ class Mix:
         self.substances= substance_list
         self.phase= phase.lower()
         
-    def concentrations(self, moles, T, P):
+    def concentrations(self, moles, T, P, setConc=False):
         """" Reaction volume given moles of each compound, T and P.
         Volumes are supposed to be aditive.
 
@@ -29,34 +29,34 @@ class Mix:
         elif self.phase == 'gas':
             for i,substance in enumerate (self.substances):
                 Vol = Vol + substance.volume_gas(T, P) * self.moles[i]
-        self.conc= self.moles / Vol    #concentrations in moles/m^3
-        return self.conc
+        elif setConc == True: # PARA SETEAR CONCENTRACIONES A PARTIR DE LA DENSIDAD
+            pass              # Y ZI, O ALGUNA OTRA OPCION. QUEDA PENDIENTE.........
+        
+        conc= self.moles / Vol    #concentrations in moles/m^3
+        return conc
       
     def mol_frac(self, moles):
         """Molar fractions calculator. 
         zi are the molar fractions"""
         self.moles= np.array(moles)
-        self.total_moles= sum (self.moles)
-        self.zi= self.moles / self.total_moles
-        return self.zi
+        self.total_moles= sum(self.moles)
+        zi= self.moles / self.total_moles
+        return zi
 
     def partial_P(self, moles, P):
         """Partial Pressure calculations using molar fractions and total pressure.
         zi are the molar fractions"""
         self.moles= np.array(moles)
-        self.zi= self.mol_frac(self.moles)
-        self.Pp= self.zi * P
-        return self.Pp
+        zi= self.mol_frac(self.moles)
+        Pp= zi * P
+        return Pp
 
     def partial_P_2_conc (self, Pp, T):
         R= 8.31446261815324 # J/mol.K
         self.Pp= np.array(Pp)
-        self.conc= self.Pp /(R*T) # mol/m^3
-        return self.conc
-
-    def Set_concentrations(self,concentrations):
-        return np.array(concentrations)
-
+        conc= self.Pp /(R*T) # mol/m^3
+        return conc
+    
     def __str__ (self):
         string=(f"The mixture is in {self.phase} phase and " 
                 f"contains the following {len(self.substances)} components:\n")
