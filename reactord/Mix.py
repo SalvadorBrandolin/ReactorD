@@ -4,11 +4,14 @@ class Mix:
     """ Set up of the initial conditions in the reactor."""
     
     def __init__(self, substance_list, phase):
-        self.substances= substance_list
+        self.substances= substance_list #A list of objects
         self.phase= phase.lower()
         
     def concentrations(self, moles, T, P, setConc=False):
-        """" Reaction volume given moles of each compound, T and P.
+        """" Concentrations given moles of each compound, T and P.
+        The molar volume of each compound is calculated and the
+        total molar volume is calculated and used to return the
+        concentrations.
         Volumes are supposed to be aditive.
 
         Parameters:
@@ -18,23 +21,26 @@ class Mix:
             Temperature [K]
         P: float
            Total Pressure [Pa]
-        Vol: float 
-            Total volume of the mixture [m^3]
+        setConc: boolean
+            Allows to set concentrations directly. By default False
         """
-        self.moles = np.array(moles)
-        Vol = 0
+        
+        self.moles = np.array(moles)     
+        zi= self.mol_frac(self.moles)
+        Total_Molar_Vol = 0   # [m^3/mol]
         if self.phase == 'liquid':                        
-            for i,substance in enumerate (self.substances):
-                Vol = Vol + substance.volume_liquid(T, P) * self.moles[i]
+            for i, substance in enumerate (self.substances):
+                Total_Molar_Vol = Total_Molar_Vol + substance.volume_liquid(T, P) * zi[i]
         elif self.phase == 'gas':
-            for i,substance in enumerate (self.substances):
-                Vol = Vol + substance.volume_gas(T, P) * self.moles[i]
+            for i, substance in enumerate (self.substances):
+                Total_Molar_Vol = Total_Molar_Vol + substance.volume_gas(T, P) * zi[i]
+
         elif setConc == True: # PARA SETEAR CONCENTRACIONES A PARTIR DE LA DENSIDAD
             pass              # Y ZI, O ALGUNA OTRA OPCION. QUEDA PENDIENTE.........
         
-        conc= self.moles / Vol    #concentrations in moles/m^3
+        conc= zi / Total_Molar_Vol    #concentrations in moles/m^3     
         return conc
-      
+ 
     def mol_frac(self, moles):
         """Molar fractions calculator. 
         zi are the molar fractions"""
@@ -61,7 +67,7 @@ class Mix:
         string=(f"The mixture is in {self.phase} phase and " 
                 f"contains the following {len(self.substances)} components:\n")
         for i,substance in enumerate (self.substances):
-            string = string + substance.name + "\n"     
+            string = string + substance.name.capitalize() + "\n"     
         return string
         """Observaciones: Quise hacer que devuelva un listado de concentraciones,
         fracciones molares y presiones parciales cuando hacemos el print del
