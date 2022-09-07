@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Mix:
     """ Set up of the initial conditions in the reactor."""
     
@@ -41,6 +42,37 @@ class Mix:
         conc= zi / Total_Molar_Vol    #concentrations in moles/m^3     
         return conc
  
+    def volume(self, moles, T, P):
+        if self.phase == 'liquid':
+            pure_volumes = np.array([substance.volume_liquid(T,P) for substance
+                                    in self.substances 
+            ])
+            return sum(pure_volumes)
+
+        if self.phase == 'gas':
+            pure_volumes = np.array([substance.volume_gas(T,P) for substance
+                                    in self.substances 
+            ])
+            return sum(pure_volumes)
+        
+    def mix_heat_capacity(self, moles, T, set=None):
+        zi = self.mol_frac(moles)
+        if self.phase == 'liquid':
+            pure_cp = np.array([
+                                substance.heat_capacity_liquid(self, T) for 
+                                substance in self.substances
+            ])
+            mix_cp = np.dot(zi, pure_cp)
+            return mix_cp
+
+        elif self.phase == 'gas':
+            pure_cp = np.array([
+                                substance.heat_capacity_gas(self, T) for 
+                                substance in self.substances
+            ])
+            mix_cp = np.dot(zi, pure_cp)
+            return mix_cp
+
     def mol_frac(self, moles):
         """Molar fractions calculator. 
         zi are the molar fractions"""

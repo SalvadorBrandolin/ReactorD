@@ -2,7 +2,9 @@ from ..ReactorBase import ReactorBase
 from scipy.integrate import solve_bvp
 import numpy as np
 
+
 class Homogeneous_PFR(ReactorBase):
+    
     def __init__(
         self, mix, kinetic, t_operation,
         r_dims_minmax, 
@@ -58,32 +60,32 @@ class Homogeneous_PFR(ReactorBase):
         
         for i,(fin, fout) in enumerate(zip(self._f_in, self._f_out)):
             if fin is 'var':
-                in_guess[i,:] = np.ones(N) * fout
+                in_guess[i,:] = np.full((N,1), fout)
             else:
-                in_guess[i,:] = np.ones(N) * fin
+                in_guess[i,:] = np.full((N,1), fin)
         
         if self._thermal_operation.lower() == 'isothermal':
-            in_guess[-1,:] = np.ones(N) * self._t_in
+            in_guess[-1,:] = np.full((N,1), self._t_in)
         elif self._thermal_operation.lower() == 'non-isothermal':
             if self._t_in == 'var':
-                in_guess[-1,:] = np.ones(N) * self._t_out
+                in_guess[-1,:] = np.full((N,1), self._t_out)
             else:
-                in_guess[-1,:] = np.ones(N) * self._t_in
+                in_guess[-1,:] = np.full((N,1), self._t_in)
         return in_guess
                 
-    def _mass_balance(self,z,f,*args):
+    def _mass_balance(self,z,fs,*args):
         t,p,N = args
 
-        n = self._num_subs
+        n_comp = len(self._mix.substances)
         
         #kinetic evaluation on each of the N discretizations of z
-        kinetics_eval =  np.array([self.kinetic.func(f[:,i],t[i],p) 
+        kinetics_eval =  np.array([self.kinetic.func(fs[:,i],t[i],p) 
                                   for i in range(N)])
         #Tranversal area:
         A = self._transversal_a
         
         #Mass balance of the n substances in mix
-        dF_dz = np.array([A * kinetics_eval[i] for i in range(n)])
+        dF_dz = np.array([A * kinetics_eval[i] for i in range(n_comp)])
         
         return np.vstack(dF_dz)
 
@@ -98,11 +100,9 @@ class Homogeneous_PFR(ReactorBase):
         elif self._thermal_operation.lower() == 'non-isothermal':
             DH = self._kinetic.DH
             
-            mix = self._mix
-            
             ri = np.array([self._kinetic.rs(fs[:,i],t[i],p) for i in range(N)])
             
-            cpm = np.array([self._mix.heat_capasity(fs[:,i],t[i],p) 
+            cpm = np.array([self._mix.mix_heat_capasity(fs[:,i],t[i],p) 
                            for i in range(N)
                            ])
             
