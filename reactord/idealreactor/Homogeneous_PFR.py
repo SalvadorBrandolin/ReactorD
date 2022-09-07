@@ -88,7 +88,7 @@ class Homogeneous_PFR(ReactorBase):
         return np.vstack(dF_dz)
 
     def _energy_balance(self,z,t,*args):
-        f, N = args
+        fs, N = args
         p = self._p
         
         A = self._transversal_a
@@ -100,15 +100,15 @@ class Homogeneous_PFR(ReactorBase):
             
             mix = self._mix
             
-            ri = np.array([self._kinetic.rs(F[:,i],t[i],p) for i in range(N)])
+            ri = np.array([self._kinetic.rs(fs[:,i],t[i],p) for i in range(N)])
             
-            cpm = np.array([self._mix.heat_capasity(F[:,i],t[i],p) 
+            cpm = np.array([self._mix.heat_capasity(fs[:,i],t[i],p) 
                            for i in range(N)
                            ])
             
             Q_z = self._q(z)
             
-            dT_dz = ((Q_z - np.dot(-DH, ri)) / (sum(F) * cpm) * A)
+            dT_dz = ((Q_z - np.dot(-DH, ri)) / (sum(fs) * cpm) * A)
             
         return dT_dz
 
@@ -132,7 +132,7 @@ class Homogeneous_PFR(ReactorBase):
             #Mass balance
             dF_dz = self._mass_balance(z,fs,[t, self._p, N])
             #Energy balance
-            dT_dz = self._energy_balance(z,T,Fs,self._p)
+            dT_dz = self._energy_balance(z,t,fs,self._p)
 
             dvars_dz = np.append(dF_dz, dT_dz)
             return dvars_dz
