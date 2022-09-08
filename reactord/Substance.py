@@ -167,4 +167,4 @@ class Substance:
         return self._viscosity_l_tp(T, P)
 
     def viscosity_gas(self, T, P):
-        return self._viscosity_g_tp(T, P) 
+        return self._viscosity_g_tp(T, P)

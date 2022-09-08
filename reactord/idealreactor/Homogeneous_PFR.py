@@ -1,4 +1,4 @@
-from ..ReactorBase import ReactorBase
+from .. import ReactorBase
 from scipy.integrate import solve_bvp
 import numpy as np
 

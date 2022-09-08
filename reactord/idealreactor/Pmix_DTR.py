@@ -3,6 +3,7 @@ from scipy.integrate import solve_bvp
 import numpy as np
 
 
+
 class Pmix_DTR(ReactorBase):
     def __init__(self, mix, kinetic, t_operation, p_operation,
                 time_minmax, f_in, f_out, t_in, 
@@ -30,7 +31,7 @@ class Pmix_DTR(ReactorBase):
     def _border_condition_builder(self, ya, yb):
         bc = np.array([])
         for i,(n_in, n_fi) in enumerate(zip(self._n_initial, self._n_final)):
-            if n_in is 'var':
+            if n_in == 'var':
                 bc = np.append(bc, yb[i] - n_fi)
             else:
                 bc = np.append(bc, ya[i] - n_in)
@@ -58,7 +59,7 @@ class Pmix_DTR(ReactorBase):
         in_guess = np.zeros([n_comp+1,N])
         
         for i,(n_in, n_fi) in enumerate(zip(self._n_initial, self._n_final)):
-            if n_in is 'var':
+            if n_in == 'var':
                 in_guess[i,:] = np.full((N,1), n_fi)
             else:
                 in_guess[i,:] = np.full((N,1), n_in)
@@ -147,6 +148,3 @@ class Pmix_DTR(ReactorBase):
                         verbose=verbose)
 
         return z_array, sol.y
-
-
-
