@@ -3,7 +3,6 @@ from scipy.integrate import solve_bvp
 import numpy as np
 
 
-
 class Pmix_DTR(ReactorBase):
     def __init__(self, mix, kinetic, t_operation, p_operation,
                 time_minmax, f_in, f_out, t_in, 

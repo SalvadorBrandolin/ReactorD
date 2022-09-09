@@ -6,8 +6,6 @@ class Substance:
 
     Parameters
     ----------
-    id_database : string, optional
-        Name or CAS number of the substance, by default None
     name : string
         Name of the substance, by default None
     mw : float
@@ -26,7 +24,7 @@ class Substance:
     g_formation : float
         Standard state molar change of Gibbs energy of formation [J/mol]
         , by default None
-    g_formation : float
+    g_formation_ig : float
         Ideal-gas molar change of Gibbs energy of formation [J/mol], by 
         default None
     volume_s_t : function

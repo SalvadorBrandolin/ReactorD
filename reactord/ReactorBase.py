@@ -140,10 +140,7 @@ class ReactorBase:
             if self._t_initial == 'var' and self._t_final == 'var':
                 raise Exception("Not border condition given for initial or " 
                                 "final reactor's temperature")
-        else:
-            pass
-        pass
-
+        
     def _border_condition_builder(self):
         pass
 

@@ -28,18 +28,19 @@ class Mix:
         
         self.moles = np.array(moles)     
         zi= self.mol_frac(self.moles)
-        Total_Molar_Vol = 0   # [m^3/mol]
+        total_molar_vol = 0   # [m^3/mol]
+        #volumes = np.array([substance.volume_liquid(T, P) for substance in self.substances])
         if self.phase == 'liquid':                        
             for i, substance in enumerate (self.substances):
-                Total_Molar_Vol = Total_Molar_Vol + substance.volume_liquid(T, P) * zi[i]
+                total_molar_vol = total_molar_vol + substance.volume_liquid(T, P) * zi[i]
         elif self.phase == 'gas':
             for i, substance in enumerate (self.substances):
-                Total_Molar_Vol = Total_Molar_Vol + substance.volume_gas(T, P) * zi[i]
+                total_molar_vol = total_molar_vol + substance.volume_gas(T, P) * zi[i]
 
         elif setConc == True: # PARA SETEAR CONCENTRACIONES A PARTIR DE LA DENSIDAD
             pass              # Y ZI, O ALGUNA OTRA OPCION. QUEDA PENDIENTE.........
         
-        conc= zi / Total_Molar_Vol    #concentrations in moles/m^3     
+        conc= zi / total_molar_vol    #concentrations in moles/m^3     
         return conc
  
     def volume(self, moles, T, P):
@@ -47,13 +48,13 @@ class Mix:
             pure_volumes = np.array([substance.volume_liquid(T,P) for substance
                                     in self.substances 
             ])
-            return sum(pure_volumes)
+            return np.sum(pure_volumes)
 
         if self.phase == 'gas':
             pure_volumes = np.array([substance.volume_gas(T,P) for substance
                                     in self.substances 
             ])
-            return sum(pure_volumes)
+            return np.sum(pure_volumes)
         
     def mix_heat_capacity(self, moles, T, set=None):
         zi = self.mol_frac(moles)
