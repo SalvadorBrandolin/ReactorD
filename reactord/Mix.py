@@ -5,10 +5,10 @@ class Mix:
     """ Set up of the initial conditions in the reactor."""
     
     def __init__(self, substance_list, phase):
-        self.substances= substance_list #A list of objects
-        self.phase= phase.lower()
+        self.substances = substance_list #A list of objects
+        self.phase = phase.lower()
         
-    def concentrations(self, moles, T, P, setConc=False):
+    def concentrations(self, moles, temp, pressure, setConc = False):
         """" Concentrations given moles of each compound, T and P.
         The molar volume of each compound is calculated and the
         total molar volume is calculated and used to return the
@@ -18,29 +18,35 @@ class Mix:
         Parameters:
         moles: float
             moles of each substance
-        T: float
+        temp: float
             Temperature [K]
-        P: float
+        pressure: float
            Total Pressure [Pa]
         setConc: boolean
             Allows to set concentrations directly. By default False
         """
         
         self.moles = np.array(moles)     
-        zi= self.mol_frac(self.moles)
+        zi = self.mol_frac(self.moles)
         total_molar_vol = 0   # [m^3/mol]
-        #volumes = np.array([substance.volume_liquid(T, P) for substance in self.substances])
-        if self.phase == 'liquid':                        
-            for i, substance in enumerate (self.substances):
-                total_molar_vol = total_molar_vol + substance.volume_liquid(T, P) * zi[i]
-        elif self.phase == 'gas':
-            for i, substance in enumerate (self.substances):
-                total_molar_vol = total_molar_vol + substance.volume_gas(T, P) * zi[i]
 
+        if self.phase == 'liquid':
+            molar_volumes = np.array(
+                [substance.volume_liquid(temp, pressure) 
+                for substance in self.substances]
+            )                        
+            
+        elif self.phase == 'gas':
+            molar_volumes = np.array(
+                [substance.volume_gas(temp, pressure) 
+                for substance in self.substances]
+            )
+            
         elif setConc == True: # PARA SETEAR CONCENTRACIONES A PARTIR DE LA DENSIDAD
             pass              # Y ZI, O ALGUNA OTRA OPCION. QUEDA PENDIENTE.........
         
-        conc= zi / total_molar_vol    #concentrations in moles/m^3     
+        total_molar_vol = np.dot(molar_volumes, zi)
+        conc = zi / total_molar_vol    #concentrations in moles/m^3     
         return conc
  
     def volume(self, moles, T, P):
