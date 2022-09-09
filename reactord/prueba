@@ -1,0 +1,3 @@
+from Substance import Substance
+
+agua = Substance.from_thermo_database('water')
