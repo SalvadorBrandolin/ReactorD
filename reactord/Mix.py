@@ -9,7 +9,7 @@ class Mix:
         self.phase = phase.lower()
         
     def concentrations(self, moles, temp, pressure, setConc = False):
-        """" Concentrations given moles of each compound, T and P.
+        """ Concentrations given moles of each compound, T and P.
         The molar volume of each compound is calculated and the
         total molar volume is calculated and used to return the
         concentrations.
@@ -27,7 +27,7 @@ class Mix:
         """
         
         self.moles = np.array(moles)     
-        zi = self.mol_frac(self.moles)
+        zi = self.mol_frac(self.moles) # zi are the molar fractions
         total_molar_vol = 0   # [m^3/mol]
 
         if self.phase == 'liquid':
@@ -49,57 +49,54 @@ class Mix:
         conc = zi / total_molar_vol    #concentrations in moles/m^3     
         return conc
  
-    def volume(self, moles, T, P):
+    def volume(self, moles, temp, pressure):
         if self.phase == 'liquid':
-            pure_volumes = np.array([substance.volume_liquid(T,P) for substance
+            pure_volumes = np.array([substance.volume_liquid(temp, pressure) for substance
                                     in self.substances 
             ])
-            return np.sum(pure_volumes)
+            return np.dot(pure_volumes, moles)
 
         if self.phase == 'gas':
-            pure_volumes = np.array([substance.volume_gas(T,P) for substance
+            pure_volumes = np.array([substance.volume_gas(temp, pressure) for substance
                                     in self.substances 
             ])
-            return np.sum(pure_volumes)
+            return np.dot(pure_volumes, moles)
         
-    def mix_heat_capacity(self, moles, T, set=None):
+    def mix_heat_capacity(self, moles, temp, set=None):
         zi = self.mol_frac(moles)
-        if self.phase == 'liquid':
+        if self.phase == 'liquid':            
             pure_cp = np.array([
-                                substance.heat_capacity_liquid(self, T) for 
+                                substance.heat_capacity_liquid(temp) for 
                                 substance in self.substances
-            ])
-            mix_cp = np.dot(zi, pure_cp)
-            return mix_cp
-
+            ])            
         elif self.phase == 'gas':
             pure_cp = np.array([
-                                substance.heat_capacity_gas(self, T) for 
+                                substance.heat_capacity_gas(temp) for 
                                 substance in self.substances
             ])
-            mix_cp = np.dot(zi, pure_cp)
-            return mix_cp
+        mix_cp = np.dot(zi, pure_cp)
+        return mix_cp
 
     def mol_frac(self, moles):
         """Molar fractions calculator. 
-        zi are the molar fractions"""
-        self.moles= np.array(moles)
-        self.total_moles= sum(self.moles)
-        zi= self.moles / self.total_moles
+        zi is a np array with the molar fractions"""
+        self.moles = np.array(moles)
+        self.total_moles = sum(self.moles)
+        zi = self.moles / self.total_moles
         return zi
 
-    def partial_P(self, moles, P):
-        """Partial Pressure calculations using molar fractions and total pressure.
-        zi are the molar fractions"""
-        self.moles= np.array(moles)
-        zi= self.mol_frac(self.moles)
-        Pp= zi * P
-        return Pp
+    def partial_p(self, moles, pressure):
+        """Partial pressure calculations using molar fractions and total pressure.
+        zi is a np array with the molar fractions"""
+        self.moles = np.array(moles)
+        zi = self.mol_frac(self.moles)
+        par_p = zi * pressure
+        return par_p
 
-    def partial_P_2_conc (self, Pp, T):
-        R= 8.31446261815324 # J/mol.K
-        self.Pp= np.array(Pp)
-        conc= self.Pp /(R*T) # mol/m^3
+    def partial_p2conc (self, par_p, temp):
+        R = 8.31446261815324 # J/mol.K
+        self.par_p = np.array(par_p)
+        conc = self.par_p / (R*temp) # mol/m^3
         return conc
     
     def __str__ (self):
