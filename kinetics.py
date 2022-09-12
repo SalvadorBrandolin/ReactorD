@@ -1,30 +1,42 @@
 import numpy as np
+from thermo.eos import R
+from Mix import Mix
+from Stoichiometry import Stoichiometry
+from Substance import Substance
 
-class Kinetics:
-    """Kinetics object class"
+#A -> B reaction1
+#A -> C reaction2
 
-    Parameters
-    ----------
-    ri: array of all kinetics reactions laws in the system.
-    stoichiometry: array of coefficients of reagents with shape (r,c)
-    Where r is the number of reactions and c number of compounds
-    Each reaction row must start with the reaget coefficient which government the kinetics law.
-    """
+def reaction1(concentrations,T):
+    return 10*np.exp(-5000/(R*T))*concentrations[0]
+
+def reaction2(concentrations,T):
+    return -8*np.exp(-6000/(R*T))*concentrations[0]
 
 
-    def __init__(self, ri, stoichiometry):
-        self.ri=ri
-        self.stoichiometry= stoichiometry
+list_of_r = [reaction1, reaction2]
+water= Substance.from_thermo_database("water")
+ether= Substance.from_thermo_database("ether")
+methane= Substance.from_thermo_database("methane")
 
-        self.r_compounds= np.zeros(self.stoichiometry.shape)
+mix_p=Mix([water,ether, methane], "liquid")
+stoichiometry_p=Stoichiometry(2, 3)
 
-        for i in self.stoichiometry:
-            self.r_compounds[i]=self.stoichiometry[i]*self.ri(i)
+class Kinetics():
+    def __init__(self,list_of_r, Mix, Stoichiometry):
+        self.list_of_r = list_of_r
+        self.mix = Mix
+        self.stoichiometry = Stoichiometry.coefficients
 
-#%%
-ri=np.array([2,2])
-st=np.array([[-1, 1, 0],[-1, 2, 3]])
+    def kinetic_eval(self, moles,T,P):
+        concentrations = self.mix.concentrations(moles,T,P)
+        kinetic_evaluated = np.array([kinetic(concentrations,T) for kinetic in
+                                     self.list_of_r])
+        kinetic_stoichiometry = np.array([self.stoichiometry[i]*kinetic_evaluated[i] 
+                                         for i in enumerate(self.list_of_r)])
+        return kinetic_stoichiometry
 
-a=Kinetics(ri,st)
+cinetica = Kinetics(list_of_r,mix_p,stoichiometry_p)
 
-print (a)
+a=cinetica.kinetic_eval([1, 1, 2], 300, 1)
+print(a)
