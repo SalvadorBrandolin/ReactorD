@@ -2,105 +2,175 @@ import numpy as np
 
 
 class Mix:
-    """ Set up of the initial conditions in the reactor."""
+    """Mixture object generator class.
+
+        Parameters
+        ----------
+        substance_list : ndarray or list[Substance objects]
+            list or array of Substance objects.            
+        phase : string
+            string that indicates the phase nature of the mixture. The
+            avaliable options are: 'liquid', 'gas'.
+        """
     
     def __init__(self, substance_list, phase):
-        self.substances = substance_list #A list of objects
+        self.substances = substance_list
         self.phase = phase.lower()
         
-    def concentrations(self, moles, temp, pressure, setConc = False):
-        """" Concentrations given moles of each compound, T and P.
-        The molar volume of each compound is calculated and the
-        total molar volume is calculated and used to return the
-        concentrations.
-        Volumes are supposed to be aditive.
-
+    def concentrations(self, moles, temperature, pressure):
+        """Concentrations of the mixtures substances at the given moles 
+        of each compound, temperature and pressure.
+        
         Parameters:
-        moles: float
+        moles: ndarray or list [float]
             moles of each substance
-        temp: float
+        temperature: float
             Temperature [K]
         pressure: float
            Total Pressure [Pa]
-        setConc: boolean
-            Allows to set concentrations directly. By default False
+                
+        Returns
+        -------
+        ndarray [float]
+            ndarray that contains the concentrations of the mixture's 
+            substances [mol/m^3]
         """
-        
+
         self.moles = np.array(moles)     
-        zi = self.mol_frac(self.moles)
-        total_molar_vol = 0   # [m^3/mol]
+        zi = self.mol_fracations(self.moles)
+        total_molar_vol = 0
 
         if self.phase == 'liquid':
             molar_volumes = np.array(
-                [substance.volume_liquid(temp, pressure) 
+                [substance.volume_liquid(temperature, pressure) 
                 for substance in self.substances]
             )                        
             
         elif self.phase == 'gas':
             molar_volumes = np.array(
-                [substance.volume_gas(temp, pressure) 
+                [substance.volume_gas(temperature, pressure) 
                 for substance in self.substances]
             )
             
-        elif setConc == True: # PARA SETEAR CONCENTRACIONES A PARTIR DE LA DENSIDAD
-            pass              # Y ZI, O ALGUNA OTRA OPCION. QUEDA PENDIENTE.........
-        
         total_molar_vol = np.dot(molar_volumes, zi)
-        conc = zi / total_molar_vol    #concentrations in moles/m^3     
-        return conc
+        concentrations = np.divide(zi, total_molar_vol) #moles/m^3     
+        return concentrations
  
-    def volume(self, moles, T, P):
+    def volume(self, moles, temperature, pressure):
+        """Method that returns the volume of the mixture.
+
+        Parameters
+        ----------
+        moles: ndarray or list [float]
+            moles of each substance
+        temperature: float
+            Temperature [K]
+        pressure: float
+           Total Pressure [Pa]
+
+        Returns
+        -------
+        float
+            volume of the mixture [m^3]
+        """
         if self.phase == 'liquid':
-            pure_volumes = np.array([substance.volume_liquid(T,P) for substance
-                                    in self.substances 
-            ])
-            return np.sum(pure_volumes)
+            pure_volumes = np.array(
+                [substance.volume_liquid(temperature, pressure) 
+                for substance in self.substances]
+            )
+            return np.dot(pure_volumes, moles)
 
         if self.phase == 'gas':
-            pure_volumes = np.array([substance.volume_gas(T,P) for substance
-                                    in self.substances 
-            ])
-            return np.sum(pure_volumes)
+            pure_volumes = np.array(
+                [substance.volume_gas(temperature, pressure) 
+                for substance in self.substances]
+            )
+            return np.dot(pure_volumes, moles)
         
-    def mix_heat_capacity(self, moles, T, set=None):
-        zi = self.mol_frac(moles)
+    def mix_heat_capacity(self, moles, temperature, pressure):
+        """Method that returns the heat capacity of the mixture.
+
+        Parameters
+        ----------
+        moles: ndarray or list [float]
+            moles of each substance
+        temperature: float
+            Temperature [K]
+        pressure: float
+           Total Pressure [Pa]
+
+        Returns
+        -------
+        float
+            heat capacity of the mixture [j/mol/K)] 
+        """
+
+        zi = self.mol_fracations(moles)
+
         if self.phase == 'liquid':
-            pure_cp = np.array([
-                                substance.heat_capacity_liquid(self, T) for 
-                                substance in self.substances
-            ])
+            pure_cp = np.array(
+                [substance.heat_capacity_liquid(self, temperature) 
+                for substance in self.substances]
+            )
             mix_cp = np.dot(zi, pure_cp)
             return mix_cp
 
         elif self.phase == 'gas':
             pure_cp = np.array([
-                                substance.heat_capacity_gas(self, T) for 
-                                substance in self.substances
-            ])
+                                substance.heat_capacity_gas(self, temperature) 
+                                for substance in self.substances]
+            )
             mix_cp = np.dot(zi, pure_cp)
             return mix_cp
 
-    def mol_frac(self, moles):
-        """Molar fractions calculator. 
-        zi are the molar fractions"""
-        self.moles= np.array(moles)
-        self.total_moles= sum(self.moles)
-        zi= self.moles / self.total_moles
+    def mol_fracations(self, moles):
+        """method that calculates the molar fractions of the mixture
+
+        Parameters
+        ----------
+        moles: ndarray or list [float]
+            moles of each substance
+
+        Returns
+        -------
+        ndarray
+            array that contains the molar fractions of mixture's 
+            substances
+        """
+        total_moles = np.sum(moles)
+        zi = np.divide(self.moles, total_moles)
         return zi
 
-    def partial_P(self, moles, P):
-        """Partial Pressure calculations using molar fractions and total pressure.
-        zi are the molar fractions"""
-        self.moles= np.array(moles)
-        zi= self.mol_frac(self.moles)
-        Pp= zi * P
-        return Pp
+    def partial_pressures(self, moles, temperature, pressure):
+        """method that calculates the partial pressures of the mixture
 
-    def partial_P_2_conc (self, Pp, T):
+        Parameters
+        ----------
+        moles: ndarray or list [float]
+            moles of each substance
+        temperature: float
+            Temperature [K]
+        pressure: float
+           Total Pressure [Pa]
+
+        Returns
+        -------
+        ndarray
+            array that contains the partial pressures of mixture's 
+            substances
+        """
+        zi = self.mol_fracations(self.moles)
+        partial_pressures= np.multiply(zi, pressure)
+        return partial_pressures
+
+    def partial_P_2_conc (self, partial_pressures, T):
         R= 8.31446261815324 # J/mol.K
-        self.Pp= np.array(Pp)
-        conc= self.Pp /(R*T) # mol/m^3
+        self.partial_pressures= np.array(partial_pressures)
+        conc= self.partial_pressures /(R*T) # mol/m^3
         return conc
+
+    def __len__(self):
+        return len(self.substances)
     
     def __str__ (self):
         string=(f"The mixture is in {self.phase} phase and " 
