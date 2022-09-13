@@ -185,17 +185,3 @@ class Mix:
         de la clase Mix, no lo puedo hacer (mejor dicho, no sé como hacerlo, si es
         que se puede) 
         """
-
-
-      
-
-
-        
-
-
-        
-
-
-                
-
-          
