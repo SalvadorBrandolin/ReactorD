@@ -1,4 +1,5 @@
 import numpy as np
+from thermo.eos import R
 
 
 class Mix:
@@ -54,8 +55,7 @@ class Mix:
             pure_volumes = np.array([substance.volume_liquid(temp, pressure) for substance
                                     in self.substances 
             ])
-            return np.dot(pure_volumes, moles)
-
+            
         if self.phase == 'gas':
             pure_volumes = np.array([substance.volume_gas(temp, pressure) for substance
                                     in self.substances 
@@ -74,6 +74,7 @@ class Mix:
                                 substance.heat_capacity_gas(temp) for 
                                 substance in self.substances
             ])
+            
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
 
@@ -94,7 +95,6 @@ class Mix:
         return par_p
 
     def partial_p2conc (self, par_p, temp):
-        R = 8.31446261815324 # J/mol.K
         self.par_p = np.array(par_p)
         conc = self.par_p / (R*temp) # mol/m^3
         return conc
