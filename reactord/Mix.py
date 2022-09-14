@@ -87,7 +87,7 @@ class Mix:
             )
             return np.dot(pure_volumes, moles)
         
-    def mix_heat_capacity(self, moles, temperature, pressure):
+    def mix_heat_capacity(self, moles, temperature): #La presion no se usa, LA BORRÉ
         """Method that returns the heat capacity of the mixture.
 
         Parameters
