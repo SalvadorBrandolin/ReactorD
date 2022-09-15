@@ -87,7 +87,7 @@ class Mix:
             )
             return np.dot(pure_volumes, moles)
         
-    def mix_heat_capacity(self, moles, temperature): #La presion no se usa, LA BORRÉ
+    def mix_heat_capacity(self, moles, temperature): 
         """Method that returns the heat capacity of the mixture.
 
         Parameters
@@ -109,7 +109,7 @@ class Mix:
 
         if self.phase == 'liquid':
             pure_cp = np.array(
-                [substance.heat_capacity_liquid(self, temperature) 
+                [substance.heat_capacity_liquid(temperature) 
                 for substance in self.substances]
             )
             mix_cp = np.dot(zi, pure_cp)
@@ -117,7 +117,7 @@ class Mix:
 
         elif self.phase == 'gas':
             pure_cp = np.array([
-                                substance.heat_capacity_gas(self, temperature) 
+                                substance.heat_capacity_gas(temperature) 
                                 for substance in self.substances]
             )
             mix_cp = np.dot(zi, pure_cp)
@@ -138,7 +138,7 @@ class Mix:
             substances
         """
         total_moles = np.sum(moles)
-        zi = np.divide(self.moles, total_moles)
+        zi = np.divide(moles, total_moles)
         return zi
 
     def partial_pressures(self, moles, temperature, pressure):
@@ -159,7 +159,7 @@ class Mix:
             array that contains the partial pressures of mixture's 
             substances
         """
-        zi = self.mol_fracations(self.moles)
+        zi = self.mol_fracations(moles)
         partial_pressures= np.multiply(zi, pressure)
         return partial_pressures
 
