@@ -92,8 +92,16 @@ class Kinetics:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates 
 
-    def reaction_enthalpy(self, temperature, pressure):
-        pass  
+    # def reaction_enthalpy(self, temperature, pressure) 
+    # Habrá que mejorar esto si hacemos que la entalpia varíe con la T...
+    #Por ahora queda asi:
+    def reaction_enthalpy(self):
+        d_H = []
+        for reaction in self.stoichiometry:
+            d_H.append (np.dot(reaction, self.mix.formation_enthalpies))
+        d_H = np.array(d_H)  
+        return d_H 
+
 
 
 #DE ACA PARA ABAJO SOLAMENTE SE PRUEBA LA CLASE:
@@ -121,5 +129,15 @@ cinetica = Kinetics(list_of_reactions, mix_p, stoichiometry_p)
 a, b = cinetica.kinetic_eval([1, 1, 2], 300, 101325)
 
 print(a)
-
 print(b)
+
+print (f"Las entalpias de reaccion son: {cinetica.reaction_enthalpy()}")
+
+## ALGUNAS PRUEBAS PARA EL METODO reaction_enthalpy
+#A=cinetica.stoichiometry
+#dot1= np.dot(A[0],cinetica.mix.formation_enthalpies)
+#dot2= np.dot(A[1],cinetica.mix.formation_enthalpies)
+#print(A[0], cinetica.mix.formation_enthalpies, dot1)
+#print(A[1], cinetica.mix.formation_enthalpies, dot2)
+
+

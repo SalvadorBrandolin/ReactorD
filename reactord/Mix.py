@@ -16,6 +16,10 @@ class Mix:
     def __init__(self, substance_list, phase):
         self.substances = substance_list
         self.phase = phase.lower()
+        self.formation_enthalpies = [
+            substance.h_formation for substance in self.substances
+        ]        
+ 
         
     def concentrations(self, moles, temperature, pressure):
         """Concentrations of the mixtures substances at the given moles 
