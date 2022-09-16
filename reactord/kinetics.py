@@ -11,12 +11,11 @@ class Kinetics:
     Parameters
     ----------
     list_of_reactions : ndarray or list [function]
-        array that constains user defined python function with the 
-        form: function(kinetic_argument, temperature) where argument is 
-        an (number_of_components,) dimension array that contains the 
-        concentration unit of meassure of each system substance. 
-        E.g: concentration [mol/m3] or partial pressure [Pa] of
-        the substances.            
+        array that constains user defined python functions with the 
+        form: function(composition, temperature) where 
+        composition is a (number_of_components) dimension array
+        that contains the partial pressures [Pa] or the concentrations
+        of the substances.            
     mix : Mix object
         Mix object defined with all the substances present in the system
     stoichiometry : Stoichiometry object
@@ -26,12 +25,12 @@ class Kinetics:
         kinetic rate function are evaluated. Avaliable options: 
         'concentration', 'partial_pressure'
     enthalpy_of_reaction : ndarray or list, optional
-        array that contains the enthalpy of reaction of each reaction in
-        list_of_reactions [j/mol/K]. Elements of the list may be set as
-        None, then, that values are calculated using the heat capasity 
-        and enthalpy of formation of the substances on mix. Single 
-        None value is accepted and all the values are calculated,
-        default = None.
+        array that contains the enthalpy of reaction of each reaction 
+        in list_of_reactions [j/mol/K]. Elements of the list may be set
+        as None, then, that values are calculated using the heat
+        capacity and enthalpy of formation of the substances on mix. 
+        Single None value is accepted and all the values are 
+        calculated, default = None.
     """
 
     def __init__(self, 
@@ -45,15 +44,17 @@ class Kinetics:
         self.reactions = list_of_reactions
         self.mix = mix
         self.stoichiometry = stoichiometry.coefficients
-        self.argument = kinetic_argument
-
-        if kinetic_argument.lower() == 'concentration':
-            self._kinetic_argument_function = self.mix.concentrations
-        elif kinetic_argument.lower() == 'partial_pressure':
-            self._kinetic_argument_function = self.mix.partial_pressures
+        self.argument = kinetic_argument.lower()
+        
+        # The method <concentrations> from the class Mix is
+        # assigned to self._composition_calculator 
+        if self.argument == 'concentration':
+            self._composition_calculator = self.mix.concentrations
+        elif self.argument == 'partial_pressure':
+            self._composition_calculator = self.mix.partial_pressures
         else:
             raise ValueError(
-                f"{kinetic_argument} is not a valid kinetic argument"
+                f"{self.argument} is not a valid kinetic argument"
             )
         
         if enthalpy_of_reaction is None:
@@ -80,20 +81,21 @@ class Kinetics:
         ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡NO SE DOCUMENTAR ESTA SALIDA!!!!!!!!!!!!!!!!!
 
         """
-        arg = self._kinetic_argument_function(moles, temperature, pressure)
+        # The partial pressures or concentrations are calculated:
+        composition = self._composition_calculator(moles, temperature, pressure)
         
+        # Rates for each individual reaction:
         reaction_rates = np.array(
-            [reaction(arg, temperature) for reaction in self.reactions]               
+            [reaction(composition, temperature) for reaction in self.reactions]               
         )
-             
+        # Rates for each compound:     
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
-        
-        return rates_i, reaction_rates
+        return rates_i, reaction_rates 
 
     def reaction_enthalpy(self, temperature, pressure):
         pass  
 
-"""
+
 #DE ACA PARA ABAJO SOLAMENTE SE PRUEBA LA CLASE:
 #Ejemplo
 #A -> B reaction1
@@ -121,4 +123,3 @@ a, b = cinetica.kinetic_eval([1, 1, 2], 300, 101325)
 print(a)
 
 print(b)
-"""
