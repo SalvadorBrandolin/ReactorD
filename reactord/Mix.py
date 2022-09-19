@@ -16,10 +16,16 @@ class Mix:
     def __init__(self, substance_list, phase):
         self.substances = substance_list
         self.phase = phase.lower()
-        self.formation_enthalpies = [
-            substance.h_formation for substance in self.substances
-        ]        
- 
+        if self.phase == 'liquid':
+            self.h_formations = [
+                substance.h_formation for substance in self.substances
+            ]
+        elif self.phase == 'gas':
+                self.h_formations = [
+                substance.h_formation_ig for substance in self.substances
+            ]
+        else:
+            raise ValueError(f'{self.phase} is not a supported phase') 
         
     def concentrations(self, moles, temperature, pressure):
         """Concentrations of the mixtures substances at the given moles 

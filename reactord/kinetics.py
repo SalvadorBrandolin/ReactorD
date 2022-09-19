@@ -3,6 +3,7 @@ from thermo.eos import R
 from Mix import Mix
 from Stoichiometry import Stoichiometry
 from Substance import Substance
+from scipy.integrate import quad
 
 
 class Kinetics:
@@ -45,6 +46,7 @@ class Kinetics:
         self.mix = mix
         self.stoichiometry = stoichiometry.coefficients
         self.argument = kinetic_argument.lower()
+        self.standard_reactions_enthalpy = self._standard_reaction_enthalpy()
         
         # The method <concentrations> from the class Mix is
         # assigned to self._composition_calculator 
@@ -92,22 +94,37 @@ class Kinetics:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates 
 
-    # def reaction_enthalpy(self, temperature, pressure) 
-    # Habrá que mejorar esto si hacemos que la entalpia varíe con la 
-    # temperatura...
-    # Otra aclaracion: En la clase Substance hay un atributo llamado
-    # h_formation_ig (entalpia de formacion para gases ideales).
-    # En algun momento habria que considerar usarlo para el calculo
-    # de entalpias de reaccion en gases ideales.
-    # Por ahora el método queda asi:
-    def reaction_enthalpy(self):
-        d_H = []
-        for reaction in self.stoichiometry:
-            d_H.append(np.dot(reaction, self.mix.formation_enthalpies))
-        d_H = np.array(d_H)  
-        return d_H 
+    def _standard_reaction_enthalpy(self):
+        return np.dot(self.stoichiometry, self.mix.h_formations)
 
+    def reaction_enthalpy(self, temperature, pressure):
+        t_0 = 298.15
 
+        if self.mix.phase == 'liquid':
+            cp_dt_integrals = np.array([])
+
+            for substance in self.mix.substances:
+                cp_dt_integral, error = quad(
+                    substance.heat_capacity_liquid, t_0, temperature
+                )
+                cp_dt_integrals = np.append(cp_dt_integrals, cp_dt_integral)
+            
+            dh = np.dot(self.stoichiometry, cp_dt_integrals)
+
+        if self.mix.phase == 'gas':
+            cp_dt_integrals = np.array([])
+
+            for substance in self.mix.substances:
+                cp_dt_integral, error = quad(
+                    substance.heat_capacity_gas, t_0, temperature
+                )
+                cp_dt_integrals = np.append(cp_dt_integrals, cp_dt_integral)
+            
+            dh = np.dot(self.stoichiometry, cp_dt_integrals)
+
+        return (dh + self.standard_reactions_enthalpy)
+
+"""
 #DE ACA PARA ABAJO SOLAMENTE SE PRUEBA LA CLASE:
 #Ejemplo
 #A -> B reaction1
@@ -143,5 +160,4 @@ print (f"Las entalpias de reaccion son: {cinetica.reaction_enthalpy()}")
 #dot2= np.dot(A[1],cinetica.mix.formation_enthalpies)
 #print(A[0], cinetica.mix.formation_enthalpies, dot1)
 #print(A[1], cinetica.mix.formation_enthalpies, dot2)
-
-
+"""

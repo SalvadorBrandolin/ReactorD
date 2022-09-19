@@ -12,7 +12,7 @@ benzene = Substance.from_thermo_database('benzene')
 
 mezcla= Mix([agua, ether, benzene], 'gas')
 moles= [1000, 2000, 3000]
-print (f"Las entalpias de formacion son: {mezcla.formation_enthalpies}")
+print (f"Las entalpias de formacion son: {mezcla.h_formations}")
 print(f"entalpia agua: {benzene.h_formation}")
 #print(mezcla.phase)
 #print(f"concentraciones en fase {mezcla.phase}: {mezcla.concentrations(moles, 273.15, 101325)}")
