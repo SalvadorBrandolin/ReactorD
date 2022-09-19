@@ -93,15 +93,19 @@ class Kinetics:
         return rates_i, reaction_rates 
 
     # def reaction_enthalpy(self, temperature, pressure) 
-    # Habrá que mejorar esto si hacemos que la entalpia varíe con la T...
-    #Por ahora queda asi:
+    # Habrá que mejorar esto si hacemos que la entalpia varíe con la 
+    # temperatura...
+    # Otra aclaracion: En la clase Substance hay un atributo llamado
+    # h_formation_ig (entalpia de formacion para gases ideales).
+    # En algun momento habria que considerar usarlo para el calculo
+    # de entalpias de reaccion en gases ideales.
+    # Por ahora el método queda asi:
     def reaction_enthalpy(self):
         d_H = []
         for reaction in self.stoichiometry:
-            d_H.append (np.dot(reaction, self.mix.formation_enthalpies))
+            d_H.append(np.dot(reaction, self.mix.formation_enthalpies))
         d_H = np.array(d_H)  
         return d_H 
-
 
 
 #DE ACA PARA ABAJO SOLAMENTE SE PRUEBA LA CLASE:

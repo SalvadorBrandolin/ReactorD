@@ -80,7 +80,7 @@ class ReactorBase:
         self._mix = mix
         self._kinetic = kinetic
         
-        # Checking supported thermal, pressure
+        # Checking supported thermal, pressure 
         if t_operation in ['isothermal', 'non-isothermal']:
             self._thermal_operation = t_operation
         else:
@@ -110,8 +110,9 @@ class ReactorBase:
         self._degree_of_fredoom_check()
                 
     def _degree_of_fredoom_check(self):
-        """Method to guarantee the minimum information given to the
-        Reactor instantiation to solve mass, pressure and energy balance
+        """Method to guarantee that the minimum information is given
+        to the Reactor instantiation to solve mass, pressure and energy 
+        balances
         """
 
         if (self._r_dims_minmax or self._r_volume) is not None:
