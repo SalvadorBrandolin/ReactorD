@@ -46,7 +46,7 @@ class Kinetics:
         self.mix = mix
         self.stoichiometry = stoichiometry.coefficients
         self.argument = kinetic_argument.lower()
-        self.standard_reactions_enthalpy = self._standard_reaction_enthalpy()
+        self.std_reaction_enthalpies = self._std_reaction_enthalpies()
         
         # The method <concentrations> from the class Mix is
         # assigned to self._composition_calculator 
@@ -59,6 +59,7 @@ class Kinetics:
                 f"{self.argument} is not a valid kinetic argument"
             )
         
+        # The array for enthalpies of reaction is allocated:
         if enthalpy_of_reaction is None:
             self._enthalpy_of_reaction_data = np.full(
                 len(self.stoichiometry), None
@@ -94,10 +95,11 @@ class Kinetics:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates 
 
-    def _standard_reaction_enthalpy(self):
+    def _std_reaction_enthalpies(self):  #  Standard Enthalpies for 
+                                         #  each reaction
         return np.dot(self.stoichiometry, self.mix.h_formations)
 
-    def reaction_enthalpy(self, temperature, pressure):
+    def reaction_enthalpies(self, temperature, pressure):
         t_0 = 298.15
 
         if self.mix.phase == 'liquid':
@@ -122,14 +124,14 @@ class Kinetics:
             
             dh = np.dot(self.stoichiometry, cp_dt_integrals)
 
-        return (dh + self.standard_reactions_enthalpy)
+        return (dh + self.std_reaction_enthalpies)
 
-"""
-#DE ACA PARA ABAJO SOLAMENTE SE PRUEBA LA CLASE:
-#Ejemplo
-#A -> B reaction1
-#A -> C reaction2
-# [[-1,1,0],[-1,0,1]] La matiz que ingreso por teclado para estas reacciones
+
+# TEST FOR A SYSTEM COMPRISED OF 2 DIFFERENT REACTIONS WITH
+# 3 COMPONENTS
+# A -> B reaction1
+# A -> C reaction2
+# [[-1,1,0],[-1,0,1]] La matriz que ingreso por teclado para estas reacciones
 def reaction1(concentrations, temperature):
     return 10 * np.exp(-5000 / (R*temperature)) * concentrations[0]
 
@@ -147,17 +149,45 @@ stoichiometry_p = Stoichiometry([[-1,1,0],[-1,0,1]])
 
 cinetica = Kinetics(list_of_reactions, mix_p, stoichiometry_p)
 
-a, b = cinetica.kinetic_eval([1, 1, 2], 300, 101325)
+rates_i, rate_rxns = cinetica.kinetic_eval([1, 1, 2], 300, 101325)
 
-print(a)
-print(b)
+print(f"velocidades por componente: {rates_i}")
+print(f"velocidades por reaccion: {rate_rxns}")
 
-print (f"Las entalpias de reaccion son: {cinetica.reaction_enthalpy()}")
+print(f"Las entalpias de reaccion son: " 
+        f"{cinetica.reaction_enthalpies(500, 101325)}")
 
-## ALGUNAS PRUEBAS PARA EL METODO reaction_enthalpy
-#A=cinetica.stoichiometry
-#dot1= np.dot(A[0],cinetica.mix.formation_enthalpies)
-#dot2= np.dot(A[1],cinetica.mix.formation_enthalpies)
-#print(A[0], cinetica.mix.formation_enthalpies, dot1)
-#print(A[1], cinetica.mix.formation_enthalpies, dot2)
-"""
+
+# ENTHALPY TEST EVALUATION FOR AN EXOTHERMIC REACTION:
+# CH4 + 2 O2 ----> 2 H2O + CO2
+def combustion(concentrations, temperature):
+    return 10 * np.exp(-5000 / (R*temperature)) * concentrations[0]
+
+reaction_list= [combustion]
+
+# Substances involved:
+methane = Substance.from_thermo_database("methane")
+oxygen = Substance.from_thermo_database("oxygen")
+water = Substance.from_thermo_database("water")
+co2 = Substance.from_thermo_database("co2")
+
+# Objects from classes Mix, Stoichiometry and Kinetics are created
+exothermic_reaction_mix = Mix([methane, oxygen, water, co2], 'gaS')
+stoichiometry_exothermic = Stoichiometry([[-1, -2, 2, 1]])
+ 
+exothermic_reaction_kinetics = Kinetics(
+    reaction_list, exothermic_reaction_mix, stoichiometry_exothermic
+) 
+
+enthalpy = exothermic_reaction_kinetics.reaction_enthalpies(298, 101325)
+
+if float(enthalpy) <= 0:
+    print("\nEnthalpy is a negative value, as expected")
+else:
+    print("\nEnthalpy is not a negative number!!")
+
+print(f"The enthalpy of the combustion reaction is: "
+      f"{round(float(enthalpy),2)} J/mol")
+
+
+

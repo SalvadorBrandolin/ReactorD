@@ -16,6 +16,8 @@ class Mix:
     def __init__(self, substance_list, phase):
         self.substances = substance_list
         self.phase = phase.lower()
+        
+        # Initialization of the heats of formation
         if self.phase == 'liquid':
             self.h_formations = [
                 substance.h_formation for substance in self.substances
