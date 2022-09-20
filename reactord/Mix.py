@@ -46,10 +46,8 @@ class Mix:
             substances [mol/m^3]
         """
 
-        self.moles = np.array(moles)     
-        zi = self.mol_fracations(self.moles)
-        total_molar_vol = 0
-
+        zi = self.mol_fracations(moles)
+        
         if self.phase == 'liquid':
             molar_volumes = np.array(
                 [substance.volume_liquid(temperature, pressure) 

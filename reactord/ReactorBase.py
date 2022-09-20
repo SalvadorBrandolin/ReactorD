@@ -107,7 +107,7 @@ class ReactorBase:
         self._p_final = p_final
         self._q = q
 
-        self._degree_of_fredoom_check()
+        #self._degree_of_fredoom_check()
                 
     def _degree_of_fredoom_check(self):
         """Method to guarantee that the minimum information is given
