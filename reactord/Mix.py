@@ -147,7 +147,7 @@ class Mix:
             array that contains the molar fractions of mixture's 
             substances
         """
-        total_moles = np.sum(moles)
+        total_moles = np.sum(moles, axis=0)
         zi = np.divide(moles, total_moles)
         return zi
 

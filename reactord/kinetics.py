@@ -126,7 +126,7 @@ class Kinetics:
 
         return (dh + self.std_reaction_enthalpies)
 
-
+"""
 # TEST FOR A SYSTEM COMPRISED OF 2 DIFFERENT REACTIONS WITH
 # 3 COMPONENTS
 # A -> B reaction1
@@ -188,6 +188,4 @@ else:
 
 print(f"The enthalpy of the combustion reaction is: "
       f"{round(float(enthalpy),2)} J/mol")
-
-
-
+"""
