@@ -7,9 +7,10 @@ class Homogeneous_PFR:
     
     def __init__(
         self, mix, kinetic, reactor_dims_minmax, transversal_area,
-        pressure, reactor_t_operation, refrigerant_t_operation,
+        pressure, reactor_t_operation, 
         reactor_f_in, reactor_f_out,
         reactor_t_in, reactor_t_out,
+        refrigerant_t_operation=None,
         refrigerant_mix=None,
         refrigerant_f_in=None,
         refrigerant_t_in=None, refrigerant_t_out=None, 
@@ -127,7 +128,7 @@ class Homogeneous_PFR:
         reactions_heat = np.dot(reaction_rates, reaction_enthalpies)
         total_molar_flux = np.sum(molar_fluxes, axis=0)
         
-        if self.refrigerant_t_operation == None:
+        if self.refrigerant_t_operation is None:
             dt_dz = (a
                      * (- reactions_heat)
                      / (total_molar_flux * mix_heat_capacity))
@@ -143,7 +144,7 @@ class Homogeneous_PFR:
         refrigerant_heat_capacity
         ):
         
-        if self.refrigerant_t_operation == None:
+        if self.refrigerant_t_operation is None:
             dta_dz = np.zeros(grid_size)
             return dta_dz
         elif self.reactor_t_operation == 'isothermal':
@@ -159,7 +160,38 @@ class Homogeneous_PFR:
             dta_dz = a * u * (t - ta) / (f_ref * refrigerant_heat_capacity)
             return dta_dz
 
-    def solve(self, grid_size ,tol=0.001, max_nodes=1000, verbose=0):
+    def solve(self, grid_size=1000,  tol=0.001, max_nodes=1000, verbose=0):
+        
+        def odesystem(z,vars):
+            fs = np.array(vars[0:len(vars)-1])
+            t_reactor = np.array(vars[-2])
+            t_refrigerant = np.array(vars[-1])
+            
+            r_i, r_rates = kinetic_eval(fs, t_reactor, pressure) 
+            
+            r_enthalpies_eval = reaction_enthalpies(t_reactor, pressure)
+
+            reactor_heat_capacities = mix_heat_capacity(fs, t_reactor)
+
+            refrig_heat_capacities = refr_heat_capacities(
+                t_refrigerant, pressure
+            )
+            
+            df_dz = self._mass_balance(r_i)
+            
+            dt_dz = self._reactor_energy_balance(
+                grid_size, fs, t_reactor, reactor_heat_capacities,
+                t_refrigerant, r_rates, r_enthalpies_eval
+            )
+
+            dta_dz = self._refrigerant_energy_balance(
+                grid_size, t_reactor, t_refrigerant, refrig_heat_capacities
+            )
+
+            
+            dvars_dz = np.vstack(df_dz, dt_dz, dta_dz)
+            return dvars_dz
+
         z = self._grid_builder(grid_size)
         bc = self._border_condition_builder
         in_guess = self._initial_guess_builder(grid_size)
@@ -174,42 +206,12 @@ class Homogeneous_PFR:
         mix_heat_capacity = np.vectorize(
             self.mix.mix_heat_capacity, signature='(n),(m)->(m)')
 
-        #refr_heat_capacities = np.vectorize(
-        #    self.refrigerant_mix.mix_heat_capacity)
-
-        def odesystem(z,vars):
-            fs = vars[0:len(vars)-1]
-            t_reactor = vars[-2]
-            t_refrigerant = vars[-1]
-            
-            r_i, r_rates = kinetic_eval(fs, t_reactor, pressure) 
-            
-            r_enthalpies_eval = reaction_enthalpies(t_reactor, pressure)
-
-            reactor_heat_capacities = mix_heat_capacity(fs, t_reactor)
-
-            #refrig_heat_capacities = refr_heat_capacities(
-            #    t_refrigerant, pressure
-            #)
-            
-            df_dz = self._mass_balance(r_i)
-            
-            dt_dz = self._reactor_energy_balance(
-                grid_size, fs, t_reactor, reactor_heat_capacities,
-                t_refrigerant, r_rates, r_enthalpies_eval
-            )
-
-            #dta_dz = self._refrigerant_energy_balance(
-            #    grid_size, t_reactor, t_refrigerant, refrig_heat_capacities
-            #)
-
-            
-            dvars_dz = np.append(df_dz, dt_dz, dta_dz)
-            return dvars_dz
-
+        refr_heat_capacities = np.vectorize(
+            self.refrigerant_mix.mix_heat_capacity)
+        
         sol = solve_bvp(
             odesystem, bc, z, in_guess, tol=tol, 
             max_nodes=max_nodes,verbose=verbose
         )
-
-        return z, sol.y
+        
+        return sol

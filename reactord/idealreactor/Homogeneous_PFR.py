@@ -40,7 +40,7 @@ class Homogeneous_PFR(ReactorBase):
     def _border_condition_builder(self, ya, yb):
         bc = np.array([])
         for i,(fin, fout) in enumerate(zip(self._f_in, self._f_out)):
-            if fin is 'var':
+            if fin == 'var':
                 bc = np.append(bc, yb[i] - fout)
             else:
                 bc = np.append(bc, ya[i] - fin)
