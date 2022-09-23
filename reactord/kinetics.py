@@ -1,7 +1,6 @@
 import numpy as np
 from thermo.eos import R
 from Mix import Mix
-from Stoichiometry import Stoichiometry
 from Substance import Substance
 from scipy.integrate import quad
 
@@ -19,8 +18,32 @@ class Kinetics:
         of the substances.            
     mix : Mix object
         Mix object defined with all the substances present in the system
-    stoichiometry : Stoichiometry object
-        Stoichiometry object
+    stoichiometry: ndarray or list
+        array or list containing the stoichiometric coefficients of
+        all the substances involved in the reactive system. the
+        substances that do not participate in a reaction but are present
+        in the reactive system, must have a zero as stoichiometric 
+        coefficient.
+
+        Example:
+        Consider the following reactions with 4 components and 1 
+        inert with the substances order [A, B, C, D, I]:
+        A + B --->  C + 2 D
+        B + C + I ---> D + I
+        the matrix of coefficients must be introduced as:
+
+        stoichiometry = np.array[
+            [-1, -1, 1, 2, 0],
+            [0, -1, -1, 1, 0]
+        ]
+
+        or
+
+        stoichiometry = [
+            [-1, -1, 1, 2, 0],
+            [0, -1, -1, 1, 0]
+        ]
+
     kinetic_argument : string
         string that indicates on wich concentration unit meassure the
         kinetic rate function are evaluated. Avaliable options: 
@@ -44,7 +67,18 @@ class Kinetics:
                                 
         self.reactions = list_of_reactions
         self.mix = mix
-        self.stoichiometry = stoichiometry.coefficients
+
+####    Creation of the stoichiometry matrix:
+        self.stoichiometry = stoichiometry        
+        # num_reactions and total_comp are computed differently in
+        # systems with one reaction or more than one reaction        
+        if len(np.shape(self.stoichiometry)) == 1:
+            self.num_reactions = 1
+            self.total_comp = np.shape(self.stoichiometry)[0]
+        else:
+            self.num_reactions, self.total_comp = np.shape(
+            self.stoichiometry) 
+
         self.argument = kinetic_argument.lower()
         self.std_reaction_enthalpies = self._std_reaction_enthalpies()
         
@@ -126,8 +160,8 @@ class Kinetics:
 
         return (dh + self.std_reaction_enthalpies)
 
-"""
-# TEST FOR A SYSTEM COMPRISED OF 2 DIFFERENT REACTIONS WITH
+
+""" # TEST FOR A SYSTEM COMPRISED OF 2 DIFFERENT REACTIONS WITH
 # 3 COMPONENTS
 # A -> B reaction1
 # A -> C reaction2
@@ -143,9 +177,8 @@ list_of_reactions = [reaction1, reaction2]
 water = Substance.from_thermo_database("water")
 ether = Substance.from_thermo_database("ether")
 methane = Substance.from_thermo_database("methane")
-
 mix_p = Mix([water,ether, methane], "liquid")
-stoichiometry_p = Stoichiometry([[-1,1,0],[-1,0,1]])
+stoichiometry_p = ([[-1,1,0],[-1,0,1]])
 
 cinetica = Kinetics(list_of_reactions, mix_p, stoichiometry_p)
 
@@ -156,6 +189,10 @@ print(f"velocidades por reaccion: {rate_rxns}")
 
 print(f"Las entalpias de reaccion son: " 
         f"{cinetica.reaction_enthalpies(500, 101325)}")
+
+print("\nRevision de la matriz estequiometrica")
+print(f"Numero de reacciones: {cinetica.num_reactions}\n"
+      f"Numero de componentes: {cinetica.total_comp}")
 
 
 # ENTHALPY TEST EVALUATION FOR AN EXOTHERMIC REACTION:
@@ -173,7 +210,7 @@ co2 = Substance.from_thermo_database("co2")
 
 # Objects from classes Mix, Stoichiometry and Kinetics are created
 exothermic_reaction_mix = Mix([methane, oxygen, water, co2], 'gaS')
-stoichiometry_exothermic = Stoichiometry([[-1, -2, 2, 1]])
+stoichiometry_exothermic = ([-1, -2, 2, 1])
  
 exothermic_reaction_kinetics = Kinetics(
     reaction_list, exothermic_reaction_mix, stoichiometry_exothermic
@@ -188,4 +225,8 @@ else:
 
 print(f"The enthalpy of the combustion reaction is: "
       f"{round(float(enthalpy),2)} J/mol")
-"""
+
+print("\nRevision de la matriz estequiometrica")
+print(f"Numero de reacciones: {exothermic_reaction_kinetics.num_reactions}\n"
+      f"Numero de componentes: {exothermic_reaction_kinetics.total_comp}")
+ """
