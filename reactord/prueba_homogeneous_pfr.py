@@ -38,7 +38,7 @@ def mass_balance(r_i):
     return r_i
 
 def energy_balance(r_rates, fi, temperature, q, delta_H):
-    dh = np.dot(delta_H, r_rates)
+    dh = np.dot(delta_H.T, r_rates)
     cpm = mix.mix_heat_capacity(fi, temperature)
 
     dT_dV = (q - dh) / (np.sum(fi) * cpm)
@@ -55,11 +55,11 @@ def border_conditions(ya, yb):
 z = np.linspace(0, 1, 100)
 
 def odesystem(z,var):
-    fs = var[0:-1] 
-    t = var[2]
-    p = np.full(100, 101325)
+    fs = np.array(var[0:-1]) 
+    t = np.array([var[2]]).T
+    p = np.array([np.full(100, 101325)]).T
 
-
+    """
     rs = list(map(cinetica.kinetic_eval, np.transpose(fs), t, p))
     rs = np.transpose(rs)
     r_i = rs[0]
@@ -71,19 +71,22 @@ def odesystem(z,var):
         
     df_dz = np.transpose(list(map(mass_balance, r_i)))
     dt_dz = np.transpose(list(map(energy_balance, r_rates, np.transpose(fs), t, heat, dh)))
-    
     """
-    kinetic_eval = np.vectorize(cinetica._kinetic_eval_ode)
+    
+    kinetic_eval = np.vectorize(cinetica.kinetic_eval, signature='(n),(m),(l)->(s),(k)')
     dh = np.vectorize(cinetica.reaction_enthalpies)
     Q = np.vectorize(q)
     
-    r_i, r_rates = kinetic_eval(var)
+    r_i, r_rates = kinetic_eval(fs.T, t, p)
     DH = dh(t, p)
     heat = Q(z)
     
-    df_dz = np.apply_along_axis(mass_balance,0, r_i)
-    dt_dz = np.apply_along_axis(energy_balance, 0, r_rates, fs, t, heat, DH)
-    """
+    Mass_balance = np.vectorize(mass_balance)
+    Energy_balance = np.vectorize(energy_balance, signature='(n),(m),(k),(l),(j)->(b)')
+
+    df_dz = Mass_balance(r_i)
+    dt_dz = Energy_balance(r_rates, fs.T, t, np.array([heat]).T, DH)
+    
 
     """
     kinetic_eval = np.frompyfunc(cinetica._kinetic_eval_ode, 1, 2)
@@ -107,7 +110,8 @@ def odesystem(z,var):
     df_dz = np.apply_along_axis(mass_balance,0, r_i)
     dt_dz = np.apply_along_axis(energy_balance,1, r_rates, fs, t, heat, dh)
     """
-    return np.vstack((df_dz, dt_dz))
+    print('a')
+    return np.vstack((df_dz.T, dt_dz))
 
 fa_guess = np.full(100, 10)
 fb_guess = np.full(100, 0)

@@ -41,8 +41,9 @@ class Stoichiometry:
     """
     
     def __init__(self, stoichiometric_coefficients):
-        self.num_reactions, self.total_comp = np.shape(
-            stoichiometric_coefficients) 
+        #self.num_reactions
+        #self.total_comp = np.shape(
+        #   stoichiometric_coefficients) 
         self.coefficients = stoichiometric_coefficients
               
     def __str__(self):

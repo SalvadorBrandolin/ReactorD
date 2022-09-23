@@ -65,48 +65,48 @@ class ReactorBase:
         """
     
     def __init__(
-        self, mix, kinetic, t_operation, p_operation,
-        r_v=None, 
-        r_dims_minmax=None, time_minmax=None,
-        f_in=None,
-        f_out=None,
-        t_in=None, t_out=None, 
-        n_initial=None, t_initial=None, p_initial=None,
-        n_final=None, t_final=None, p_final=None,
+        self, mix, kinetic, 
+        t_operation, p_operation,
         catalyst_particle=None,
-        q=0.0
+        r_dims_minmax=None, time_minmax=None,
+        f_in=None, f_out=None,
+        t_in=None, t_out=None,
+        p_in=None, p_out=None, 
+        n_initial=None, n_final=None,
+        t_initial=None, t_final=None,
+        p_initial=None, p_final=None,          
     ):
         
         self._mix = mix
         self._kinetic = kinetic
         
         # Checking supported thermal, pressure 
-        if t_operation in ['isothermal', 'non-isothermal']:
+        if t_operation.lower() in ['isothermal', 'non-isothermal']:
             self._thermal_operation = t_operation
         else:
             raise Exception(f"Not supported thermal operation: {t_operation}")
 
-        if p_operation in ['isobaric', 'non-isobaric']:
+        if p_operation.lower() in ['isobaric', 'non-isobaric']:
             self._pressure_operation = p_operation
         else:
             raise Exception(f"Not supported pressure operation: {p_operation}")
 
         self._catalyst_particle = catalyst_particle
-        self._r_volume = r_v
         self._r_dims_minmax = r_dims_minmax
         self._time_minmax = time_minmax
         self._f_in = f_in
         self._f_out = f_out
         self._t_in = t_in
         self._t_out = t_out
+        self._p_in = p_in
+        self._p_out = p_out
         self._n_initial = n_initial
         self._t_initial = t_initial
         self._p_initial = p_initial
         self._n_final = n_final
         self._t_final = t_final
         self._p_final = p_final
-        self._q = q
-
+        
         self._degree_of_fredoom_check()
                 
     def _degree_of_fredoom_check(self):

@@ -106,10 +106,10 @@ class Kinetics:
             cp_dt_integrals = np.array([])
 
             for substance in self.mix.substances:
-                cp_dt_integral, error = quad(
-                    substance.heat_capacity_liquid, t_0, temperature
+                cp_dt_int, error = quad(
+                    substance.heat_capacity_liquid, t_0, temperature,
                 )
-                cp_dt_integrals = np.append(cp_dt_integrals, cp_dt_integral)
+                cp_dt_integrals = np.append(cp_dt_integrals, cp_dt_int)
             
             dh = np.dot(self.stoichiometry, cp_dt_integrals)
 
