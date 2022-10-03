@@ -4,14 +4,12 @@ import numpy as np
 class Stoichiometry:
     """Stoichiometry object class.
     
-    The creation of an object from this class prompts the user to
-    introduce the parameters. After that, the stoichiometric
-    coefficients of the reactions must be introduced as a numpy
-    array. Reactants are introduced as negative numbers, products
-    as positive number and inerts as zero.
+    The stoichiometric coefficients of the reactions must be
+    introduced as a numpy array. Reactants are introduced as negative
+    numbers, products as positive numbers and inerts as zero.
 
     Example:
-    Consider the following reactions with 4 components and 1 inert and 
+    Consider the following reactions with 4 components and 1 inert with 
     the substances order [A, B, C, D, I]:
     A + B --->  C + 2 D
     B + C + I ---> D + I
@@ -32,19 +30,26 @@ class Stoichiometry:
     Parameters
     ----------
     stoichiometric_coefficients: ndarray or list
-        array or list containing all the stoichiometric coefficients of
+        array or list containing the stoichiometric coefficients of
         all the substances involved in the reactive system. the
         substances that do not participate in a reaction but are present
-        in the reactive system, it must have a zero as
-        stoichiometric coefficient.
+        in the reactive system, must have a zero as stoichiometric 
+        coefficient.
     ----------
     """
     
     def __init__(self, stoichiometric_coefficients):
-        self.num_reactions, self.total_comp = np.shape(
-            stoichiometric_coefficients) 
         self.coefficients = stoichiometric_coefficients
-              
+        
+        # num_reactions and total_comp are computed differently in
+        # systems with one reaction or more than one reaction        
+        if len(np.shape(stoichiometric_coefficients)) == 1:
+            self.num_reactions = 1
+            self.total_comp = np.shape(stoichiometric_coefficients)[0]
+        else:
+            self.num_reactions, self.total_comp = np.shape(
+            stoichiometric_coefficients) 
+
     def __str__(self):
         return(f"Total components: {str(self.total_comp)}\n"
         f"Number of reactions: {str(self.num_reactions)} \n")
@@ -60,8 +65,8 @@ class Stoichiometry:
     #    return self.coefficients[index]
     #buscador de elemento detro del objeto
     
-# ACA SE PRUEBA LA CLASE    
-#prueba= Stoichiometry(2,2)
-#print(prueba.coefficients,np.shape(prueba.coefficients)) #La matriz de coeficientes
-#print(prueba.names) #Nombres de las reacciones
-#print(prueba) #Se prueba el metodo __str__
+""" # ACA SE PRUEBA LA CLASE    
+one_reaction = Stoichiometry([-1,1,0])
+two_reactions = Stoichiometry ([[1,0,2],[-1,2,3]])
+print (f"Una reaccion: {one_reaction}")
+print (f"Dos reacciones: {two_reactions}") """

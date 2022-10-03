@@ -17,6 +17,18 @@ class Mix:
         self.substances = substance_list
         self.phase = phase.lower()
         
+        # Initialization of the heats of formation
+        if self.phase == 'liquid':
+            self.h_formations = [
+                substance.h_formation for substance in self.substances
+            ]
+        elif self.phase == 'gas':
+                self.h_formations = [
+                substance.h_formation_ig for substance in self.substances
+            ]
+        else:
+            raise ValueError(f'{self.phase} is not a supported phase') 
+        
     def concentrations(self, moles, temperature, pressure):
         """Concentrations of the mixtures substances at the given moles 
         of each compound, temperature and pressure.
@@ -36,10 +48,8 @@ class Mix:
             substances [mol/m^3]
         """
 
-        self.moles = np.array(moles)     
-        zi = self.mol_fracations(self.moles)
-        total_molar_vol = 0
-
+        zi = self.mol_fracations(moles)
+        
         if self.phase == 'liquid':
             molar_volumes = np.array(
                 [substance.volume_liquid(temperature, pressure) 
@@ -87,7 +97,7 @@ class Mix:
             )
             return np.dot(pure_volumes, moles)
         
-    def mix_heat_capacity(self, moles, temperature, pressure):
+    def mix_heat_capacity(self, moles, temperature, pressure): 
         """Method that returns the heat capacity of the mixture.
 
         Parameters
@@ -109,7 +119,7 @@ class Mix:
 
         if self.phase == 'liquid':
             pure_cp = np.array(
-                [substance.heat_capacity_liquid(self, temperature) 
+                [substance.heat_capacity_liquid(temperature) 
                 for substance in self.substances]
             )
             mix_cp = np.dot(zi, pure_cp)
@@ -117,7 +127,7 @@ class Mix:
 
         elif self.phase == 'gas':
             pure_cp = np.array([
-                                substance.heat_capacity_gas(self, temperature) 
+                                substance.heat_capacity_gas(temperature) 
                                 for substance in self.substances]
             )
             mix_cp = np.dot(zi, pure_cp)
@@ -137,8 +147,8 @@ class Mix:
             array that contains the molar fractions of mixture's 
             substances
         """
-        total_moles = np.sum(moles)
-        zi = np.divide(self.moles, total_moles)
+        total_moles = np.sum(moles, axis=0)
+        zi = np.divide(moles, total_moles)
         return zi
 
     def partial_pressures(self, moles, temperature, pressure):
@@ -159,7 +169,7 @@ class Mix:
             array that contains the partial pressures of mixture's 
             substances
         """
-        zi = self.mol_fracations(self.moles)
+        zi = self.mol_fracations(moles)
         partial_pressures= np.multiply(zi, pressure)
         return partial_pressures
 
