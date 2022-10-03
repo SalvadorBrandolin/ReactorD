@@ -1,6 +1,6 @@
 import numpy as np
 
-def vectorize(signature):
+def vectorize(signature=None):
     def outer(user_function):
         def inner(*args, **kwargs):
             f = np.vectorize(user_function, signature=signature)
@@ -15,4 +15,9 @@ def func(x):
 
 a = [1,2,3,4,5]
 
-print(func(a))
+
+@vectorize(signature=None)
+def func2(x,y):
+    return x+y
+
+print(func2(a,a))

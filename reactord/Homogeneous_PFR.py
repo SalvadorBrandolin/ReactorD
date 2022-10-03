@@ -13,7 +13,8 @@ class Homogeneous_PFR:
         refrigerant_t_operation=None,
         refrigerant_mix=None,
         refrigerant_f_in=None,
-        refrigerant_t_in=None, refrigerant_t_out=None, 
+        refrigerant_t_in=None, refrigerant_t_out=None,
+        refrigerant_pressure = None, 
         heat_exchange_disposition='cocurrent',       
         u=0        
     ):
@@ -34,7 +35,23 @@ class Homogeneous_PFR:
         self.heat_exchange_disposition = heat_exchange_disposition
         self.refrigerant_t_in = refrigerant_t_in
         self.refrigerant_t_out = refrigerant_t_out
+        self.refrigerant_pressure = refrigerant_pressure 
         self.u = u
+
+        self._mass_balance = np.vectorize(
+            self._mass_balance, 
+            excluded='self', 
+            signature='(n)->(n)')
+
+        self._reactor_energy_balance = np.vectorize(
+            self._reactor_energy_balance, 
+            excluded='self', 
+            signature='(),(n),(),(),(),(m)->()')
+
+        self._refrigerant_energy_balance = np.vectorize(
+            self._refrigerant_energy_balance,
+            excluded='self',
+            signature='(),(),()->()')
         
     def _grid_builder(self, grid_size):
         dim_array = np.linspace(self.reactor_dims_minmax[0], 
@@ -55,12 +72,15 @@ class Homogeneous_PFR:
         
         #Border condition for the reactive mixture's temperature
         if self.reactor_t_operation == 'isothermal':
-            bc = np.append(bc, ya[-2] - self.reactor_t_in)
+            bc = np.append(bc, ya[-3] - self.reactor_t_in)
         else:
             if self.reactor_t_in == 'var':
-                bc = np.append(bc, yb[-2] - self.reactor_t_out)
+                bc = np.append(bc, yb[-3] - self.reactor_t_out)
             else:
-                bc = np.append(bc, ya[-2] - self.reactor_t_in)
+                bc = np.append(bc, ya[-3] - self.reactor_t_in)
+        
+        #Border condition for pressure
+        bc = np.append(bc, ya[-2] - self.pressure)
         
         #Border condition for refrigerant's temperature
         if self.refrigerant_t_operation == 'isothermal':
@@ -77,7 +97,7 @@ class Homogeneous_PFR:
 
     def _initial_guess_builder(self, grid_size):
         n_comp = len(self.mix)
-        in_guess = np.zeros([n_comp + 2, grid_size])
+        in_guess = np.zeros([n_comp + 3, grid_size])
         
         #Guess for reagents, products and inerts molar flux
         for i,(fin, fout) in enumerate(zip(self.reactor_f_in, 
@@ -89,13 +109,16 @@ class Homogeneous_PFR:
         
         #Guess for the reactive mixture's temperature
         if self.reactor_t_operation == 'isothermal':
-            in_guess[-2,:] = np.full(grid_size, self.reactor_t_in)
+            in_guess[-3,:] = np.full(grid_size, self.reactor_t_in)
         else:
             if self.reactor_t_in == 'var':
-                in_guess[-2,:] = np.full(grid_size, self.reactor_t_out)
+                in_guess[-3,:] = np.full(grid_size, self.reactor_t_out)
             else:
-                in_guess[-2,:] = np.full(grid_size, self.reactor_t_in)
+                in_guess[-3,:] = np.full(grid_size, self.reactor_t_in)
         
+        #Guess for reactor's pressure
+        in_guess[-2,:] = np.full(grid_size, self.pressure)
+
         #Guess for refrigerant's temperature
         if self.refrigerant_t_operation == 'isothermal':
             in_guess[-1,:] = np.full(grid_size, self.refrigerant_t_in)
@@ -106,7 +129,7 @@ class Homogeneous_PFR:
                 in_guess[-1,:] = np.full(grid_size, self.refrigerant_t_in)
         else:
             in_guess[-1,:] = np.full(grid_size, 0)
-        
+
         return in_guess
                 
     def _mass_balance(self, substances_reaction_rates):
@@ -114,18 +137,23 @@ class Homogeneous_PFR:
         return dfi_dz
     
     def _reactor_energy_balance(
-        self, grid_size, molar_fluxes, reactor_temperatures, mix_heat_capacity,
-        refrigerant_temperatures, reaction_rates, reaction_enthalpies):
+        self, grid_size, molar_fluxes, temperature, pressure,
+        refrigerant_temperature, reaction_rates):
         
         if self.reactor_t_operation == 'isothermal':
-            dt_dz = np.zeros(grid_size)
+            dt_dz = 0
             return dt_dz
         
         a = self.transversal_area
         u = self.u
-        t = reactor_temperatures
-        ta = refrigerant_temperatures
-        reactions_heat = np.dot(reaction_rates, reaction_enthalpies)
+        t = temperature
+        ta = refrigerant_temperature
+        p = pressure
+        
+        r_enthalpies = self.kinetic.reaction_enthalpies(t, p)
+        mix_heat_capacity = self.mix.mix_heat_capacity(molar_fluxes, t, p)
+
+        reactions_heat = np.dot(reaction_rates, r_enthalpies)
         total_molar_flux = np.sum(molar_fluxes, axis=0)
         
         if self.refrigerant_t_operation is None:
@@ -139,76 +167,62 @@ class Homogeneous_PFR:
                      / (total_molar_flux * mix_heat_capacity))
             return dt_dz
     
+    def _pressure_balance(self, grid_size):
+        dp_dz = np.full(grid_size, 0)
+        return dp_dz
+
     def _refrigerant_energy_balance(
-        self, grid_size, reactor_temperature, refrigerant_temperature, 
-        refrigerant_heat_capacity
+        self, grid_size, reactor_temperature, refrigerant_temperature
         ):
         
         if self.refrigerant_t_operation is None:
-            dta_dz = np.zeros(grid_size)
+            dta_dz = 0
             return dta_dz
         elif self.reactor_t_operation == 'isothermal':
-            dta_dz = np.zeros(grid_size)
+            dta_dz = 0
             return dta_dz
         else:
+            refr_heat_capacity = self.refrigerant_mix.mix_heat_capacity(
+                    self.refrigerant_f_in, ta, self.refrigerant_pressure
+            )
             a = self.transversal_area
             u = self.u
             t = reactor_temperature
             ta = refrigerant_temperature
             f_ref = np.sum(self.refrigerant_f_in)
 
-            dta_dz = a * u * (t - ta) / (f_ref * refrigerant_heat_capacity)
+            dta_dz = a * u * (t - ta) / (f_ref *  refr_heat_capacity)
             return dta_dz
 
     def solve(self, grid_size=1000,  tol=0.001, max_nodes=1000, verbose=0):
         
         def odesystem(z,vars):
-            fs = np.array(vars[0:len(vars)-1])
-            t_reactor = np.array(vars[-2])
-            t_refrigerant = np.array(vars[-1])
-            
-            r_i, r_rates = kinetic_eval(fs, t_reactor, pressure) 
-            
-            r_enthalpies_eval = reaction_enthalpies(t_reactor, pressure)
+            fs = np.array(vars[0:len(vars)-3]).T
+            t = np.array(vars[-3])
+            p = np.array(vars[-2])
+            ta = np.array(vars[-1])
 
-            reactor_heat_capacities = mix_heat_capacity(fs, t_reactor)
+            grid_solver = np.size(fs, axis=0)
 
-            refrig_heat_capacities = refr_heat_capacities(
-                t_refrigerant, pressure
-            )
+            r_i, r_rates = self.kinetic.kinetic_eval(fs, t, p) 
             
             df_dz = self._mass_balance(r_i)
             
             dt_dz = self._reactor_energy_balance(
-                grid_size, fs, t_reactor, reactor_heat_capacities,
-                t_refrigerant, r_rates, r_enthalpies_eval
-            )
+                grid_solver, fs, t, p, ta, r_rates)
 
-            dta_dz = self._refrigerant_energy_balance(
-                grid_size, t_reactor, t_refrigerant, refrig_heat_capacities
-            )
+            dp_dz = self._pressure_balance(grid_solver)
 
-            
-            dvars_dz = np.vstack(df_dz, dt_dz, dta_dz)
+            dta_dz = self._refrigerant_energy_balance(grid_solver, t, ta)
+
+            dvars_dz = np.vstack((df_dz.T, dt_dz, dp_dz, dta_dz))
             return dvars_dz
 
         z = self._grid_builder(grid_size)
         bc = self._border_condition_builder
         in_guess = self._initial_guess_builder(grid_size)
-        pressure = np.full(grid_size, self.pressure)
+        pressure = np.full(grid_size, self.pressure, order='F')
 
-        #Function vectorization
-        kinetic_eval = np.vectorize(
-            self.kinetic.kinetic_eval, signature='(n),(m),(m)->(m),(m)')
-       
-        reaction_enthalpies = np.vectorize(self.kinetic.reaction_enthalpies)
-        
-        mix_heat_capacity = np.vectorize(
-            self.mix.mix_heat_capacity, signature='(n),(m)->(m)')
-
-        refr_heat_capacities = np.vectorize(
-            self.refrigerant_mix.mix_heat_capacity)
-        
         sol = solve_bvp(
             odesystem, bc, z, in_guess, tol=tol, 
             max_nodes=max_nodes,verbose=verbose

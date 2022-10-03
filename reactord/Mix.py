@@ -27,8 +27,8 @@ class Mix:
                 substance.h_formation_ig for substance in self.substances
             ]
         else:
-            raise ValueError(f'{self.phase} is not a supported phase') 
-        
+            raise ValueError(f'{self.phase} is not a supported phase')
+
     def concentrations(self, moles, temperature, pressure):
         """Concentrations of the mixtures substances at the given moles 
         of each compound, temperature and pressure.
@@ -62,7 +62,7 @@ class Mix:
                 for substance in self.substances]
             )
             
-        total_molar_vol = np.dot(molar_volumes, zi)
+        total_molar_vol = np.dot(zi,molar_volumes)
         concentrations = np.divide(zi, total_molar_vol) #moles/m^3     
         return concentrations
  

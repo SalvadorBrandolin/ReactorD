@@ -1,6 +1,6 @@
+#%%
 from Substance import Substance
 from Mix import Mix
-from Stoichiometry import Stoichiometry
 from kinetics import Kinetics
 from Homogeneous_PFR import Homogeneous_PFR
 import numpy as np
@@ -16,10 +16,10 @@ ethanol = Substance.from_thermo_database('ethanol')
 mix = Mix(np.array([water, ethanol]), 'liquid')
 
 #stoichiometry definition
-stoichiometry = Stoichiometry(np.array([-1,1]))
+stoichiometry = np.array([-1,1])
 #kinetic law
 def christ_reaction(concentrations, T):
-    ra = 0.01 * np.exp(-30000 / (8.314 * T)) * concentrations[0]
+    ra = 100 * np.exp(-30000 / (8.314 * T)) * concentrations[0]
     return ra
 
 #kinetic
@@ -36,4 +36,25 @@ t_out = 'var'
 pfr = Homogeneous_PFR(mix, kinetic, r_dim, area, 101325, 'non-isothermal',
                       f_in, f_out, t_in, t_out)
 
+#%%
 solution = pfr.solve(100)
+
+#%%
+import matplotlib.pyplot as plt
+x = solution.x
+
+Fa, Fb, T, P, Ta = solution.y
+
+plt.figure(0)
+plt.plot(x, Fa)
+plt.plot(x, Fb)
+
+plt.figure(1)
+
+plt.plot(x, T)
+plt.plot(x, Ta)
+
+plt.figure(2)
+plt.plot(x, P)
+
+# %%
