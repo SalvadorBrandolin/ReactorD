@@ -1,35 +1,22 @@
 import numpy as np
+from abc import ABCMeta, abstractmethod
 
 
-class Mix:
-    """Mixture object generator class.
+class Abstract_Mix(metaclass = ABCMeta):
+    
+    """Mixture object abstract class.
 
         Parameters
         ----------
         substance_list : ndarray or list[Substance objects]
-            list or array of Substance objects.            
-        phase : string
-            string that indicates the phase nature of the mixture. The
-            avaliable options are: 'liquid', 'gas'.
-        """
-    
-    def __init__(self, substance_list, phase):
-        self.substances = substance_list
-        self.phase = phase.lower()
-        
-        # Initialization of the heats of formation
-        if self.phase == 'liquid':
-            self.h_formations = [
-                substance.h_formation for substance in self.substances
-            ]
-        elif self.phase == 'gas':
-                self.h_formations = [
-                substance.h_formation_ig for substance in self.substances
-            ]
-        else:
-            raise ValueError(f'{self.phase} is not a supported phase')
+            list or array of Substance objects."""
 
-    def concentrations(self, moles, temperature, pressure):
+    @abstractmethod
+    def __init__(self):
+        pass        
+
+    @abstractmethod
+    def concentrations(self):
         """Concentrations of the mixtures substances at the given moles 
         of each compound, temperature and pressure.
         
@@ -47,26 +34,10 @@ class Mix:
             ndarray that contains the concentrations of the mixture's 
             substances [mol/m^3]
         """
+        pass
 
-        zi = self.mol_fracations(moles)
-        
-        if self.phase == 'liquid':
-            molar_volumes = np.array(
-                [substance.volume_liquid(temperature, pressure) 
-                for substance in self.substances]
-            )                        
-            
-        elif self.phase == 'gas':
-            molar_volumes = np.array(
-                [substance.volume_gas(temperature, pressure) 
-                for substance in self.substances]
-            )
-            
-        total_molar_vol = np.dot(zi,molar_volumes)
-        concentrations = np.divide(zi, total_molar_vol) #moles/m^3     
-        return concentrations
- 
-    def volume(self, moles, temperature, pressure):
+    @abstractmethod
+    def volume(self):
         """Method that returns the volume of the mixture.
 
         Parameters
@@ -83,21 +54,10 @@ class Mix:
         float
             volume of the mixture [m^3]
         """
-        if self.phase == 'liquid':
-            pure_volumes = np.array(
-                [substance.volume_liquid(temperature, pressure) 
-                for substance in self.substances]
-            )
-            return np.dot(pure_volumes, moles)
+        pass
 
-        if self.phase == 'gas':
-            pure_volumes = np.array(
-                [substance.volume_gas(temperature, pressure) 
-                for substance in self.substances]
-            )
-            return np.dot(pure_volumes, moles)
-        
-    def mix_heat_capacity(self, moles, temperature, pressure): 
+    @abstractmethod
+    def mix_heat_capacity(self):
         """Method that returns the heat capacity of the mixture.
 
         Parameters
@@ -113,26 +73,10 @@ class Mix:
         -------
         float
             heat capacity of the mixture [j/mol/K)] 
-        """
+        """      
+        pass
 
-        zi = self.mol_fracations(moles)
-
-        if self.phase == 'liquid':
-            pure_cp = np.array(
-                [substance.heat_capacity_liquid(temperature) 
-                for substance in self.substances]
-            )
-            mix_cp = np.dot(zi, pure_cp)
-            return mix_cp
-
-        elif self.phase == 'gas':
-            pure_cp = np.array([
-                                substance.heat_capacity_gas(temperature) 
-                                for substance in self.substances]
-            )
-            mix_cp = np.dot(zi, pure_cp)
-            return mix_cp
-
+# Other methods (Inhereted but not implemented in subclasses)
     def mol_fracations(self, moles):
         """method that calculates the molar fractions of the mixture
 
@@ -173,25 +117,91 @@ class Mix:
         partial_pressures= np.multiply(zi, pressure)
         return partial_pressures
 
-    def partial_P_2_conc (self, partial_pressures, T):
+    def partial_P_2_conc (self, partial_pressures, temperature):
         R= 8.31446261815324 # J/mol.K
         self.partial_pressures= np.array(partial_pressures)
-        conc= self.partial_pressures /(R*T) # mol/m^3
+        conc= self.partial_pressures /(R*temperature) # mol/m^3
         return conc
 
     def __len__(self):
         return len(self.substances)
     
     def __str__ (self):
-        string=(f"The mixture is in {self.phase} phase and " 
-                f"contains the following {len(self.substances)} components:\n")
+        string=(f"The mixture contains the following" 
+                f" {len(self.substances)} components:\n")
         for i,substance in enumerate (self.substances):
             string = string + substance.name.capitalize() + "\n"     
         return string
-        """Observaciones: Quise hacer que devuelva un listado de concentraciones,
-        fracciones molares y presiones parciales cuando hacemos el print del
-        objeto, pero para eso tendría que calcular todo eso dentro de la funcion
-        __str__. Como los argumentos de las funciones implicadas NO son atributos
-        de la clase Mix, no lo puedo hacer (mejor dicho, no sé como hacerlo, si es
-        que se puede) 
-        """
+
+
+class Liquid_Mix(Abstract_Mix):
+
+    def __init__(self, substance_list):
+        self.substances = substance_list
+        self.h_formations = [
+                substance.h_formation for substance in self.substances
+            ]
+        
+    def concentrations(self, moles, temperature, pressure):
+        zi = self.mol_fracations(moles)      
+        molar_volumes = np.array(
+        [substance.volume_liquid(temperature, pressure) 
+        for substance in self.substances]
+        )                        
+
+        total_molar_vol = np.dot(zi,molar_volumes)
+        concentrations = np.divide(zi, total_molar_vol) #moles/m^3     
+        return concentrations
+
+    def volume(self, moles, temperature, pressure):  
+        pure_volumes = np.array(
+            [substance.volume_liquid(temperature, pressure) 
+            for substance in self.substances]
+        )
+        return np.dot(pure_volumes, moles)        
+
+    def mix_heat_capacity(self, moles, temperature, pressure):
+        zi = self.mol_fracations(moles)
+        pure_cp = np.array(
+            [substance.heat_capacity_liquid(temperature) 
+            for substance in self.substances]
+        )
+        mix_cp = np.dot(zi, pure_cp)
+        return mix_cp
+
+
+class IdealGas_Mix(Abstract_Mix):
+
+    def __init__(self, substance_list):
+        self.substances = substance_list
+        self.h_formations = [
+                substance.h_formation_ig for substance in self.substances
+            ]
+
+    def concentrations(self, moles, temperature, pressure):
+        zi = self.mol_fracations(moles)      
+        
+        molar_volumes = np.array(
+        [substance.volume_gas(temperature, pressure) 
+        for substance in self.substances]
+        )
+
+        total_molar_vol = np.dot(zi,molar_volumes)
+        concentrations = np.divide(zi, total_molar_vol) #moles/m^3     
+        return concentrations
+
+    def volume(self, moles, temperature, pressure):
+        pure_volumes = np.array(
+            [substance.volume_gas(temperature, pressure) 
+            for substance in self.substances]
+        )
+        return np.dot(pure_volumes, moles) 
+
+    def mix_heat_capacity(self, moles, temperature, pressure):
+        zi = self.mol_fracations(moles)
+        pure_cp = np.array([
+                            substance.heat_capacity_gas(temperature) 
+                            for substance in self.substances]
+        )
+        mix_cp = np.dot(zi, pure_cp)
+        return mix_cp
