@@ -48,13 +48,15 @@ Fa, Fb, T, P, Ta = solution.y
 plt.figure(0)
 plt.plot(x, Fa)
 plt.plot(x, Fb)
+plt.show()
 
 plt.figure(1)
 
 plt.plot(x, T)
 plt.plot(x, Ta)
+plt.show()
 
 plt.figure(2)
 plt.plot(x, P)
-
+plt.show()
 # %%

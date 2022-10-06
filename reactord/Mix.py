@@ -15,10 +15,10 @@ class Abstract_Mix(metaclass = ABCMeta):
          
     def __init__(self, list_of_substances):
         self.substances = list_of_substances
-        self.enthalpies_formation = self.enthalpies_formation(self.substances) 
+        self.enthalpies_formation = self.enthalpies_formation_builder() 
         
     @abstractmethod
-    def enthalpies_formation(self):
+    def enthalpies_formation_builder(self):
         pass
 
     @abstractmethod
@@ -114,15 +114,11 @@ class Abstract_Mix(metaclass = ABCMeta):
 
 class Liquid_Mix(Abstract_Mix):
 
-    def __init__(self, substance_list):
-        self.substances = substance_list
-        self.enthalpies_formation = self.enthalpies_formation()
-
-    def enthalpies_formation(self):
-        self.enthalpies_formation = [
+    def enthalpies_formation_builder(self):
+        enthalpies_formation = [
                 substance.h_formation for substance in self.substances
             ]
-        pass
+        return enthalpies_formation
 
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)      
@@ -154,14 +150,11 @@ class Liquid_Mix(Abstract_Mix):
 
 class IdealGas_Mix(Abstract_Mix):
 
-    def __init__(self, substance_list):
-        self.substances = substance_list
-        self.enthalpies_formation = self.enthalpies_formation()
-
-    def enthalpies_formation(self):
-        self.enthalpies_formation = [
+    def enthalpies_formation_builder(self):
+        enthalpies_formation = [
                 substance.h_formation_ig for substance in self.substances
             ]
+        return enthalpies_formation
     
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)      
