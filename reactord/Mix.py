@@ -79,7 +79,7 @@ class Abstract_Mix(metaclass = ABCMeta):
         pass
     
     @abstractmethod
-    def pure_heat_capacities_integrals(self):
+    def formation_enthalpies_correction(self):
         pass
 
 # Other methods (Inhereted but not implemented in subclasses)
@@ -139,7 +139,6 @@ class Abstract_Mix(metaclass = ABCMeta):
             string = string + substance.name.capitalize() + "\n"     
         return string
 
-
 class Liquid_Mix(Abstract_Mix):
 
     def __init__(self, substance_list):
@@ -175,33 +174,27 @@ class Liquid_Mix(Abstract_Mix):
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
     
-    def pure_heat_capacities_integrals(self, temperature:float, *args):
-        """Function that calculates the integral of the liquid heat capacities
-        of each pure substance in the mixture, from 298.15 K to temperature.
-        The method heat_capacity_liquid must be defined for each substance in 
-        mixture.
+    def formation_enthalpies_correction(self, temperature:float, *args):
+        """Correction of the standard enthalpies of formation from 298.15 K and
+        1 bar to 'temperature'. As an ideal liquid, the pressure dependece is
+        neglected. 
 
         Parameters
         ----------
         temperature : float
-            Final temperature of the integral.
-        
+            Temperature of correction [K].
+
         Returns
         -------
         ndarray
-            1D-array containing the integrals of each pure component of the 
-            mixture in the same order of mixture's substances order. 
+            Array containing the temperature corrected enthalpy of formation
+            of each pure substance in the mixture. 
         """
-        t_0 = 298.15
-        integrals = np.array([])
-        
-        for substance in self.mix.substances:
-            integral_substance = substance.heat_capacity_liquid_integral(
-                t_0, temperature
-            )
-            integrals = np.append(integrals, integral_substance)
 
-        return integrals
+        enthalpies_corrected = np.array([])
+
+        for substances in self.substances:
+            integral = quad()
 
 class IdealGas_Mix(Abstract_Mix):
 
