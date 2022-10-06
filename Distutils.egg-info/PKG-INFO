@@ -1,7 +1,0 @@
-Metadata-Version: 2.1
-Name: Distutils
-Version: 1.0
-Summary: Python Distribution Utilities
-Home-page: https://www.python.org/sigs/distutils-sig/
-Author: Greg Ward
-Author-email: gward@python.net
