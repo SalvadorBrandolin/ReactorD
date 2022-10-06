@@ -1,22 +1,28 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod
+from Substance import Substance
+from thermo.chemical import Chemical
 
 
 class Abstract_Mix(metaclass = ABCMeta):
-    
+
     """Mixture object abstract class.
 
         Parameters
         ----------
         substance_list : ndarray or list[Substance objects]
             list or array of Substance objects."""
+         
+    def __init__(self, list_of_substances):
+        self.substances = list_of_substances
+        self.enthalpies_formation = self.enthalpies_formation(self.substances) 
+        
+    @abstractmethod
+    def enthalpies_formation(self):
+        pass
 
     @abstractmethod
-    def __init__(self):
-        pass        
-
-    @abstractmethod
-    def concentrations(self):
+    def concentrations(self, moles, temperature, pressure):
         """Concentrations of the mixtures substances at the given moles 
         of each compound, temperature and pressure.
         
@@ -43,7 +49,7 @@ class Abstract_Mix(metaclass = ABCMeta):
         Parameters
         ----------
         moles: ndarray or list [float]
-            moles of each substance
+         moles of each substance
         temperature: float
             Temperature [K]
         pressure: float
@@ -57,7 +63,7 @@ class Abstract_Mix(metaclass = ABCMeta):
         pass
 
     @abstractmethod
-    def mix_heat_capacity(self):
+    def mix_heat_capacity(self, moles, temperature, pressure):
         """Method that returns the heat capacity of the mixture.
 
         Parameters
@@ -94,35 +100,7 @@ class Abstract_Mix(metaclass = ABCMeta):
         total_moles = np.sum(moles, axis=0)
         zi = np.divide(moles, total_moles)
         return zi
-
-    def partial_pressures(self, moles, temperature, pressure):
-        """method that calculates the partial pressures of the mixture
-
-        Parameters
-        ----------
-        moles: ndarray or list [float]
-            moles of each substance
-        temperature: float
-            Temperature [K]
-        pressure: float
-           Total Pressure [Pa]
-
-        Returns
-        -------
-        ndarray
-            array that contains the partial pressures of mixture's 
-            substances
-        """
-        zi = self.mol_fracations(moles)
-        partial_pressures= np.multiply(zi, pressure)
-        return partial_pressures
-
-    def partial_P_2_conc (self, partial_pressures, temperature):
-        R= 8.31446261815324 # J/mol.K
-        self.partial_pressures= np.array(partial_pressures)
-        conc= self.partial_pressures /(R*temperature) # mol/m^3
-        return conc
-
+    
     def __len__(self):
         return len(self.substances)
     
@@ -138,10 +116,14 @@ class Liquid_Mix(Abstract_Mix):
 
     def __init__(self, substance_list):
         self.substances = substance_list
-        self.h_formations = [
+        self.enthalpies_formation = self.enthalpies_formation()
+
+    def enthalpies_formation(self):
+        self.enthalpies_formation = [
                 substance.h_formation for substance in self.substances
             ]
-        
+        pass
+
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)      
         molar_volumes = np.array(
@@ -174,10 +156,13 @@ class IdealGas_Mix(Abstract_Mix):
 
     def __init__(self, substance_list):
         self.substances = substance_list
-        self.h_formations = [
+        self.enthalpies_formation = self.enthalpies_formation()
+
+    def enthalpies_formation(self):
+        self.enthalpies_formation = [
                 substance.h_formation_ig for substance in self.substances
             ]
-
+    
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)      
         
@@ -205,3 +190,31 @@ class IdealGas_Mix(Abstract_Mix):
         )
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
+
+    def partial_pressures(self, moles, temperature, pressure):
+        """method that calculates the partial pressures of the mixture
+
+        Parameters
+        ----------
+        moles: ndarray or list [float]
+            moles of each substance
+        temperature: float
+            Temperature [K]
+        pressure: float
+           Total Pressure [Pa]
+
+        Returns
+        -------
+        ndarray
+            array that contains the partial pressures of mixture's 
+            substances
+        """
+        zi = self.mol_fracations(moles)
+        partial_pressures= np.multiply(zi, pressure)
+        return partial_pressures
+
+    def partial_P_2_conc (self, partial_pressures, temperature):
+        R= 8.31446261815324 # J/mol.K
+        self.partial_pressures= np.array(partial_pressures)
+        conc= self.partial_pressures /(R*temperature) # mol/m^3
+        return conc
