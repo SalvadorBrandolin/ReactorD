@@ -1,5 +1,5 @@
 from thermo.chemical import Chemical
-
+from scipy.integrate import quad
 
 class Substance:
     """Substance object class
@@ -166,3 +166,15 @@ class Substance:
 
     def viscosity_gas(self, T, P):
         return self._viscosity_g_tp(T, P)
+
+    def heat_capacity_liquid_integral(self, temperature1, temperature2):
+        integral, error = quad(
+            self.heat_capacity_liquid, temperature1, temperature2
+        )
+        return integral
+
+    def heat_capacity_gas_integral(self, temperature1, temperature2):
+        integral, error = quad(
+            self.heat_capacity_gas, temperature1, temperature2
+        )
+        return integral

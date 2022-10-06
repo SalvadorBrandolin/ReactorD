@@ -1,5 +1,7 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod
+from scipy.integrate import quad
+from Substance import Substance
 
 
 class Abstract_Mix(metaclass = ABCMeta):
@@ -74,6 +76,10 @@ class Abstract_Mix(metaclass = ABCMeta):
         float
             heat capacity of the mixture [j/mol/K)] 
         """      
+        pass
+    
+    @abstractmethod
+    def pure_heat_capacities_integrals(self):
         pass
 
 # Other methods (Inhereted but not implemented in subclasses)
@@ -168,11 +174,38 @@ class Liquid_Mix(Abstract_Mix):
         )
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
+    
+    def pure_heat_capacities_integrals(self, temperature:float, *args):
+        """Function that calculates the integral of the liquid heat capacities
+        of each pure substance in the mixture, from 298.15 K to temperature.
+        The method heat_capacity_liquid must be defined for each substance in 
+        mixture.
 
+        Parameters
+        ----------
+        temperature : float
+            Final temperature of the integral.
+        
+        Returns
+        -------
+        ndarray
+            1D-array containing the integrals of each pure component of the 
+            mixture in the same order of mixture's substances order. 
+        """
+        t_0 = 298.15
+        integrals = np.array([])
+        
+        for substance in self.mix.substances:
+            integral_substance = substance.heat_capacity_liquid_integral(
+                t_0, temperature
+            )
+            integrals = np.append(integrals, integral_substance)
+
+        return integrals
 
 class IdealGas_Mix(Abstract_Mix):
 
-    def __init__(self, substance_list):
+    def __init__(self, substance_list : list[Substance]):
         self.substances = substance_list
         self.h_formations = [
                 substance.h_formation_ig for substance in self.substances
@@ -182,8 +215,8 @@ class IdealGas_Mix(Abstract_Mix):
         zi = self.mol_fracations(moles)      
         
         molar_volumes = np.array(
-        [substance.volume_gas(temperature, pressure) 
-        for substance in self.substances]
+            [substance.volume_gas(temperature, pressure) 
+            for substance in self.substances]
         )
 
         total_molar_vol = np.dot(zi,molar_volumes)
@@ -205,3 +238,31 @@ class IdealGas_Mix(Abstract_Mix):
         )
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
+
+    def pure_heat_capacities_integrals(self, temperature:float, *args):
+        """Function that calculates the integral of the idel gas heat 
+        capacities of each pure substance in the mixture, from 298.15 K to 
+        temperature. The method heat_capacity_gas must be defined for each
+        substance in mixture.
+
+        Parameters
+        ----------
+        temperature : float
+            Final temperature of the integral
+        
+        Returns
+        -------
+        ndarray
+            1D-array containing the integrals of each pure component of the 
+            mixture in the same order of mixture's substances order. 
+        """
+        t_0 = 298.15
+        integrals = np.array([])
+        
+        for substance in self.substances:
+            integral_substance, error = substance.heat_capacity_gas_integral(
+                t_0, temperature
+            )
+            integrals = np.append(integrals, integral_substance)
+
+        return integrals
