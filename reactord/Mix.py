@@ -5,7 +5,6 @@ from Substance import Substance
 
 
 class Abstract_Mix(metaclass = ABCMeta):
-    
     """Mixture object abstract class.
 
         Parameters
@@ -79,7 +78,7 @@ class Abstract_Mix(metaclass = ABCMeta):
         pass
     
     @abstractmethod
-    def formation_enthalpies_correction(self):
+    def pure_heat_capacities_integral(self):
         pass
 
 # Other methods (Inhereted but not implemented in subclasses)
@@ -143,8 +142,8 @@ class Liquid_Mix(Abstract_Mix):
 
     def __init__(self, substance_list):
         self.substances = substance_list
-        self.h_formations = [
-                substance.h_formation for substance in self.substances
+        self.formation_enthalpies = [
+                substance.formation_enthalpy for substance in self.substances
             ]
         
     def concentrations(self, moles, temperature, pressure):
@@ -174,10 +173,13 @@ class Liquid_Mix(Abstract_Mix):
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
     
-    def formation_enthalpies_correction(self, temperature:float, *args):
+    def pure_heat_capacities_integral(
+        self, 
+        temperature: float, 
+        *args
+    ) -> list[float]:
         """Correction of the standard enthalpies of formation from 298.15 K and
-        1 bar to 'temperature'. As an ideal liquid, the pressure dependece is
-        neglected. 
+       to 'temperature'. The pure substances heat_capacity_liquid are used.
 
         Parameters
         ----------
@@ -187,21 +189,31 @@ class Liquid_Mix(Abstract_Mix):
         Returns
         -------
         ndarray
-            Array containing the temperature corrected enthalpy of formation
-            of each pure substance in the mixture. 
+            Corrected enthalpy of formation of each pure substance in the 
+            mixture [J/mol]. 
         """
+        
+        ref_temperature = 298.15
+        correction_enthalpies = np.array([])
 
-        enthalpies_corrected = np.array([])
-
-        for substances in self.substances:
-            integral = quad()
+        for substance in self.substances:
+            cp_dt_integral = self.mix.heat_capacity_liquid_dt_integral(
+                ref_temperature, temperature
+            )
+            correction_enthalpies = np.append(
+                (correction_enthalpies, 
+                
+                )
+            )
+        
+        return correction_enthalpies
 
 class IdealGas_Mix(Abstract_Mix):
 
     def __init__(self, substance_list : list[Substance]):
         self.substances = substance_list
-        self.h_formations = [
-                substance.h_formation_ig for substance in self.substances
+        self.formation_enthalpies = [
+                substance.formation_enthalpy_ig for substance in self.substances
             ]
 
     def concentrations(self, moles, temperature, pressure):
@@ -232,30 +244,31 @@ class IdealGas_Mix(Abstract_Mix):
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
 
-    def pure_heat_capacities_integrals(self, temperature:float, *args):
-        """Function that calculates the integral of the idel gas heat 
-        capacities of each pure substance in the mixture, from 298.15 K to 
-        temperature. The method heat_capacity_gas must be defined for each
-        substance in mixture.
+    def pure_heat_capacities_integral(self, temperature:float, *args):
+        """Correction of the standard enthalpies of formation from 298.15 K and
+        1 bar to 'temperature'.The pure substances heat_capacity_gas are used.
 
         Parameters
         ----------
         temperature : float
-            Final temperature of the integral
-        
+            Temperature of correction [K].
+
         Returns
         -------
         ndarray
-            1D-array containing the integrals of each pure component of the 
-            mixture in the same order of mixture's substances order. 
+            Corrected enthalpy of formation of each pure substance in the 
+            mixture [J/mol].  
         """
-        t_0 = 298.15
-        integrals = np.array([])
         
-        for substance in self.substances:
-            integral_substance, error = substance.heat_capacity_gas_integral(
-                t_0, temperature
-            )
-            integrals = np.append(integrals, integral_substance)
+        ref_temperature = 298.15
+        correction_enthalpies = np.array([])
 
-        return integrals
+        for substance in self.substances:
+            integral, err = quad(
+                substance.heat_capacity_gas, ref_temperature, temperature
+            )
+            correction_enthalpies = np.append(
+                (correction_enthalpies, integral)
+            )
+        
+        return correction_enthalpies + self.formation_enthalpies

@@ -2,41 +2,27 @@ import numpy as np
 from scipy.integrate import quad
 from abc import ABCMeta 
 from Mix import Abstract_Mix
+from kinetics import Kinetics
 
 class ReactorBase(metaclass=ABCMeta):
 
     def __init__(
         self, 
         mix : Abstract_Mix,
-        dict_of_reactions : dict[str:function],
+        list_of_reactions : dict[str:function],
         stoichiometry : list,
         **options,
     ):                      
         
-        if np.ndim(np.shape(stoichiometry)) == 1:
-            self.num_reactions = 1
-            self.total_substances = np.shape(stoichiometry)[0]
-        else:
-            self.num_reactions, self.total_substances = np.shape(stoichiometry) 
-
-        if self.num_reactions != len(dict_of_reactions):
-            raise IndexError(
-                "'stoichiometry' rows number must be equal to" 
-                "dict_of_reactions' length" 
-            )
-        
-        if len(mix) != self.total_substances:
-            raise IndexError(
-                "'stoichiometry' columns number must be equal to substances" 
-                "number in 'mix' object" 
-            )
-
+        self.kinetic : Kinetics = Kinetics(
+            list_of_reactions=list_of_reactions,
+            mix=mix,
+            stoichiometry=stoichiometry,
+            **options)
         self.stoichiometry = np.array(stoichiometry)
         self.mix = mix
-        self.dict_of_reactions = dict_of_reactions
-        self.std_reaction_enthalpies = np.dot(
-            self.stoichiometry, self.mix.h_formations
-        )
+        self.list_of_reactions = list_of_reactions
+        
         
     def reaction_enthalpies(self, temperature, pressure):
         t_0 = 298.15

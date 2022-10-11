@@ -16,10 +16,10 @@ class Substance:
         Critical pressure of the substance [Pa], by default None
     omega : float
         Acentric factor of the substance, by default None
-    h_formation : float
+    formation_enthalpy : float
         Standard state molar enthalpy of formation [J/mol], by default 
         None.
-    h_formation_ig : float
+    formation_enthalpy_ig : float
         Ideal-gas molar enthalpy of formation [J/mol], by default None
     g_formation : float
         Standard state molar change of Gibbs energy of formation [J/mol]
@@ -63,8 +63,9 @@ class Substance:
     """
 
     def __init__(
-            self, name=None, mw=None, tc=None, pc=None, 
-            omega=None, h_formation=None, h_formation_ig=None, 
+            self, name=None, mw=None, normal_boiling_point=None, tc=None, 
+            pc=None, omega=None, formation_enthalpy=None, 
+            formation_enthalpy_ig=None, 
             g_formation=None, g_formation_ig=None, volume_s_t=None, 
             volume_l_tp=None, volume_g_tp=None, heat_capacity_s_t=None, 
             heat_capacity_l_t=None, heat_capacity_g_t=None,
@@ -76,11 +77,12 @@ class Substance:
         #Pure compound properties:
         self.name = name
         self.mw = mw
+        self.normal_boiling_point = normal_boiling_point
         self.tc = tc
         self.pc = pc
         self.omega = omega
-        self.h_formation = h_formation
-        self.h_formation_ig = h_formation_ig
+        self.formation_enthalpy = formation_enthalpy
+        self.formation_enthalpy_ig = formation_enthalpy_ig
         self.g_formation = g_formation
         self.g_formation_ig = g_formation_ig
         #Temperature dependent properties calculation functions:
@@ -112,12 +114,13 @@ class Substance:
 
         substance_object = cls(
             name=chemobj.name, 
-            mw=chemobj.MW, 
+            mw=chemobj.MW,
+            normal_boiling_point=chemobj.tb? 
             tc=chemobj.Tc, 
             pc=chemobj.Pc, 
             omega=chemobj.omega, 
-            h_formation=chemobj.Hfm, 
-            h_formation_ig=chemobj.Hfgm, 
+            formation_enthalpy=chemobj.Hfm, 
+            formation_enthalpy_ig=chemobj.Hfgm, 
             g_formation=chemobj.Gfm, 
             g_formation_ig=chemobj.Gfgm, 
             volume_s_t=chemobj.VolumeSolid, 
@@ -167,14 +170,30 @@ class Substance:
     def viscosity_gas(self, T, P):
         return self._viscosity_g_tp(T, P)
 
-    def heat_capacity_liquid_integral(self, temperature1, temperature2):
-        integral, error = quad(
-            self.heat_capacity_liquid, temperature1, temperature2
+    def heat_capacity_liquid_dt_integral(
+        self, 
+        temperature1: float,
+        temperature2: float 
+    ) -> float:
+
+        integral, err = quad(
+            self.heat_capacity_liquid,
+            a=temperature1,
+            b=temperature2
         )
+
         return integral
 
-    def heat_capacity_gas_integral(self, temperature1, temperature2):
-        integral, error = quad(
-            self.heat_capacity_gas, temperature1, temperature2
+    def heat_capacity_gas_dt_integral(
+        self, 
+        temperature1: float,
+        temperature2: float 
+    ) -> float:
+
+        integral, err = quad(
+            self.heat_capacity_gas,
+            a=temperature1,
+            b=temperature2
         )
+
         return integral

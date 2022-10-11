@@ -1,6 +1,6 @@
 import numpy as np
 from thermo.eos import R
-from Mix import Mix
+from Mix import Abstract_Mix
 from Substance import Substance
 from scipy.integrate import quad
 
@@ -57,40 +57,34 @@ class Kinetics:
         calculated, default = None.
     """
 
-    def __init__(self, 
-            list_of_reactions, 
-            mix, 
-            stoichiometry, 
-            kinetic_argument = 'concentration',
-            enthalpy_of_reaction = None
-        ):
-                                
-        self.reactions = list_of_reactions
-        self.mix = mix
-        
-        self.kinetic_eval = np.vectorize(
-            self.kinetic_eval, 
-            excluded='self', 
-            signature='(n),(),()->(n),(m)')
+    def __init__(
+            self, 
+            mix : Abstract_Mix,
+            list_of_reactions : list[function],
+            stoichiometry : list[float], 
+            kinetic_argument : str = 'concentration',
+            **options
+        ) -> None:
 
-####    Creation of the stoichiometry matrix:
-                
-        # num_reactions and total_comp are computed differently in
-        # systems with one reaction or more than one reaction        
-        if len(np.shape(stoichiometry)) == 1:
+        # Data validation               
+        if np.ndim(np.shape(stoichiometry)) == 1:
             self.num_reactions = 1
-            self.total_comp = np.shape(stoichiometry)[0]
+            self.total_substances = np.shape(stoichiometry)[0]
         else:
-            self.num_reactions, self.total_comp = np.shape(stoichiometry) 
+            self.num_reactions, self.total_substances = np.shape(stoichiometry) 
 
-        self.stoichiometry = np.array(stoichiometry).reshape(
-            (self.num_reactions, self.total_comp)
-        )
-        self.argument = kinetic_argument.lower()
-        self.std_reaction_enthalpies = self._std_reaction_enthalpies()
+        if self.num_reactions != len(list_of_reactions):
+            raise IndexError(
+                "'stoichiometry' rows number must be equal to" 
+                "list_of_reactions' length" 
+            )
+
+        if len(mix) != self.total_substances:
+            raise IndexError(
+                "'stoichiometry' columns number must be equal to substances" 
+                "number in 'mix' object" 
+            )
         
-        # The method <concentrations> from the class Mix is
-        # assigned to self._composition_calculator 
         if self.argument == 'concentration':
             self._composition_calculator = self.mix.concentrations
         elif self.argument == 'partial_pressure':
@@ -100,29 +94,36 @@ class Kinetics:
                 f"{self.argument} is not a valid kinetic argument"
             )
         
-        """ # The array for enthalpies of reaction is allocated:
-        if enthalpy_of_reaction is None:
-            self._enthalpy_of_reaction_data = np.full(self.num_reactions, None)
-        else:
-            self._enthalpy_of_reaction_data = enthalpy_of_reaction """
+        self.stoichiometry = stoichiometry
+        self.reactions = list_of_reactions
+        self.mix = mix
+        self.argument = kinetic_argument.lower()
+        self.std_reaction_enthalpies = self.std_reaction_enthalpies_calc()
 
-    def kinetic_eval(self, moles, temperature, pressure):
-        """Method that evaluates the reaction 
+    def kinetic_eval(
+        self, 
+        moles : list, 
+        temperature : float, 
+        pressure : float
+    ) -> np.ndarray:
+        """Method that evaluates the reaction rate for the reaction and 
+        for the mix components. 
 
         Parameters
         ----------
-        moles: ndarray or list [float]
+        moles : ndarray or list
             moles of each substance
-        temperature: float
+        temperature : float
             Temperature [K]
-        pressure: float
-            Total Pressure [Pa]
+        pressure : float
+            Pressure [Pa]
 
         Returns
         -------
-        ¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡NO SE DOCUMENTAR ESTA SALIDA!!!!!!!!!!!!!!!!!
-
+        np.ndarray, 
+            
         """
+
         # The partial pressures or concentrations are calculated:
         composition = self._composition_calculator(moles, temperature, pressure)
         
@@ -134,34 +135,23 @@ class Kinetics:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates 
 
-    def _std_reaction_enthalpies(self):
-        return np.dot(self.stoichiometry, self.mix.h_formations)
+    def std_reaction_enthalpies_calc(self) -> list[float]:
+        """Evaluation of the standard reaction enthalpies with the given 
+        stoichiometry matrix and the formation enthalphies of the
+        substances in mixture.
+
+        Returns
+        -------
+        ndarray[float]
+            Reaction enthalpies [J/mol]
+        """
+        return np.dot(self.stoichiometry, self.mix.formation_enthalpies)
 
     def reaction_enthalpies(self, temperature, pressure):
-        t_0 = 298.15
-
-        if self.mix.phase == 'liquid':
-            cp_dt_integrals = np.array([])
-
-            for substance in self.mix.substances:
-                cp_dt_int, error = quad(
-                    substance.heat_capacity_liquid, t_0, temperature,
-                )
-                cp_dt_integrals = np.append(cp_dt_integrals, cp_dt_int)
-            
-            dh = np.dot(self.stoichiometry, cp_dt_integrals)
-
-        if self.mix.phase == 'gas':
-            cp_dt_integrals = np.array([])
-
-            for substance in self.mix.substances:
-                cp_dt_integral, error = quad(
-                    substance.heat_capacity_gas, t_0, temperature
-                )
-                cp_dt_integrals = np.append(cp_dt_integrals, cp_dt_integral)
-            
-            dh = np.dot(self.stoichiometry, cp_dt_integrals)
-
+        
+        corr_enthalpies = 
+        dh = np.dot(self.stoichiometry, cp_dt_integrals)
+        
         return (dh + self.std_reaction_enthalpies)
 
 
@@ -196,7 +186,7 @@ print(f"Las entalpias de reaccion son: "
 
 print("\nRevision de la matriz estequiometrica")
 print(f"Numero de reacciones: {cinetica.num_reactions}\n"
-      f"Numero de componentes: {cinetica.total_comp}")
+      f"Numero de componentes: {cinetica.total_substances}")
 
 
 # ENTHALPY TEST EVALUATION FOR AN EXOTHERMIC REACTION:
@@ -232,4 +222,4 @@ print(f"The enthalpy of the combustion reaction is: "
 
 print("\nRevision de la matriz estequiometrica")
 print(f"Numero de reacciones: {exothermic_reaction_kinetics.num_reactions}\n"
-      f"Numero de componentes: {exothermic_reaction_kinetics.total_comp}") """
+      f"Numero de componentes: {exothermic_reaction_kinetics.total_substances}") """
