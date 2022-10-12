@@ -1,19 +1,13 @@
 #%%
-from Substance import Substance
-from Mix import Mix
-from kinetics import Kinetics
-from reactord.pfr_homogeneous_stationary import Homogeneous_PFR
+from ..reactord import Substance
 import numpy as np
-""" Reaccion quimica agua -> etanol, con cinetica kCagua.
-Al reactor ingresa 10 mol/tiempo de agua pura a 298.15 K
-La reaccions e realiza a pression atmosférica. Y es adiabatica. """
 
-#Substance definition
-water = Substance.from_thermo_database('water')
-ethanol = Substance.from_thermo_database('ethanol')
+water = rd.Substance.from_thermo_database('water')
+ethanol = rd.Substance.from_thermo_database('ethanol')
 
+#%%
 #mixture definition
-mix = Mix(np.array([water, ethanol]), 'liquid')
+mix = rd.Liquid_Mix([water, ethanol])
 
 #stoichiometry definition
 stoichiometry = np.array([-1,1])
@@ -56,5 +50,3 @@ plt.plot(x, Ta)
 
 plt.figure(2)
 plt.plot(x, P)
-
-# %%

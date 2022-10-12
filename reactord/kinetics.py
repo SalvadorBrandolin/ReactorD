@@ -1,8 +1,10 @@
+from typing_extensions import Self
 import numpy as np
 from thermo.eos import R
 from Mix import Abstract_Mix
 from Substance import Substance
 from scipy.integrate import quad
+from decorators import vectorize
 
 
 class Kinetics:
@@ -100,6 +102,7 @@ class Kinetics:
         self.argument = kinetic_argument.lower()
         self.std_reaction_enthalpies = self.std_reaction_enthalpies_calc()
 
+    @vectorize(signature='(n),(),()->(),()', exclude='self')
     def kinetic_eval(
         self, 
         moles : list, 
@@ -147,12 +150,12 @@ class Kinetics:
         """
         return np.dot(self.stoichiometry, self.mix.formation_enthalpies)
 
-    def reaction_enthalpies(self, temperature, pressure):
+"""     def reaction_enthalpies(self, temperature, pressure):
         
         corr_enthalpies = 
         dh = np.dot(self.stoichiometry, cp_dt_integrals)
         
-        return (dh + self.std_reaction_enthalpies)
+        return (dh + self.std_reaction_enthalpies) """
 
 
 """ # TEST FOR A SYSTEM COMPRISED OF 2 DIFFERENT REACTIONS WITH

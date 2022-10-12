@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.integrate import quad
-from abc import ABCMeta 
+from abc import ABCMeta, abstractmethod 
 from Mix import Abstract_Mix
 from kinetics import Kinetics
 
@@ -8,9 +8,9 @@ class ReactorBase(metaclass=ABCMeta):
 
     def __init__(
         self, 
-        mix : Abstract_Mix,
-        list_of_reactions : dict[str:function],
-        stoichiometry : list,
+        mix: Abstract_Mix,
+        list_of_reactions: list[function],
+        stoichiometry: list[float],
         **options,
     ):                      
         
@@ -22,25 +22,23 @@ class ReactorBase(metaclass=ABCMeta):
         self.stoichiometry = np.array(stoichiometry)
         self.mix = mix
         self.list_of_reactions = list_of_reactions
-        
-        
+    
     def reaction_enthalpies(self, temperature, pressure):
-        t_0 = 298.15
-        pure_cp_integrals = self.mix.pure_heat_capacities_integrals(
-            temperature, pressure
-        )
-        enthalpies_change = np.dot(self.stoichiometry, pure_cp_integrals)
-        return (self.std_reaction_enthalpies + enthalpies_change)
+        pass
 
+    @abstractmethod
     def _border_condition_builder(self):
         pass
 
+    @abstractmethod
     def _mass_balance(self):
         pass
 
+    @abstractmethod
     def _energy_balance(self):
         pass
 
+    @abstractmethod
     def _pressure_balance(self):
         pass
 
@@ -49,9 +47,7 @@ class ReactorBase(metaclass=ABCMeta):
     
     def _particle_energy_balance(self):
         pass
-    
-    def _result_report(self):
-        pass
 
+    @abstractmethod
     def solve(self):
         pass

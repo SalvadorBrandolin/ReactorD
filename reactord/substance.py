@@ -115,7 +115,7 @@ class Substance:
         substance_object = cls(
             name=chemobj.name, 
             mw=chemobj.MW,
-            normal_boiling_point=chemobj.tb? 
+            normal_boiling_point=chemobj.Tb, 
             tc=chemobj.Tc, 
             pc=chemobj.Pc, 
             omega=chemobj.omega, 
