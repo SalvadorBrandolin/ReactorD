@@ -1,6 +1,6 @@
 #%%
-from Substance import Substance
-from Mix import Mix
+from substance import Substance
+from Mix import Liquid_Mix, IdealGas_Mix
 from kinetics import Kinetics
 from reactord.pfr_homogeneous_stationary import Homogeneous_PFR
 import numpy as np
