@@ -69,7 +69,7 @@ class Substance:
             normal_boiling_point: str=None, 
             tc=None, 
             pc=None, 
-            mega=None, 
+            omega=None, 
             formation_enthalpy=None, 
             formation_enthalpy_ig=None, 
             formation_gibbs=None, 
