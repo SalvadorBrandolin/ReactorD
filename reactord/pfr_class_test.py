@@ -2,7 +2,7 @@
 from substance import Substance
 from Mix import Liquid_Mix, IdealGas_Mix
 from kinetics import Kinetics
-from reactord.pfr_homogeneous_stationary import Homogeneous_PFR
+from pfr_homogeneous_stationary import Homogeneous_PFR
 import numpy as np
 """ Reaccion quimica agua -> etanol, con cinetica kCagua.
 Al reactor ingresa 10 mol/tiempo de agua pura a 298.15 K

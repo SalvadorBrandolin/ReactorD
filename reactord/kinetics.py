@@ -1,4 +1,3 @@
-from typing_extensions import Self
 import numpy as np
 from thermo.eos import R
 from Mix import Abstract_Mix
@@ -62,7 +61,7 @@ class Kinetics:
     def __init__(
             self, 
             mix : Abstract_Mix,
-            list_of_reactions : list[function],
+            list_of_reactions : list,
             stoichiometry : list[float], 
             kinetic_argument : str = 'concentration',
             **options
