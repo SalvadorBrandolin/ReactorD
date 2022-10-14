@@ -1,10 +1,9 @@
-from typing_extensions import Self
 import numpy as np
 from thermo.eos import R
-from Mix import Abstract_Mix
+from Mix import Abstract_Mix, IdealGas_Mix, Liquid_Mix
 from Substance import Substance
 from scipy.integrate import quad
-from decorators import vectorize
+from utils import vectorize
 
 
 class Kinetics:
@@ -61,53 +60,58 @@ class Kinetics:
 
     def __init__(
             self, 
-            mix : Abstract_Mix,
-            list_of_reactions : list[function],
-            stoichiometry : list[float], 
-            kinetic_argument : str = 'concentration',
+            mix: Abstract_Mix,
+            list_of_reactions: list,
+            stoichiometry: list, 
+            kinetic_argument: str = 'concentration',
             **options
         ) -> None:
 
+        
+        self.reactions = list_of_reactions
+        self.mix = mix
+        self.kinetic_argument = kinetic_argument.lower()
+        
         # Data validation               
-        if np.ndim(np.shape(stoichiometry)) == 1:
+        if np.ndim(stoichiometry) == 1:
             self.num_reactions = 1
-            self.total_substances = np.shape(stoichiometry)[0]
+            self.num_substances = np.shape(stoichiometry)[0]
         else:
-            self.num_reactions, self.total_substances = np.shape(stoichiometry) 
+            self.num_reactions, self.num_substances = np.shape(stoichiometry) 
 
         if self.num_reactions != len(list_of_reactions):
             raise IndexError(
                 "'stoichiometry' rows number must be equal to" 
-                "list_of_reactions' length" 
+                " list_of_reactions' length" 
             )
 
-        if len(mix) != self.total_substances:
+        if len(mix) != self.num_substances:
             raise IndexError(
                 "'stoichiometry' columns number must be equal to substances" 
                 "number in 'mix' object" 
             )
         
-        if self.argument == 'concentration':
+        if self.kinetic_argument == 'concentration':
             self._composition_calculator = self.mix.concentrations
-        elif self.argument == 'partial_pressure':
+        elif self.kinetic_argument == 'partial_pressure':
             self._composition_calculator = self.mix.partial_pressures
         else:
             raise ValueError(
-                f"{self.argument} is not a valid kinetic argument"
+                f"{self.kinetic_argument} is not a valid kinetic argument"
             )
-        
-        self.stoichiometry = stoichiometry
-        self.reactions = list_of_reactions
-        self.mix = mix
-        self.argument = kinetic_argument.lower()
+
+        self.stoichiometry = np.array(stoichiometry).reshape(
+            self.num_reactions, self.num_substances
+        )
         self.std_reaction_enthalpies = self.std_reaction_enthalpies_calc()
 
-    @vectorize(signature='(n),(),()->(),()', exclude='self')
+
+    @vectorize(signature='(n),(),()->(n),(m)', excluded={0})
     def kinetic_eval(
         self, 
-        moles : list, 
-        temperature : float, 
-        pressure : float
+        moles: list, 
+        temperature: float, 
+        pressure: float
     ) -> np.ndarray:
         """Method that evaluates the reaction rate for the reaction and 
         for the mix components. 
@@ -123,7 +127,7 @@ class Kinetics:
 
         Returns
         -------
-        np.ndarray, 
+        ndarray, ndarray
             
         """
 
@@ -134,11 +138,11 @@ class Kinetics:
         reaction_rates = np.array(
             [reaction(composition, temperature) for reaction in self.reactions]               
         )
-        # Rates for each compound:     
+        # Rates for each compound:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates 
 
-    def std_reaction_enthalpies_calc(self) -> list[float]:
+    def std_reaction_enthalpies_calc(self) -> np.ndarray:
         """Evaluation of the standard reaction enthalpies with the given 
         stoichiometry matrix and the formation enthalphies of the
         substances in mixture.
@@ -150,7 +154,7 @@ class Kinetics:
         """
         return np.dot(self.stoichiometry, self.mix.formation_enthalpies)
 
-"""     def reaction_enthalpies(self, temperature, pressure):
+""" def reaction_enthalpies(self, temperature, pressure):
         
         corr_enthalpies = 
         dh = np.dot(self.stoichiometry, cp_dt_integrals)
@@ -174,18 +178,18 @@ list_of_reactions = [reaction1, reaction2]
 water = Substance.from_thermo_database("water")
 ether = Substance.from_thermo_database("ether")
 methane = Substance.from_thermo_database("methane")
-mix_p = Mix([water, ether, methane], "liquid")
+mix_p = Liquid_Mix([water, ether, methane])
 stoichiometry_p = ([[-1,1,0],[-1,0,1]])
 
-cinetica = Kinetics(list_of_reactions, mix_p, stoichiometry_p)
+cinetica = Kinetics(mix_p, list_of_reactions, stoichiometry_p)
 
 rates_i, rate_rxns = cinetica.kinetic_eval(np.array([1, 1, 2]), 300, 101325)
 
 print(f"velocidades por componente: {rates_i}")
 print(f"velocidades por reaccion: {rate_rxns}")
 
-print(f"Las entalpias de reaccion son: " 
-        f"{cinetica.reaction_enthalpies(500, 101325)}")
+#print(f"Las entalpias de reaccion son: " 
+#        f"{cinetica.reaction_enthalpies(500, 101325)}")
 
 print("\nRevision de la matriz estequiometrica")
 print(f"Numero de reacciones: {cinetica.num_reactions}\n"
@@ -206,23 +210,22 @@ water = Substance.from_thermo_database("water")
 co2 = Substance.from_thermo_database("co2")
 
 # Objects from classes Mix, Stoichiometry and Kinetics are created
-exothermic_reaction_mix = Mix([methane, oxygen, water, co2], 'gaS')
+exothermic_reaction_mix = IdealGas_Mix([methane, oxygen, water, co2])
 stoichiometry_exothermic = ([-1, -2, 2, 1])
  
 exothermic_reaction_kinetics = Kinetics(
-    reaction_list, exothermic_reaction_mix, stoichiometry_exothermic
-) 
+    exothermic_reaction_mix,reaction_list,stoichiometry_exothermic)
 
-enthalpy = exothermic_reaction_kinetics.reaction_enthalpies(298, 101325)
+#enthalpy = exothermic_reaction_kinetics.reaction_enthalpies(298, 101325)
 
-if float(enthalpy) <= 0:
-    print("\nEnthalpy is a negative value, as expected")
-else:
-    print("\nEnthalpy is not a negative number!!")
+#if float(enthalpy) <= 0:
+#    print("\nEnthalpy is a negative value, as expected")
+#else:
+#    print("\nEnthalpy is not a negative number!!")
 
-print(f"The enthalpy of the combustion reaction is: "
-      f"{round(float(enthalpy),2)} J/mol")
+#print(f"The enthalpy of the combustion reaction is: "
+#      f"{round(float(enthalpy),2)} J/mol")
 
-print("\nRevision de la matriz estequiometrica")
-print(f"Numero de reacciones: {exothermic_reaction_kinetics.num_reactions}\n"
-      f"Numero de componentes: {exothermic_reaction_kinetics.total_substances}") """
+#print("\nRevision de la matriz estequiometrica")
+#print(f"Numero de reacciones: {exothermic_reaction_kinetics.num_reactions}\n"
+#      f"Numero de componentes: {exothermic_reaction_kinetics.total_substances}") """

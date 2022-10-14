@@ -2,7 +2,7 @@ from ReactorBase import ReactorBase
 from kinetics import Kinetics
 from Mix import Abstract_Mix
 from scipy.integrate import solve_bvp
-from decorators import vectorize
+from utils import vectorize
 import numpy as np
 
 
@@ -11,37 +11,41 @@ class PFR_Homog_Stat_Isoth(ReactorBase):
     def __init__(
         self, 
         mix: Abstract_Mix,
-        list_of_reactions: list[function],
-        stoichiometry: list[float],
-        reactor_dims_minmax: list[float], 
+        list_of_reactions: list,
+        stoichiometry: list,
+        reactor_dims_minmax: list, 
         transversal_area: float,
         pressure: float,
         reactor_isothermic_temperature: float, 
-        reactor_f_in: list[float|str], 
-        reactor_f_out: list[float|str],
+        reactor_f_in: list, 
+        reactor_f_out: list,
+        kinetic_argument: str = 'concentration',
         **options     
     ):
 
-        ReactorBase.__init__(
-            self,
-            mix=mix,
+        self.kinetic : Kinetics = Kinetics(
             list_of_reactions=list_of_reactions,
+            mix=mix,
             stoichiometry=stoichiometry,
-            options=options 
-        )
-
+            kinetic_argument=kinetic_argument,
+            **options)
+            
+        self.stoichiometry = np.array(stoichiometry)
+        self.mix = mix
+        self.list_of_reactions = list_of_reactions
         self.reactor_dims_minmax = reactor_dims_minmax
         self.transversal_area = transversal_area
         self.pressure = pressure
         self.temperature = reactor_isothermic_temperature
-        self.reactor_f_in = reactor_f_in
-        self.reactor_f_out = reactor_f_out
+        self.reactor_f_in = np.array(reactor_f_in)
+        self.reactor_f_out = np.array(reactor_f_out)
 
         #Index where border conditions are given
-        self._in_index = np.argwhere(
-            np.isin(self.reactor_f_in, 'var', invert=True)).ravel()
-        self._out_index = np.argwhere(
-            np.isin(self.reactor_f_out,'var', invert=True)).ravel()
+        self._in_index = np.invert(np.isnan(reactor_f_in))
+        self._out_index = np.invert(np.isnan(reactor_f_out))
+
+        self._in_index = np.argwhere(self._in_index).ravel()
+        self._out_index = np.argwhere(self._out_index).ravel()
 
     def _grid_builder(self, grid_size: int):
         dim_array = np.linspace(self.reactor_dims_minmax[0], 
@@ -61,7 +65,7 @@ class PFR_Homog_Stat_Isoth(ReactorBase):
         return bc
 
     def _initial_guess_builder(self, grid_size):
-        n_comp = self.kinetic.total_substances
+        n_comp = self.kinetic.num_substances
         initial_guess = np.zeros([n_comp, grid_size])
         
         for i in self._in_index:
@@ -72,7 +76,7 @@ class PFR_Homog_Stat_Isoth(ReactorBase):
 
         return initial_guess
 
-    @vectorize(signature='()->()', exclude='self')
+    @vectorize(signature='()->()', excluded={0})
     def _mass_balance(self, substances_reaction_rates):
         dfi_dz = substances_reaction_rates * self.transversal_area
         return dfi_dz
@@ -83,10 +87,16 @@ class PFR_Homog_Stat_Isoth(ReactorBase):
     def _pressure_balance(self, grid_size):
         pass
 
+    def _particle_mass_balance(self):
+        pass
+
+    def _particle_energy_balance(self):
+        pass
+
     def _refrigerant_energy_balance(self):
         pass
 
-    def solve(self, grid_size=1000,  tol=0.001, max_nodes=1000, verbose=0):
+    def simulate(self, grid_size=1000,  tol=0.001, max_nodes=1000, verbose=0):
         
         def odesystem(z,vars):
             molar_fluxes = np.transpose(vars)
@@ -94,9 +104,9 @@ class PFR_Homog_Stat_Isoth(ReactorBase):
             ri_rates, reaction_rates = self.kinetic.kinetic_eval(
                 molar_fluxes, self.temperature, self.pressure
             )
-
-            df_dz = self._mass_balance(ri_rates)   
-
+            
+            df_dz = self._mass_balance(ri_rates).T   
+            
             return df_dz
 
         z = self._grid_builder(grid_size)
