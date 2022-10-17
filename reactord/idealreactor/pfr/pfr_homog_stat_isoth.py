@@ -1,15 +1,16 @@
-from reactord.reactorbase import ReactorBase
-from reactord.kinetics import Kinetics
-from reactord.mix import Abstract_Mix
-from scipy.integrate import solve_bvp
-from reactord.utils import vectorize
 import numpy as np
+from scipy.integrate import solve_bvp
+
+from reactord.kinetics import Kinetics
+from reactord.mix import AbstractMix
+from reactord.reactorbase import ReactorBase
+from reactord.utils import vectorize
 
 
 class PfrHomogStatIsoth(ReactorBase):
     def __init__(
         self,
-        mix: Abstract_Mix,
+        mix: AbstractMix,
         list_of_reactions: list,
         stoichiometry: list,
         reactor_dims_minmax: list,

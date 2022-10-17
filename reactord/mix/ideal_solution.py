@@ -1,5 +1,7 @@
 import numpy as np
+
 from reactord.substance import Substance
+
 from .abstract_mix import AbstractMix
 
 
@@ -63,5 +65,7 @@ class IdealSolution(AbstractMix):
                     enthalpies, substance.formation_enthalpy + dhs + dhf + dhl
                 )
             else:
-                enthalpies = np.append(enthalpies, substance.formation_enthalpy)
+                enthalpies = np.append(
+                    enthalpies, substance.formation_enthalpy
+                )
         return enthalpies

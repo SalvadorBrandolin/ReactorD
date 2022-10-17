@@ -1,5 +1,7 @@
 import numpy as np
+
 from reactord.substance import Substance
+
 from .abstract_mix import AbstractMix
 
 
@@ -66,8 +68,8 @@ class IdealGas(AbstractMix):
         partial_pressures = np.multiply(zi, pressure)
         return partial_pressures
 
-    def partial_P_2_conc(self, partial_pressures, temperature):
-        R = 8.31446261815324  # J/mol.K
+    def partial_p_to_conc(self, partial_pressures, temperature):
+        r = 8.31446261815324  # J/mol.K
         self.partial_pressures = np.array(partial_pressures)
-        conc = self.partial_pressures / (R * temperature)  # mol/m^3
+        conc = self.partial_pressures / (r * temperature)  # mol/m^3
         return conc

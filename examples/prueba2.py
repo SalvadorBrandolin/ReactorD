@@ -1,20 +1,21 @@
-#%%
-import reactord as rd
+import matplotlib.pyplot as plt
 import numpy as np
+
+import reactord as rd
 
 water = rd.Substance.from_thermo_database("water")
 ethanol = rd.Substance.from_thermo_database("ethanol")
 
-#%%
-# mixture definition
-mix = rd.Ideal_Solution([water, ethanol])
+mix = rd.mix.IdealSolution([water, ethanol])
 
-#%%
 # stoichiometry definition
 stoichiometry = np.array([-1, 1])
+
 # kinetic law
-def christ_reaction(concentrations, T):
-    ra = 100 * np.exp(-30000 / (8.314 * T)) * concentrations[0]
+
+
+def christ_reaction(concentrations, t):
+    ra = 100 * np.exp(-30000 / (8.314 * t)) * concentrations[0]
     return ra
 
 
@@ -24,7 +25,7 @@ area = 1
 f_in = np.array([10, 0])
 f_out = np.array([np.nan, np.nan])
 
-pfr = rd.PFR_Homog_Stat_Isoth(
+pfr = rd.PfrHomogStatIsoth(
     mix=mix,
     list_of_reactions=[christ_reaction],
     stoichiometry=stoichiometry,
@@ -37,11 +38,7 @@ pfr = rd.PFR_Homog_Stat_Isoth(
     kinetic_argument="concentration",
 )
 
-#%%
 solution = pfr.simulate(1000)
-
-#%%
-import matplotlib.pyplot as plt
 
 x = solution.x
 
@@ -50,5 +47,3 @@ Fa, Fb = solution.y
 plt.figure(0)
 plt.plot(x, Fa)
 plt.plot(x, Fb)
-
-# %%

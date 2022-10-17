@@ -1,5 +1,6 @@
 import numpy as np
-from reactord.mix.abstract_mix import Abstract_Mix
+
+from reactord.mix.abstract_mix import AbstractMix
 from reactord.utils import vectorize
 
 
@@ -57,7 +58,7 @@ class Kinetics:
 
     def __init__(
         self,
-        mix: Abstract_Mix,
+        mix: AbstractMix,
         list_of_reactions: list,
         stoichiometry: list,
         kinetic_argument: str = "concentration",
