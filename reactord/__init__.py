@@ -1,3 +1,4 @@
-from .Substance import Substance
-from .Mix import *
-from .pfr_homog_stat_isoth import PFR_Homog_Stat_Isoth
+from .substance import Substance
+from .mix import *
+from .idealreactor import *
+from .utils import vectorize

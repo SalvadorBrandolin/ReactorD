@@ -1,6 +1,6 @@
-from thermo import EnthalpySublimation
-from thermo.chemical import Chemical
 from scipy.integrate import quad
+from thermo.chemical import Chemical
+
 
 class Substance:
     """Substance object class
@@ -18,7 +18,7 @@ class Substance:
     omega : float
         Acentric factor of the substance, by default None
     formation_enthalpy : float
-        Standard state molar enthalpy of formation [J/mol], by default 
+        Standard state molar enthalpy of formation [J/mol], by default
         None.
     formation_enthalpy_ig : float
         Ideal-gas molar enthalpy of formation [J/mol], by default None
@@ -26,71 +26,71 @@ class Substance:
         Standard state molar change of Gibbs energy of formation [J/mol]
         , by default None
     formation_gibbs_ig : float
-        Ideal-gas molar change of Gibbs energy of formation [J/mol], by 
+        Ideal-gas molar change of Gibbs energy of formation [J/mol], by
         default None
     volume_s_t : function
-        Solid molar volume as a python function of temperature 
+        Solid molar volume as a python function of temperature
         volume_solid(T) [m^3/mol], by default None
     volume_l_tp : function
-        Liquid molar volume as a python function of temperature [K] 
-        and pressure [Pa], volume_liquid(T, P) [m^3/mol], by default 
+        Liquid molar volume as a python function of temperature [K]
+        and pressure [Pa], volume_liquid(T, P) [m^3/mol], by default
         None
     volume_g_tp : function
-        Gas molar volume as a python function of temperature [K] 
+        Gas molar volume as a python function of temperature [K]
         and pressure [Pa], volume_gas(T, P) [m^3/mol], by default None
     heat_capacity_s_t : function
-        Solid heat capacity as a python function of temperature 
+        Solid heat capacity as a python function of temperature
         [K], heat_capacity_solid(T) [J/mol/K], by default None
     heat_capacity_l_t : function
-        Liquid heat capacity as a python function of temperature 
+        Liquid heat capacity as a python function of temperature
         [K], heat_capacity_liquid(T) [J/mol/K], by default None
     heat_capacity_g_t : function
         Ideal-gas heat capacity as a python function of temperature
         [K], heat_capacity_gas(T) [J/mol/K], by default None
     thermal_conductivity_l_tp : function
-        Liquid thermal conductivity as a python function of temperature 
-        [K] and pressure [Pa], thermal_conductivity_liquid(T) [W/m/K], 
+        Liquid thermal conductivity as a python function of temperature
+        [K] and pressure [Pa], thermal_conductivity_liquid(T) [W/m/K],
         by default None
     thermal_conductivity_g_tp : function
-        Gas thermal conductivity as a python function of temperature [K] 
-        and pressure [Pa], thermal_conductivity_liquid(T) [W/m/K], by 
+        Gas thermal conductivity as a python function of temperature [K]
+        and pressure [Pa], thermal_conductivity_liquid(T) [W/m/K], by
         default None
     viscosity_l_tp : function
-        Liquid viscocity as a python function of temperature [K] and 
+        Liquid viscocity as a python function of temperature [K] and
         pressure [Pa], viscosity_liquid(T) [W/m/K], by default None
     viscosity_g_tp : function
-        Gas viscocity as a python function of temperature [K] and 
+        Gas viscocity as a python function of temperature [K] and
         pressure [Pa], viscosity_gas(T) [W/m/K], by default None
     """
 
     def __init__(
-            self, 
-            name=None, 
-            mw=None, 
-            normal_boiling_point=None, 
-            normal_melting_point=None, 
-            tc=None, 
-            pc=None, 
-            omega=None, 
-            formation_enthalpy=None, 
-            formation_enthalpy_ig=None, 
-            g_formation=None, 
-            g_formation_ig=None, 
-            vaporization_enthalpy_t=None,
-            sublimation_enthalpy_t=None,
-            volume_s_t=None, 
-            volume_l_tp=None,
-            volume_g_tp=None, 
-            heat_capacity_s_t=None, 
-            heat_capacity_l_t=None, 
-            heat_capacity_g_t=None,
-            thermal_conductivity_l_tp=None, 
-            thermal_conductivity_g_tp=None, 
-            viscosity_l_tp=None, 
-            viscosity_g_tp=None
-        ):
-        
-        #Pure compound properties:
+        self,
+        name=None,
+        mw=None,
+        normal_boiling_point=None,
+        normal_melting_point=None,
+        tc=None,
+        pc=None,
+        omega=None,
+        formation_enthalpy=None,
+        formation_enthalpy_ig=None,
+        g_formation=None,
+        g_formation_ig=None,
+        vaporization_enthalpy_t=None,
+        sublimation_enthalpy_t=None,
+        volume_s_t=None,
+        volume_l_tp=None,
+        volume_g_tp=None,
+        heat_capacity_s_t=None,
+        heat_capacity_l_t=None,
+        heat_capacity_g_t=None,
+        thermal_conductivity_l_tp=None,
+        thermal_conductivity_g_tp=None,
+        viscosity_l_tp=None,
+        viscosity_g_tp=None,
+    ):
+
+        # Pure compound properties:
         self.name = name
         self.mw = mw
         self.normal_boiling_point = normal_boiling_point
@@ -102,7 +102,7 @@ class Substance:
         self.formation_enthalpy_ig = formation_enthalpy_ig
         self.g_formation = g_formation
         self.g_formation_ig = g_formation_ig
-        #Temperature dependent properties calculation functions:
+        # Temperature dependent properties calculation functions:
         self._vaporization_enthalpy_t = vaporization_enthalpy_t
         self._sublimation_enthalpy_t = sublimation_enthalpy_t
         self._volume_s_t = volume_s_t
@@ -111,63 +111,64 @@ class Substance:
         self._heat_capacity_s_t = heat_capacity_s_t
         self._heat_capacity_l_t = heat_capacity_l_t
         self._heat_capacity_g_t = heat_capacity_g_t
-        #self._thermal_conductivity_s_tp = thermal_conductivity_s_tp 
+        # self._thermal_conductivity_s_tp = thermal_conductivity_s_tp
         self._thermal_conductivity_l_tp = thermal_conductivity_l_tp
         self._thermal_conductivity_g_tp = thermal_conductivity_g_tp
         self._viscosity_l_tp = viscosity_l_tp
         self._viscosity_g_tp = viscosity_g_tp
-            
+
     @classmethod
-    def from_thermo_database(cls, ID):
+    def from_thermo_database(cls, identificator):
         """Method that use Bell Caleb's thermo library to construct the
         Substance object. Cite: Caleb Bell and Contributors (2016-2021).
-        Thermo: Chemical properties component of Chemical Engineering 
+        Thermo: Chemical properties component of Chemical Engineering
         Design Library (ChEDL) https://github.com/CalebBell/thermo.
 
         Parameters
         ----------
-        ID : string
+        identificator : string
             Name or CAS number of the substance
         """
-        chemobj = Chemical(ID)
-        
+        chemobj = Chemical(identificator)
+
         substance_object = cls(
-            name=chemobj.name, 
+            name=chemobj.name,
             mw=chemobj.MW,
-            normal_boiling_point=chemobj.Tb, 
+            normal_boiling_point=chemobj.Tb,
             normal_melting_point=chemobj.Tm,
-            tc=chemobj.Tc, 
-            pc=chemobj.Pc, 
-            omega=chemobj.omega, 
-            formation_enthalpy=chemobj.Hfm, 
-            formation_enthalpy_ig=chemobj.Hfgm, 
+            tc=chemobj.Tc,
+            pc=chemobj.Pc,
+            omega=chemobj.omega,
+            formation_enthalpy=chemobj.Hfm,
+            formation_enthalpy_ig=chemobj.Hfgm,
             vaporization_enthalpy_t=chemobj.EnthalpyVaporization,
             sublimation_enthalpy_t=chemobj.EnthalpySublimation,
-            g_formation=chemobj.Gfm, 
-            g_formation_ig=chemobj.Gfgm, 
-            volume_s_t=chemobj.VolumeSolid, 
-            volume_l_tp=chemobj.VolumeLiquid, 
-            volume_g_tp=chemobj.VolumeGas, 
-            heat_capacity_s_t=chemobj.HeatCapacitySolid, 
-            heat_capacity_l_t=chemobj.HeatCapacityLiquid, 
+            g_formation=chemobj.Gfm,
+            g_formation_ig=chemobj.Gfgm,
+            volume_s_t=chemobj.VolumeSolid,
+            volume_l_tp=chemobj.VolumeLiquid,
+            volume_g_tp=chemobj.VolumeGas,
+            heat_capacity_s_t=chemobj.HeatCapacitySolid,
+            heat_capacity_l_t=chemobj.HeatCapacityLiquid,
             heat_capacity_g_t=chemobj.HeatCapacityGas,
-            thermal_conductivity_l_tp=chemobj.ThermalConductivityLiquid, 
-            thermal_conductivity_g_tp=chemobj.ThermalConductivityGas, 
-            viscosity_l_tp=chemobj.ViscosityLiquid, 
-            viscosity_g_tp=chemobj.ViscosityGas
+            thermal_conductivity_l_tp=chemobj.ThermalConductivityLiquid,
+            thermal_conductivity_g_tp=chemobj.ThermalConductivityGas,
+            viscosity_l_tp=chemobj.ViscosityLiquid,
+            viscosity_g_tp=chemobj.ViscosityGas,
         )
         return substance_object
 
     def vaporization_enthalpy(self, temperature):
-        return self._vaporization_enthalpy_t(temperature)    
+        return self._vaporization_enthalpy_t(temperature)
 
-    def sublimation_enthalpy(self,temperature):
-        return self._sublimation_enthalpy_t(temperature)    
+    def sublimation_enthalpy(self, temperature):
+        return self._sublimation_enthalpy_t(temperature)
 
     def fusion_enthalpy(self, temperature):
-        fusion_h = (self._sublimation_enthalpy_t(temperature)
-                   - self._vaporization_enthalpy_t(temperature))
-        return fusion_h 
+        fusion_h = self._sublimation_enthalpy_t(
+            temperature
+        ) - self._vaporization_enthalpy_t(temperature)
+        return fusion_h
 
     def volume_solid(self, temperature):
         return self._volume_s_t(temperature)
@@ -187,12 +188,12 @@ class Substance:
     def heat_capacity_gas(self, temperature):
         return self._heat_capacity_g_t(temperature)
 
-    #def thermal_conductivity_solid(self, temperature, pressure):
-        #Not implemented (not in thermo library)
+    # def thermal_conductivity_solid(self, temperature, pressure):
+    # Not implemented (not in thermo library)
     #    return self._thermal_conductivity_s_tp(temperature, pressure)
 
     def thermal_conductivity_liquid(self, temperature, pressure):
-        return self._thermal_conductivity_l_tp(temperature, pressure)  
+        return self._thermal_conductivity_l_tp(temperature, pressure)
 
     def thermal_conductivity_gas(self, temperature, pressure):
         return self._thermal_conductivity_g_tp(temperature, pressure)
@@ -204,43 +205,31 @@ class Substance:
         return self._viscosity_g_tp(temperature, pressure)
 
     def heat_capacity_solid_dt_integral(
-        self, 
-        temperature1: float,
-        temperature2: float 
+        self, temperature1: float, temperature2: float
     ) -> float:
 
         integral, err = quad(
-            self.heat_capacity_solid,
-            a=temperature1,
-            b=temperature2
+            self.heat_capacity_solid, a=temperature1, b=temperature2
         )
 
         return integral
 
     def heat_capacity_liquid_dt_integral(
-        self, 
-        temperature1: float,
-        temperature2: float 
+        self, temperature1: float, temperature2: float
     ) -> float:
 
         integral, err = quad(
-            self.heat_capacity_liquid,
-            a=temperature1,
-            b=temperature2
+            self.heat_capacity_liquid, a=temperature1, b=temperature2
         )
 
         return integral
 
     def heat_capacity_gas_dt_integral(
-        self, 
-        temperature1: float,
-        temperature2: float 
+        self, temperature1: float, temperature2: float
     ) -> float:
 
         integral, err = quad(
-            self.heat_capacity_gas,
-            a=temperature1,
-            b=temperature2
+            self.heat_capacity_gas, a=temperature1, b=temperature2
         )
 
         return integral

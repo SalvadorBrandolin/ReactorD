@@ -1,35 +1,34 @@
-from abc import ABCMeta, abstractmethod 
+from abc import ABCMeta, abstractmethod
 
 
 class ReactorBase(metaclass=ABCMeta):
-
     def reaction_enthalpies(self, temperature, pressure):
         pass
 
     @abstractmethod
     def _grid_builder(self):
         pass
-    
+
     @abstractmethod
     def _border_condition_builder(self):
-        pass 
-    
+        pass
+
     @abstractmethod
     def _initial_guess_builder(self):
         pass
 
-    @abstractmethod    
+    @abstractmethod
     def _mass_balance(self):
         pass
-    
+
     @abstractmethod
     def _reactor_energy_balance(self):
         pass
-    
+
     @abstractmethod
     def _pressure_balance(self):
         pass
-    
+
     @abstractmethod
     def _particle_mass_balance(self):
         pass

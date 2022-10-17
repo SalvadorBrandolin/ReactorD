@@ -1,10 +1,11 @@
 from setuptools import setup
 
-setup(name='Distutils',
-      version='1.0',
-      description='Python Distribution Utilities',
-      author='Greg Ward',
-      author_email='gward@python.net',
-      url='https://www.python.org/sigs/distutils-sig/',
-      packages=['reactord'],
-     )
+setup(
+    name="reactord",
+    version="1.0",
+    description="Reactor Design library",
+    author="Greg Ward",
+    author_email="salvadorebrandolin@mi.unc.edu.ar",
+    url="https://github.com/SalvadorBrandolin/reactord",
+    packages=["reactord"],
+)
