@@ -77,10 +77,6 @@ class Abstract_Mix(metaclass = ABCMeta):
         """      
         pass
     
- #   @abstractmethod
- #   def pure_heat_capacities_integral(self):
- #       pass
-
 # Other methods (Inhereted but not implemented in subclasses)
     def mol_fracations(self, moles):
         """method that calculates the molar fractions of the mixture
@@ -194,9 +190,6 @@ class Liquid_Mix(Abstract_Mix):
                 list = np.append(list,substance.formation_enthalpy)
         return list
 
-    
-
-
 class IdealGas_Mix(Abstract_Mix):
 
     def __init__(self, substance_list : list[Substance]):
@@ -232,4 +225,3 @@ class IdealGas_Mix(Abstract_Mix):
         )
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
-
