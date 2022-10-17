@@ -1,7 +1,7 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod
 from scipy.integrate import quad
-from Substance import Substance
+from substance import Substance
 
 
 class Abstract_Mix(metaclass = ABCMeta):

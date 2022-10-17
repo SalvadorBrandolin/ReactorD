@@ -1,7 +1,7 @@
 import numpy as np
 from thermo.eos import R
 from Mix import Abstract_Mix, IdealGas_Mix, Liquid_Mix
-from Substance import Substance
+from substance import Substance
 from scipy.integrate import quad
 from utils import vectorize
 

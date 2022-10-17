@@ -1,5 +1,5 @@
 #%%
-from Substance import Substance
+from substance import Substance
 from Mix import Liquid_Mix
 from pfr_homog_stat_isoth import PFR_Homog_Stat_Isoth
 import numpy as np
