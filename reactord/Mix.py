@@ -1,11 +1,10 @@
 import numpy as np
 from abc import ABCMeta, abstractmethod
-from Substance import Substance
-from thermo.chemical import Chemical
+from scipy.integrate import quad
+from substance import Substance
 
 
 class Abstract_Mix(metaclass = ABCMeta):
-
     """Mixture object abstract class.
 
         Parameters
@@ -81,7 +80,7 @@ class Abstract_Mix(metaclass = ABCMeta):
             heat capacity of the mixture [j/mol/K)] 
         """      
         pass
-
+    
 # Other methods (Inhereted but not implemented in subclasses)
     def mol_fracations(self, moles):
         """method that calculates the molar fractions of the mixture
@@ -111,15 +110,12 @@ class Abstract_Mix(metaclass = ABCMeta):
             string = string + substance.name.capitalize() + "\n"     
         return string
 
-
 class Liquid_Mix(Abstract_Mix):
 
-    def enthalpies_formation_builder(self):
-        enthalpies_formation = [
-                substance.h_formation for substance in self.substances
-            ]
-        return enthalpies_formation
-
+    def __init__(self, substance_list):
+        self.substances = substance_list
+        self.formation_enthalpies = self.formation_enthalpies_correction()
+            
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)      
         molar_volumes = np.array(
@@ -147,21 +143,42 @@ class Liquid_Mix(Abstract_Mix):
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
 
+    def formation_enthalpies_correction(self):
+        #for substance in self.substances:
+        list = np.array([])
+        for substance in self.substances:
+            if substance.normal_melting_point > 298.15:
+                dhs = substance.heat_capacity_solid_dt_integral(
+                    298.15,substance.normal_melting_point
+                )
+                dhf = substance.fusion_enthalpy(substance.normal_melting_point)
+                dhl = substance.heat_capacity_liquid_dt_integral(
+                    substance.normal_melting_point,298.15
+                    )
+                print(dhs)
+                print(dhf)
+                print(dhl)
+                print(substance.formation_enthalpy)
+
+                list = np.append(list,substance.formation_enthalpy+dhs+dhf+dhl)
+            else:
+                list = np.append(list,substance.formation_enthalpy)
+        return list
 
 class IdealGas_Mix(Abstract_Mix):
 
-    def enthalpies_formation_builder(self):
-        enthalpies_formation = [
-                substance.h_formation_ig for substance in self.substances
-            ]
+    def __init__(self, substance_list : list[Substance]):
+        self.substances = substance_list
+        self.formation_enthalpies = [
+                substance.formation_enthalpy_ig for substance in self.substances
         return enthalpies_formation
     
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)      
         
         molar_volumes = np.array(
-        [substance.volume_gas(temperature, pressure) 
-        for substance in self.substances]
+            [substance.volume_gas(temperature, pressure) 
+            for substance in self.substances]
         )
 
         total_molar_vol = np.dot(zi,molar_volumes)
