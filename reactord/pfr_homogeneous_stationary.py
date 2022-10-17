@@ -1,26 +1,44 @@
-#from ReactorBase import ReactorBase
+from ReactorBase import ReactorBase
+from kinetics import Kinetics
+from Mix import Abstract_Mix
 from scipy.integrate import solve_bvp
 import numpy as np
 
 
-class Homogeneous_PFR:
+class PFR_Homogeneous_Stationary(ReactorBase):
     
     def __init__(
-        self, mix, kinetic, reactor_dims_minmax, transversal_area,
-        pressure, reactor_t_operation, 
-        reactor_f_in, reactor_f_out,
-        reactor_t_in, reactor_t_out,
-        refrigerant_t_operation=None,
-        refrigerant_mix=None,
-        refrigerant_f_in=None,
-        refrigerant_t_in=None, refrigerant_t_out=None,
-        refrigerant_pressure = None, 
-        heat_exchange_disposition='cocurrent',       
-        u=0        
+        self, 
+        mix: Abstract_Mix,
+        list_of_reactions: list[function],
+        stoichiometry: list[float],
+        reactor_dims_minmax: list[float], 
+        transversal_area: float,
+        pressure: float, 
+        reactor_t_operation: str, 
+        reactor_f_in: list[float|str], 
+        reactor_f_out: list[float|str],
+        reactor_t_in: float|str, 
+        reactor_t_out: float|str,
+        refrigerant_t_operation: str=None,
+        refrigerant_mix: Abstract_Mix=None,
+        refrigerant_f_in: float=None,
+        refrigerant_t_in: float|str=None, 
+        refrigerant_t_out: float|str=None,
+        refrigerant_pressure: float=None, 
+        heat_exchange_disposition: str='cocurrent',       
+        u: float=0,
+        **options        
     ):
 
-        self.mix = mix
-        self.kinetic = kinetic
+        ReactorBase.__init__(
+            self,
+            mix=mix,
+            list_of_reactions=list_of_reactions,
+            stoichiometry=stoichiometry,
+            options=options 
+        )
+
         self.reactor_dims_minmax = reactor_dims_minmax
         self.transversal_area = transversal_area
         self.pressure = pressure
@@ -53,13 +71,16 @@ class Homogeneous_PFR:
             excluded='self',
             signature='(),(),()->()')
         
-    def _grid_builder(self, grid_size):
+    def _grid_builder(
+        self, 
+        grid_size: int
+    ):
         dim_array = np.linspace(self.reactor_dims_minmax[0], 
                                 self.reactor_dims_minmax[1], 
                                 grid_size)
         return dim_array
 
-    def _border_condition_builder(self, ya, yb):
+    def _border_condition_builder_deprecated(self, ya, yb):
         bc = np.array([])
 
         #Border conditions for reagents, products and inerts molar flux
@@ -93,7 +114,21 @@ class Homogeneous_PFR:
         else:
             bc = np.append(bc, ya[-1] - 0)
 
-        return bc 
+        return bc
+
+    def _border_condition_builder(self, ya, yb): 
+        in_conditions = np.append(
+            (self.reactor_f_in, 
+            (self.reactor_t_in, 
+            self.pressure, 
+            self.refrigerant_t_in)
+        )
+
+
+
+
+
+
 
     def _initial_guess_builder(self, grid_size):
         n_comp = len(self.mix)
@@ -150,7 +185,7 @@ class Homogeneous_PFR:
         ta = refrigerant_temperature
         p = pressure
         
-        r_enthalpies = self.kinetic.reaction_enthalpies(t, p)
+        r_enthalpies = self.kinetics.reaction_enthalpies(t, p)
         mix_heat_capacity = self.mix.mix_heat_capacity(molar_fluxes, t, p)
 
         reactions_heat = np.dot(reaction_rates, r_enthalpies)
@@ -204,7 +239,7 @@ class Homogeneous_PFR:
 
             grid_solver = np.size(fs, axis=0)
 
-            r_i, r_rates = self.kinetic.kinetic_eval(fs, t, p) 
+            r_i, r_rates = self.kinetics.kinetics_eval(fs, t, p) 
             
             df_dz = self._mass_balance(r_i)
             
