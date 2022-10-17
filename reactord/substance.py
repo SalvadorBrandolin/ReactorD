@@ -1,3 +1,4 @@
+from thermo import EnthalpySublimation
 from thermo.chemical import Chemical
 from scipy.integrate import quad
 
@@ -64,18 +65,21 @@ class Substance:
 
     def __init__(
             self, 
-            name: str=None, 
-            mw: str=None, 
-            normal_boiling_point: str=None, 
+            name=None, 
+            mw=None, 
+            normal_boiling_point=None, 
+            normal_melting_point=None, 
             tc=None, 
             pc=None, 
             omega=None, 
             formation_enthalpy=None, 
             formation_enthalpy_ig=None, 
-            formation_gibbs=None, 
-            formation_gibbs_ig=None, 
+            g_formation=None, 
+            g_formation_ig=None, 
+            vaporization_enthalpy_t=None,
+            sublimation_enthalpy_t=None,
             volume_s_t=None, 
-            volume_l_tp=None, 
+            volume_l_tp=None,
             volume_g_tp=None, 
             heat_capacity_s_t=None, 
             heat_capacity_l_t=None, 
@@ -90,6 +94,7 @@ class Substance:
         self.name = name
         self.mw = mw
         self.normal_boiling_point = normal_boiling_point
+        self.normal_melting_point = normal_melting_point
         self.tc = tc
         self.pc = pc
         self.omega = omega
@@ -98,6 +103,8 @@ class Substance:
         self.g_formation = formation_gibbs
         self.g_formation_ig = formation_gibbs_ig
         #Temperature dependent properties calculation functions:
+        self._vaporization_enthalpy_t = vaporization_enthalpy_t
+        self._sublimation_enthalpy_t = sublimation_enthalpy_t
         self._volume_s_t = volume_s_t
         self._volume_l_tp = volume_l_tp
         self._volume_g_tp = volume_g_tp
@@ -128,13 +135,16 @@ class Substance:
             name=chemobj.name, 
             mw=chemobj.MW,
             normal_boiling_point=chemobj.Tb, 
+            normal_melting_point=chemobj.Tm,
             tc=chemobj.Tc, 
             pc=chemobj.Pc, 
             omega=chemobj.omega, 
             formation_enthalpy=chemobj.Hfm, 
             formation_enthalpy_ig=chemobj.Hfgm, 
-            formation_gibbs=chemobj.Gfm, 
-            formation_gibbs_ig=chemobj.Gfgm, 
+            vaporization_enthalpy_t=chemobj.EnthalpyVaporization,
+            sublimation_enthalpy_t=chemobj.EnthalpySublimation,
+            g_formation=chemobj.Gfm, 
+            g_formation_ig=chemobj.Gfgm, 
             volume_s_t=chemobj.VolumeSolid, 
             volume_l_tp=chemobj.VolumeLiquid, 
             volume_g_tp=chemobj.VolumeGas, 
@@ -147,6 +157,17 @@ class Substance:
             viscosity_g_tp=chemobj.ViscosityGas
         )
         return substance_object
+
+    def vaporization_enthalpy(self, temperature):
+        return self._vaporization_enthalpy_t(temperature)    
+
+    def sublimation_enthalpy(self,temperature):
+        return self._sublimation_enthalpy_t(temperature)    
+
+    def fusion_enthalpy(self, temperature):
+        fusion_h = self._sublimation_enthalpy_t(temperature)
+                   - self._vaporization_enthalpy_t(temperature)
+        return fusion_h 
 
     def volume_solid(self, temperature):
         return self._volume_s_t(temperature)
@@ -181,6 +202,20 @@ class Substance:
 
     def viscosity_gas(self, temperature, pressure):
         return self._viscosity_g_tp(temperature, pressure)
+
+    def heat_capacity_solid_dt_integral(
+        self, 
+        temperature1: float,
+        temperature2: float 
+    ) -> float:
+
+        integral, err = quad(
+            self.heat_capacity_solid,
+            a=temperature1,
+            b=temperature2
+        )
+
+        return integral
 
     def heat_capacity_liquid_dt_integral(
         self, 

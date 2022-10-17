@@ -77,10 +77,6 @@ class Abstract_Mix(metaclass = ABCMeta):
         """      
         pass
     
-    @abstractmethod
-    def formation_enthalpies_correction(self):
-        pass
-
 # Other methods (Inhereted but not implemented in subclasses)
     def mol_fracations(self, moles):
         """method that calculates the molar fractions of the mixture
@@ -142,9 +138,8 @@ class Liquid_Mix(Abstract_Mix):
 
     def __init__(self, substance_list):
         self.substances = substance_list
-        self.formation_enthalpies = [
-                substance.formation_enthalpy for substance in self.substances
-            ]
+        self.formation_enthalpies = self.formation_enthalpies_correction()
+            
         
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)      
@@ -172,27 +167,29 @@ class Liquid_Mix(Abstract_Mix):
         )
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
-    
-    def formation_enthalpies_correction(
-        self, 
-        temperature: float, 
-        *args
-    ) -> list[float]:
-        """Correction of the standard enthalpies of formation from 298.15 K and
-       to 'temperature'. The pure substances heat_capacity_liquid are used.
 
-        Parameters
-        ----------
-        temperature : float
-            Temperature of correction [K].
+    def formation_enthalpies_correction(self):
+        #for substance in self.substances:
+        list = np.array([])
+        for substance in self.substances:
+            if substance.normal_melting_point > 298.15:
+                dhs = substance.heat_capacity_solid_dt_integral(
+                    298.15,substance.normal_melting_point
+                )
+                dhf = substance.fusion_enthalpy(substance.normal_melting_point)
+                dhl = substance.heat_capacity_liquid_dt_integral(
+                    substance.normal_melting_point,298.15
+                    )
+                print(dhs)
+                print(dhf)
+                print(dhl)
+                print(substance.formation_enthalpy)
 
-        Returns
-        -------
-        ndarray
-            Corrected enthalpy of formation of each pure substance in the 
-            mixture [J/mol]. 
-        """
-        
+                list = np.append(list,substance.formation_enthalpy+dhs+dhf+dhl)
+            else:
+                list = np.append(list,substance.formation_enthalpy)
+        return list
+
 class IdealGas_Mix(Abstract_Mix):
 
     def __init__(self, substance_list : list[Substance]):
@@ -228,32 +225,3 @@ class IdealGas_Mix(Abstract_Mix):
         )
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
-
-    def formation_enthalpies_correction(self, temperature:float, *args):
-        """Correction of the standard enthalpies of formation from 298.15 K and
-        1 bar to 'temperature'.The pure substances heat_capacity_gas are used.
-
-        Parameters
-        ----------
-        temperature : float
-            Temperature of correction [K].
-
-        Returns
-        -------
-        ndarray
-            Corrected enthalpy of formation of each pure substance in the 
-            mixture [J/mol].  
-        """
-        
-        ref_temperature = 298.15
-        correction_enthalpies = np.array([])
-
-        for substance in self.substances:
-            integral, err = quad(
-                substance.heat_capacity_gas, ref_temperature, temperature
-            )
-            correction_enthalpies = np.append(
-                (correction_enthalpies, integral)
-            )
-        
-        return correction_enthalpies + self.formation_enthalpies
