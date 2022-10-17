@@ -100,8 +100,8 @@ class Substance:
         self.omega = omega
         self.formation_enthalpy = formation_enthalpy
         self.formation_enthalpy_ig = formation_enthalpy_ig
-        self.g_formation = formation_gibbs
-        self.g_formation_ig = formation_gibbs_ig
+        self.g_formation = g_formation
+        self.g_formation_ig = g_formation_ig
         #Temperature dependent properties calculation functions:
         self._vaporization_enthalpy_t = vaporization_enthalpy_t
         self._sublimation_enthalpy_t = sublimation_enthalpy_t
@@ -165,8 +165,8 @@ class Substance:
         return self._sublimation_enthalpy_t(temperature)    
 
     def fusion_enthalpy(self, temperature):
-        fusion_h = self._sublimation_enthalpy_t(temperature)
-                   - self._vaporization_enthalpy_t(temperature)
+        fusion_h = (self._sublimation_enthalpy_t(temperature)
+                   - self._vaporization_enthalpy_t(temperature))
         return fusion_h 
 
     def volume_solid(self, temperature):

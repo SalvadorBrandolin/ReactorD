@@ -162,7 +162,7 @@ class Kinetics:
         return (dh + self.std_reaction_enthalpies) """
 
 
-""" # TEST FOR A SYSTEM COMPRISED OF 2 DIFFERENT REACTIONS WITH
+# TEST FOR A SYSTEM COMPRISED OF 2 DIFFERENT REACTIONS WITH
 # 3 COMPONENTS
 # A -> B reaction1
 # A -> C reaction2
@@ -193,7 +193,7 @@ print(f"velocidades por reaccion: {rate_rxns}")
 
 print("\nRevision de la matriz estequiometrica")
 print(f"Numero de reacciones: {cinetica.num_reactions}\n"
-      f"Numero de componentes: {cinetica.total_substances}")
+      f"Numero de componentes: {cinetica.num_substances}")
 
 
 # ENTHALPY TEST EVALUATION FOR AN EXOTHERMIC REACTION:
@@ -228,4 +228,4 @@ exothermic_reaction_kinetics = Kinetics(
 
 #print("\nRevision de la matriz estequiometrica")
 #print(f"Numero de reacciones: {exothermic_reaction_kinetics.num_reactions}\n"
-#      f"Numero de componentes: {exothermic_reaction_kinetics.total_substances}") """
+#      f"Numero de componentes: {exothermic_reaction_kinetics.total_substances}")

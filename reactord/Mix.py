@@ -12,14 +12,6 @@ class Abstract_Mix(metaclass = ABCMeta):
         substance_list : ndarray or list[Substance objects]
             list or array of Substance objects."""
          
-    def __init__(self, list_of_substances):
-        self.substances = list_of_substances
-        self.enthalpies_formation = self.enthalpies_formation_builder() 
-        
-    @abstractmethod
-    def enthalpies_formation_builder(self):
-        pass
-
     @abstractmethod
     def concentrations(self, moles, temperature, pressure):
         """Concentrations of the mixtures substances at the given moles 
@@ -171,7 +163,7 @@ class IdealGas_Mix(Abstract_Mix):
         self.substances = substance_list
         self.formation_enthalpies = [
                 substance.formation_enthalpy_ig for substance in self.substances
-        return enthalpies_formation
+        ]
     
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)      
