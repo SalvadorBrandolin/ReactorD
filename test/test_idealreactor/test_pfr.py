@@ -47,6 +47,7 @@ def test_fogler_p1_15a():
 
     assert np.allclose(fa_final, 0.01 * fa_initial)
 
+
 def test_fogler_p1_15b():
     """Fogler fourth ed. P1.15a"""
 
