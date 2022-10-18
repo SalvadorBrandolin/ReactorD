@@ -38,7 +38,7 @@ pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
     kinetic_argument="concentration",
 )
 
-solution = pfr.simulate(1000)
+solution = pfr.simulate(100)
 
 x = solution.x
 

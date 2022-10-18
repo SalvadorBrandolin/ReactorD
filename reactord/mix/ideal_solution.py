@@ -14,7 +14,7 @@ class IdealSolution(AbstractMix):
         zi = self.mol_fracations(moles)
         molar_volumes = np.array(
             [
-                substance.volume_gas(temperature, pressure)
+                substance.volume_liquid(temperature, pressure)
                 for substance in self.substances
             ]
         )
@@ -27,7 +27,7 @@ class IdealSolution(AbstractMix):
         zi = self.mol_fracations(moles)
         pure_volumes = np.array(
             [
-                substance.volume_gas(temperature, pressure)
+                substance.volume_liquid(temperature, pressure)
                 for substance in self.substances
             ]
         )

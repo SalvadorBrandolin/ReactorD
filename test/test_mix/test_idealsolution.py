@@ -17,11 +17,11 @@ def test_one_substance_mix():
 
         for t in temperature:
             assert mixture.volume(z, t, pressure) == (
-                hexane.volume_gas(t, pressure),
+                hexane.volume_liquid(t, pressure),
             )
 
             assert mixture.concentrations(z, t, pressure) == (
-                (1 / hexane.volume_gas(t, pressure))
+                (1 / hexane.volume_liquid(t, pressure))
             )
 
             assert mixture.mix_heat_capacity(z, t, pressure) == (
