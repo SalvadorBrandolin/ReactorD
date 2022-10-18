@@ -1,8 +1,7 @@
 import numpy as np
 
+from reactord.mix.abstract_mix import AbstractMix
 from reactord.substance import Substance
-
-from .abstract_mix import AbstractMix
 
 
 class IdealSolution(AbstractMix):
@@ -15,7 +14,7 @@ class IdealSolution(AbstractMix):
         zi = self.mol_fracations(moles)
         molar_volumes = np.array(
             [
-                substance.volume_liquid(temperature, pressure)
+                substance.volume_gas(temperature, pressure)
                 for substance in self.substances
             ]
         )
@@ -25,13 +24,14 @@ class IdealSolution(AbstractMix):
         return concentrations
 
     def volume(self, moles, temperature, pressure):
+        zi = self.mol_fracations(moles)
         pure_volumes = np.array(
             [
-                substance.volume_liquid(temperature, pressure)
+                substance.volume_gas(temperature, pressure)
                 for substance in self.substances
             ]
         )
-        return np.dot(pure_volumes, moles)
+        return np.dot(pure_volumes, zi)
 
     def mix_heat_capacity(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)
@@ -56,10 +56,6 @@ class IdealSolution(AbstractMix):
                 dhl = substance.heat_capacity_liquid_dt_integral(
                     substance.normal_melting_point, 298.15
                 )
-                print(dhs)
-                print(dhf)
-                print(dhl)
-                print(substance.formation_enthalpy)
 
                 enthalpies = np.append(
                     enthalpies, substance.formation_enthalpy + dhs + dhf + dhl

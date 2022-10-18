@@ -25,7 +25,7 @@ area = 1
 f_in = np.array([10, 0])
 f_out = np.array([np.nan, np.nan])
 
-pfr = rd.PfrHomogStatIsoth(
+pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
     mix=mix,
     list_of_reactions=[christ_reaction],
     stoichiometry=stoichiometry,
@@ -47,3 +47,5 @@ Fa, Fb = solution.y
 plt.figure(0)
 plt.plot(x, Fa)
 plt.plot(x, Fb)
+
+# %%

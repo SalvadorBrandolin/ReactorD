@@ -74,8 +74,8 @@ class Substance:
         omega=None,
         formation_enthalpy=None,
         formation_enthalpy_ig=None,
-        g_formation=None,
-        g_formation_ig=None,
+        formation_gibbs=None,
+        formation_gibbs_ig=None,
         vaporization_enthalpy_t=None,
         sublimation_enthalpy_t=None,
         volume_s_t=None,
@@ -100,8 +100,8 @@ class Substance:
         self.omega = omega
         self.formation_enthalpy = formation_enthalpy
         self.formation_enthalpy_ig = formation_enthalpy_ig
-        self.g_formation = g_formation
-        self.g_formation_ig = g_formation_ig
+        self.formation_gibbs = formation_gibbs
+        self.formation_gibbs_ig = formation_gibbs_ig
         # Temperature dependent properties calculation functions:
         self._vaporization_enthalpy_t = vaporization_enthalpy_t
         self._sublimation_enthalpy_t = sublimation_enthalpy_t
@@ -141,10 +141,10 @@ class Substance:
             omega=chemobj.omega,
             formation_enthalpy=chemobj.Hfm,
             formation_enthalpy_ig=chemobj.Hfgm,
+            formation_gibbs=chemobj.Gfm,
+            formation_gibbs_ig=chemobj.Gfgm,
             vaporization_enthalpy_t=chemobj.EnthalpyVaporization,
             sublimation_enthalpy_t=chemobj.EnthalpySublimation,
-            g_formation=chemobj.Gfm,
-            g_formation_ig=chemobj.Gfgm,
             volume_s_t=chemobj.VolumeSolid,
             volume_l_tp=chemobj.VolumeLiquid,
             volume_g_tp=chemobj.VolumeGas,
