@@ -47,5 +47,3 @@ Fa, Fb = solution.y
 plt.figure(0)
 plt.plot(x, Fa)
 plt.plot(x, Fb)
-
-# %%
