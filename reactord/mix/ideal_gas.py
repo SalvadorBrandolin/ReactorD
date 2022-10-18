@@ -14,25 +14,16 @@ class IdealGas(AbstractMix):
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)
 
-        molar_volumes = np.array(
-            [
-                substance.volume_gas(temperature, pressure)
-                for substance in self.substances
-            ]
-        )
-
-        total_molar_vol = np.dot(zi, molar_volumes)
-        concentrations = np.divide(zi, total_molar_vol)  # moles/m^3
-        return concentrations
+        r = 8.31446261815324  # m3⋅Pa/K/mol
+        density = pressure / (r * temperature)
+        return np.multiply(zi, density)
 
     def volume(self, moles, temperature, pressure):
-        pure_volumes = np.array(
-            [
-                substance.volume_gas(temperature, pressure)
-                for substance in self.substances
-            ]
-        )
-        return np.dot(pure_volumes, moles)
+        total_moles = np.sum(moles)
+
+        r = 8.31446261815324  # m3⋅Pa/K/mol
+        volume = total_moles * r * temperature / pressure
+        return volume
 
     def mix_heat_capacity(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)
