@@ -1,2 +1,5 @@
 *__pycache__*
 *reactord.egg-info*
+*.tox*
+*.coverage*
+*.pytest_cache*

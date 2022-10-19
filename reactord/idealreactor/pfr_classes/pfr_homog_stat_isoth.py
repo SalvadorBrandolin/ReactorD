@@ -20,7 +20,7 @@ class PfrHomogStatIsoth(ReactorBase):
         reactor_f_in: list,
         reactor_f_out: list,
         kinetic_argument: str = "concentration",
-        **options
+        **options,
     ):
 
         self.kinetic: Kinetics = Kinetics(
@@ -28,7 +28,7 @@ class PfrHomogStatIsoth(ReactorBase):
             mix=mix,
             stoichiometry=stoichiometry,
             kinetic_argument=kinetic_argument,
-            **options
+            **options,
         )
 
         self.stoichiometry = np.array(stoichiometry)
