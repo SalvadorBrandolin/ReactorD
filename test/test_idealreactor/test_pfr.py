@@ -24,7 +24,8 @@ def test_fogler_p1_15a():
     substance_a = rd.Substance.from_thermo_database("methane")
     substance_a.volume_liquid = volume
 
-    substance_b = substance_a
+    substance_b = rd.Substance.from_thermo_database("methane")
+    substance_b.volume_liquid = volume
 
     mixture = rd.mix.IdealSolution([substance_a, substance_b])
 
@@ -49,7 +50,7 @@ def test_fogler_p1_15a():
 
 
 def test_fogler_p1_15b():
-    """Fogler fourth ed. P1.15a"""
+    """Fogler fourth ed. P1.15b"""
 
     fa_initial = 5 / 3600  # mol/s
 
@@ -68,7 +69,8 @@ def test_fogler_p1_15b():
     substance_a = rd.Substance.from_thermo_database("methane")
     substance_a.volume_liquid = volume
 
-    substance_b = substance_a
+    substance_b = rd.Substance.from_thermo_database("methane")
+    substance_b.volume_liquid = volume
 
     mixture = rd.mix.IdealSolution([substance_a, substance_b])
 
