@@ -9,3 +9,4 @@ pytest-cov
 py-pde>=0.21.0
 scipy>=1.9.0
 thermo>=0.2.21
+tox
