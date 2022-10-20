@@ -57,6 +57,36 @@ class IdealGas(AbstractMix):
         zi = self.mol_fracations(moles)
         partial_pressures = np.multiply(zi, pressure)
         return partial_pressures
+    
+    def formation_enthalpies(self):
+        """Method that obtains/calculates the formation enthalpy of the
+        mixture's substances.
+        """
+        raise NotImplementedError()
+
+    def formation_enthalpies_correction(
+        self,
+        reference_temperature: float,
+        reference_pressure: float,
+        temperature: float,
+        pressure: float,
+    ):
+        """Method that correct the formation enthalpy of the pure substances
+        from self.reference_temperature (normally 25 °C = 298.15 K) and 
+        self.reference_pressure (normally 1 bar = 100000 Pa) to 
+        temperature and pressure.
+
+        Parameters
+        ----------
+        temperature : float
+            Correction temperature for the formation enthalpies. [K]
+        pressure : float
+            Correction pressure for the formation enthalpies. [Pa]
+
+        """
+        raise NotImplementedError()
+
+
 
     def partial_p_to_conc(self, partial_pressures, temperature):
         r = 8.31446261815324  # J/mol.K

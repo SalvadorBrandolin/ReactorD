@@ -12,7 +12,9 @@ class AbstractMix(metaclass=ABCMeta):
         list or array of Substance objects."""
 
     @abstractmethod
-    def concentrations(self, moles, temperature, pressure):
+    def concentrations(
+        self, moles: list[float], temperature: float, pressure: float
+    ):
         """Concentrations of the mixtures substances at the given moles
         of each compound, temperature and pressure.
 
@@ -30,7 +32,7 @@ class AbstractMix(metaclass=ABCMeta):
             ndarray that contains the concentrations of the mixture's
             substances [mol/m^3]
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def volume(self):
@@ -50,7 +52,7 @@ class AbstractMix(metaclass=ABCMeta):
         float
             volume of the mixture [m^3]
         """
-        pass
+        raise NotImplementedError()
 
     @abstractmethod
     def mix_heat_capacity(self, moles, temperature, pressure):
@@ -64,16 +66,41 @@ class AbstractMix(metaclass=ABCMeta):
             Temperature [K]
         pressure: float
            Total Pressure [Pa]
-
-        Returns
-        -------
-        float
-            heat capacity of the mixture [j/mol/K)]
         """
-        pass
+        raise NotImplementedError()
 
-    # Other methods (Inhereted but not implemented in subclasses)
-    def mol_fracations(self, moles):
+    @abstractmethod
+    def formation_enthalpies(self):
+        """Method that obtains/calculates the formation enthalpy of the
+        mixture's substances.
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def formation_enthalpies_correction(
+        self,
+        temperature: float,
+        pressure: float,
+    ):
+        """Method that correct the formation enthalpy of the pure substances
+        from self.reference_temperature (normally 25 °C = 298.15 K) and 
+        self.reference_pressure (normally 1 bar = 100000 Pa) to 
+        temperature and pressure
+
+        Parameters
+        ----------
+        temperature : float
+            Correction temperature for the formation enthalpies. [K]
+        pressure : float
+            Correction pressure for the formation enthalpies. [Pa]
+
+        """
+        raise NotImplementedError()
+
+    # ==================================================================
+    # Mixtures common methods
+    # ==================================================================
+    def mol_fracations(self, moles: list[float]):
         """method that calculates the molar fractions of the mixture
 
         Parameters
@@ -89,6 +116,7 @@ class AbstractMix(metaclass=ABCMeta):
         """
         total_moles = np.sum(moles, axis=0)
         zi = np.divide(moles, total_moles)
+
         return zi
 
     def __len__(self):

@@ -2,8 +2,11 @@ import numpy as np
 
 import reactord as rd
 
+# ======================================================================
+# ISOTHERMIC PFR
+# ======================================================================
 
-# Isothermic pfr
+
 def test_fogler_p1_15a():
     """Fogler fourth ed. P1.15a"""
 
