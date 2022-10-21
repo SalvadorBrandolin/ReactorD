@@ -95,7 +95,7 @@ class Kinetics:
         if len(mix) != self.num_substances:
             raise IndexError(
                 "'stoichiometry' columns number must be equal to substances"
-                "number in 'mix' object"
+                " number in 'mix' object"
             )
 
         # Checks if reacion_enthalpies option is correct
@@ -106,10 +106,10 @@ class Kinetics:
 
             if len(reaction_enthalpies) != self.num_reactions:
                 raise IndexError(
-                    "The number of reanction enthalpies in the"
-                    "reaction_enthalpies option"
-                    f"[{len(reaction_enthalpies)}] must be equal to"
-                    "the stoichiometry matrix row number"
+                    "The number of reaction enthalpies in the"
+                    " reaction_enthalpies option"
+                    f" [{len(reaction_enthalpies)}] must be equal to"
+                    " the stoichiometry matrix row number"
                 )
 
         # ==============================================================
