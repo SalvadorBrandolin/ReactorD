@@ -7,9 +7,6 @@ from reactord.substance import Substance
 class IdealGas(AbstractMix):
     def __init__(self, substance_list: list[Substance]):
         self.substances = substance_list
-        self.formation_enthalpies = [
-            substance.formation_enthalpy_ig for substance in self.substances
-        ]
 
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)
@@ -25,7 +22,7 @@ class IdealGas(AbstractMix):
         volume = total_moles * r * temperature / pressure
         return volume
 
-    def mix_heat_capacity(self, moles, temperature, pressure):
+    def mix_heat_capacity(self, moles, temperature, *args):
         zi = self.mol_fracations(moles)
         pure_cp = np.array(
             [
@@ -36,45 +33,21 @@ class IdealGas(AbstractMix):
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
 
-    def partial_pressures(self, moles, temperature, pressure):
-        """method that calculates the partial pressures of the mixture
-
-        Parameters
-        ----------
-        moles: ndarray or list [float]
-            moles of each substance
-        temperature: float
-            Temperature [K]
-        pressure: float
-           Total Pressure [Pa]
-
-        Returns
-        -------
-        ndarray
-            array that contains the partial pressures of mixture's
-            substances
+    def _formation_enthalpies_set(self):
+        """Method that read the ideal gas formation enthalpies of mix's
+        and returns them in a ordered ndarray.
         """
-        zi = self.mol_fracations(moles)
-        partial_pressures = np.multiply(zi, pressure)
-        return partial_pressures
-    
-    def formation_enthalpies(self):
-        """Method that obtains/calculates the formation enthalpy of the
-        mixture's substances.
-        """
-        raise NotImplementedError()
+        enthalpies = np.array([])
 
-    def formation_enthalpies_correction(
-        self,
-        reference_temperature: float,
-        reference_pressure: float,
-        temperature: float,
-        pressure: float,
-    ):
-        """Method that correct the formation enthalpy of the pure substances
-        from self.reference_temperature (normally 25 °C = 298.15 K) and 
-        self.reference_pressure (normally 1 bar = 100000 Pa) to 
-        temperature and pressure.
+        for substance in self.substances:
+            enthalpies = np.append(enthalpies, substance.formation_enthalpy_ig)
+
+        return enthalpies
+
+    def formation_enthalpies_correction(self, temperature: float, *args):
+        """Method that correction therm for the formation enthalpy of
+        the pure substances from 298.15 K 100000 Pa to temperature and
+        pressure using the eq:
 
         Parameters
         ----------
@@ -84,12 +57,13 @@ class IdealGas(AbstractMix):
             Correction pressure for the formation enthalpies. [Pa]
 
         """
-        raise NotImplementedError()
 
+        enthalpies = np.array([])
 
+        for substance in self.substances:
+            enthalpies = np.append(
+                enthalpies,
+                substance.heat_capacity_gas_dt_integral(298.15, temperature),
+            )
 
-    def partial_p_to_conc(self, partial_pressures, temperature):
-        r = 8.31446261815324  # J/mol.K
-        self.partial_pressures = np.array(partial_pressures)
-        conc = self.partial_pressures / (r * temperature)  # mol/m^3
-        return conc
+        return enthalpies

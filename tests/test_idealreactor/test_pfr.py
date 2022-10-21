@@ -24,10 +24,10 @@ def test_fogler_p1_15a():
     def kinetic(concentrations, temperature):
         return k
 
-    substance_a = rd.Substance.from_thermo_database("methane")
+    substance_a = rd.Substance()
     substance_a.volume_liquid = volume
 
-    substance_b = rd.Substance.from_thermo_database("methane")
+    substance_b = rd.Substance()
     substance_b.volume_liquid = volume
 
     mixture = rd.mix.IdealSolution([substance_a, substance_b])
@@ -69,10 +69,10 @@ def test_fogler_p1_15b():
     def kinetic(concentrations, temperature):
         return k * concentrations[0]
 
-    substance_a = rd.Substance.from_thermo_database("methane")
+    substance_a = rd.Substance()
     substance_a.volume_liquid = volume
 
-    substance_b = rd.Substance.from_thermo_database("methane")
+    substance_b = rd.Substance()
     substance_b.volume_liquid = volume
 
     mixture = rd.mix.IdealSolution([substance_a, substance_b])

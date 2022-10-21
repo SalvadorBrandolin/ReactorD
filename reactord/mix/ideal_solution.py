@@ -8,7 +8,6 @@ class IdealSolution(AbstractMix):
     def __init__(self, substance_list: list[Substance]):
 
         self.substances = substance_list
-        self.formation_enthalpies = self.formation_enthalpies_correction()
 
     def concentrations(self, moles, temperature, pressure):
         zi = self.mol_fracations(moles)
@@ -20,7 +19,7 @@ class IdealSolution(AbstractMix):
         )
 
         total_molar_vol = np.dot(zi, molar_volumes)
-        concentrations = np.divide(zi, total_molar_vol)  # moles/m^3
+        concentrations = np.divide(zi, total_molar_vol)
         return concentrations
 
     def volume(self, moles, temperature, pressure):
@@ -44,8 +43,19 @@ class IdealSolution(AbstractMix):
         mix_cp = np.dot(zi, pure_cp)
         return mix_cp
 
+    def _formation_enthalpies_set(self):
+        """Method that read the ideal gas formation enthalpies of mix's
+        and returns them in a ordered ndarray.
+        """
+        enthalpies = np.array([])
+
+        for substance in self.substances:
+            enthalpies = np.append(enthalpies, substance.formation_enthalpy)
+
+        return enthalpies
+
     def formation_enthalpies_correction(self):
-        # for substance in self.substances:
+
         enthalpies = np.array([])
         for substance in self.substances:
             if substance.normal_melting_point > 298.15:
@@ -57,11 +67,7 @@ class IdealSolution(AbstractMix):
                     substance.normal_melting_point, 298.15
                 )
 
-                enthalpies = np.append(
-                    enthalpies, substance.formation_enthalpy + dhs + dhf + dhl
-                )
+                enthalpies = np.append(enthalpies, dhs + dhf + dhl)
             else:
-                enthalpies = np.append(
-                    enthalpies, substance.formation_enthalpy
-                )
+                enthalpies = np.append(enthalpies, 0.0)
         return enthalpies
