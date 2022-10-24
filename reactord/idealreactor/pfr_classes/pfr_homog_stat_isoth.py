@@ -28,7 +28,7 @@ class PfrHomogStatIsoth(ReactorBase):
             mix=mix,
             stoichiometry=stoichiometry,
             kinetic_argument=kinetic_argument,
-            **options,
+            _not_reaction_enthalpies=True,
         )
 
         self.stoichiometry = np.array(stoichiometry)

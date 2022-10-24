@@ -2,9 +2,6 @@ from abc import ABCMeta, abstractmethod
 
 
 class ReactorBase(metaclass=ABCMeta):
-    def reaction_enthalpies(self, temperature, pressure):
-        pass
-
     @abstractmethod
     def _grid_builder(self):
         pass
