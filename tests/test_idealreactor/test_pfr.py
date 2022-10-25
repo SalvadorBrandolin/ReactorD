@@ -59,8 +59,8 @@ def test_fogler_p1_15a_ivp(reactive_mixture, kinetic_a):
     v_pfr = 99 * 0.001  # m3
 
     pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
-        mix=mixture,
-        list_of_reactions=[kinetic],
+        mix=reactive_mixture,
+        list_of_reactions=[kinetic_a],
         stoichiometry=np.array([-1, 1]),
         reactor_dims_minmax=[0, v_pfr],
         transversal_area=1,
