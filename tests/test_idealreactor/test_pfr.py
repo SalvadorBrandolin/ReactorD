@@ -1,3 +1,5 @@
+from collections.abc import Callable
+
 import numpy as np
 
 import pytest
@@ -9,7 +11,7 @@ import reactord as rd
 # p1.15 a, b and c
 # ======================================================================
 
-pytest.fixture(scope='module')
+pytest.fixture
 def reactive_mixture():
     fa_initial = 5 / 3600  # mol/s
 
@@ -28,7 +30,7 @@ def reactive_mixture():
 
     return mixture
 
-pytest.fixture(scope='module')
+pytest.fixture
 def kinetic_a():
     k = 0.05 / 3600 / 0.001  # mol/s/m3
     def kinetic(concentrations, temperature):
@@ -36,14 +38,14 @@ def kinetic_a():
     
     return kinetic
 
-pytest.fixture(scope='module')
+pytest.fixture
 def kinetic_b():
     k = 0.0001  # 1/s
     def kinetic(concentrations, temperature):
         return k * concentrations[0]
     return kinetic
 
-pytest.fixture(scope='module')
+pytest.fixture
 def kinetic_c():
     k = 3 / 3600 * 0.001  # 1/s
     def kinetic(concentrations, temperature):
@@ -52,11 +54,16 @@ def kinetic_c():
 
 # Excercise a
 
-def test_fogler_p1_15a_ivp(reactive_mixture, kinetic_a):
+def test_fogler_p1_15a_ivp(self,
+    reactive_mixture: rd.mix.AbstractMix, 
+    kinetic_a: Callable
+):
     """Fogler fourth ed. P1.15a as initial value problem"""
 
     fa_initial = 5 / 3600  # mol/s
     v_pfr = 99 * 0.001  # m3
+    f_volumetric = 10 * 0.001 / 60  # m3/s
+    k = 0.05 / 3600 / 0.001  # mol/s/m3
 
     pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
         mix=reactive_mixture,
@@ -89,7 +96,7 @@ def test_fogler_p1_15a_ivp(reactive_mixture, kinetic_a):
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            reactive_mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
