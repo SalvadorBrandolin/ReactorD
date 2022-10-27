@@ -61,7 +61,7 @@ class PfrHomogStatIsoth(ReactorBase):
             bc = np.append(bc, ya[i] - self.reactor_f_in[i])
 
         for j in self._out_index:
-            bc = np.append(bc, yb[j] - self.reactor_f_out[i])
+            bc = np.append(bc, yb[j] - self.reactor_f_out[j])
 
         return bc
 
