@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 import reactord as rd
 
@@ -619,11 +620,14 @@ def test_fogler_p1_15c_ivp_outlet():
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
 
+
 # ======================================================================
-# Fundamentals of Chemical Reaction Engineering. Mark E. Davis; 
+# Fundamentals of Chemical Reaction Engineering. Mark E. Davis;
 # Robert J. Davis.
 # Example 3.4.1 - page 78
 # ======================================================================
 
+
+@pytest.mark.skip
 def test_davis_3_4_1():
     return None
