@@ -74,6 +74,14 @@ class Kinetics:
         # DATA VALIDATION
         # ==============================================================
 
+        # Mix is an instances of AbstractMix?
+
+        if not(isinstance(self.mix, AbstractMix)):
+            raise TypeError(
+                f"The spplied argument 'mix' with type: {type(self.mix)}" 
+                "must be an instance of AbstractMix. See documentation for" 
+                "defining mix objects.")
+
         # Get the number of component and reactions from stoichiometry
 
         if np.ndim(stoichiometry) == 1:
@@ -140,34 +148,28 @@ class Kinetics:
         # FORMATION AND REACTION ENTHALPIES SET
         # ==============================================================
 
-        if self.options.get("_not_reaction_enthalpies"):
+        self._std_reaction_ehtnalphies = np.zeros(self.list_of_reactions)
+
+        if "reaction_enthalpies" in options.keys():
+
+            self._user_reaction_enthalpies = np.array(
+                options.get("reaction_enthalpies")
+            )
+
             self.std_reaction_enthalpies = None
 
-            self._reaction_enthalpies_func = lambda temperature, pressure: (
-                None
+            self._reaction_enthalpies_func = (
+                self._reaction_enthalpies_from_user
             )
 
         else:
-            if "reaction_enthalpies" in options.keys():
+            self.std_reaction_enthalpies = (
+                self._std_reaction_enthalpies_from_formation()
+            )
 
-                self._user_reaction_enthalpies = np.array(
-                    options.get("reaction_enthalpies")
-                )
-
-                self.std_reaction_enthalpies = None
-
-                self._reaction_enthalpies_func = (
-                    self._reaction_enthalpies_from_user
-                )
-
-            else:
-                self.std_reaction_enthalpies = (
-                    self._std_reaction_enthalpies_from_formation()
-                )
-
-                self._reaction_enthalpies_func = (
-                    self._reaction_enthalpies_from_formation
-                )
+            self._reaction_enthalpies_func = (
+                self._reaction_enthalpies_from_formation
+            )
 
     # ==================================================================
     # PUBLIC METHODS
@@ -210,6 +212,10 @@ class Kinetics:
         # Rates for each compound:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates
+
+    @property
+    def std_reaction_enthalpies(self):
+        return self._std_reaction_ehtnalphies
 
     @vectorize(signature="(),()->(m)", excluded={0})
     def reaction_enthalpies(self, temperature, pressure):
