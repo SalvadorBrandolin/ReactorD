@@ -5,11 +5,6 @@ class ReactorBase(metaclass=ABCMeta):
     """Abstract class interface for each reactor in ReactorD."""
 
     # ==================================================================
-    # Simple data validators
-    # ==================================================================
-
-
-    # ==================================================================
     # ODE/PDE reactors general used methods
     # ==================================================================
 
@@ -54,10 +49,6 @@ class ReactorBase(metaclass=ABCMeta):
     def _catalyst_energy_balance(self) -> None:
         raise NotImplementedError()
 
-    @abstractmethod
-    def _refrigerant_energy_balance(self) -> None:
-        raise NotImplementedError()
-
     # ==================================================================
     # Common reactors methods
     # ==================================================================
@@ -72,6 +63,10 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _pressure_balance(self) -> None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def _refrigerant_energy_balance(self) -> None:
         raise NotImplementedError()
 
     @abstractmethod

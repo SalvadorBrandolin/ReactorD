@@ -76,11 +76,12 @@ class Kinetics:
 
         # Mix is an instances of AbstractMix?
 
-        if not(isinstance(self.mix, AbstractMix)):
+        if not (isinstance(self.mix, AbstractMix)):
             raise TypeError(
-                f"The spplied argument 'mix' with type: {type(self.mix)}" 
-                "must be an instance of AbstractMix. See documentation for" 
-                "defining mix objects.")
+                f"The spplied argument 'mix' with type: {type(self.mix)}"
+                "must be an instance of AbstractMix. See documentation for"
+                "defining mix objects."
+            )
 
         # Get the number of component and reactions from stoichiometry
 
@@ -148,28 +149,7 @@ class Kinetics:
         # FORMATION AND REACTION ENTHALPIES SET
         # ==============================================================
 
-        self._std_reaction_ehtnalphies = np.zeros(self.list_of_reactions)
-
-        if "reaction_enthalpies" in options.keys():
-
-            self._user_reaction_enthalpies = np.array(
-                options.get("reaction_enthalpies")
-            )
-
-            self.std_reaction_enthalpies = None
-
-            self._reaction_enthalpies_func = (
-                self._reaction_enthalpies_from_user
-            )
-
-        else:
-            self.std_reaction_enthalpies = (
-                self._std_reaction_enthalpies_from_formation()
-            )
-
-            self._reaction_enthalpies_func = (
-                self._reaction_enthalpies_from_formation
-            )
+        self._std_reaction_enthalpies = np.zeros(self.list_of_reactions)
 
     # ==================================================================
     # PUBLIC METHODS
@@ -215,11 +195,30 @@ class Kinetics:
 
     @property
     def std_reaction_enthalpies(self):
-        return self._std_reaction_ehtnalphies
+        return self._std_reaction_enthalpies
+
+    @std_reaction_enthalpies.setter
+    def std_reaction_enthalpies(self):
+
+        self._std_reaction_enthalpies = (
+            self._std_reaction_enthalpies_from_formation()
+        )
 
     @vectorize(signature="(),()->(m)", excluded={0})
     def reaction_enthalpies(self, temperature, pressure):
-        return self._reaction_enthalpies_func(temperature, pressure)
+
+        if "reaction_enthalpies" in self.options.keys():
+            return self.options.get("reaction_enthalpies")
+
+        formation_correction = self.mix.formation_enthalpies_correction(
+            temperature, pressure
+        )
+
+        reaction_enthalpies_correction = np.dot(
+            formation_correction, self.stoichiometry
+        )
+
+        return reaction_enthalpies_correction + self.std_reaction_enthalpies
 
     # ==================================================================
     # PRIVATE METHODS
@@ -236,32 +235,3 @@ class Kinetics:
         """
         formation_enthalpies = self.mix._formation_enthalpies_set()
         return np.dot(self.stoichiometry, formation_enthalpies)
-
-    def _reaction_enthalpies_from_formation(self, temperature, pressure):
-        """Calculates the reaction enthalpies from formation enthalpies and
-        the correction of formation enthalpies defined in mix.
-
-        Parameters
-        ----------
-        temperature : float
-            Temperature of correction. [K]
-        pressure : float
-            Pressure of correction. [Pa]
-
-        Returns
-        -------
-        ndarray
-            Reaction enthalpies at temperature and pressure. [j/mol/K]
-        """
-
-        formation_correction = self.mix.formation_enthalpies_correction(
-            temperature, pressure
-        )
-
-        reaction_correction = np.dot(formation_correction, self.stoichiometry)
-
-        return reaction_correction + self.std_reaction_enthalpies
-
-    def _reaction_enthalpies_from_user(self, temperature, pressure):
-
-        return self._user_reaction_enthalpies
