@@ -1,10 +1,21 @@
 from abc import ABCMeta, abstractmethod
 
+from reactord.kinetics import Kinetics
+
 
 class ReactorBase(metaclass=ABCMeta):
     """Abstract class interface for each reactor in ReactorD."""
 
+    _adjetives_dictionary = {
+        "reactor_type": "",
+        "time_operation": "",
+        "catalytic_operation": "",
+        "thermal_operation": "",
+        "pressure_operation": "",
+    }
+
     # ==================================================================
+    # Abastract methods
     # ODE/PDE reactors general used methods
     # ==================================================================
 
@@ -52,6 +63,10 @@ class ReactorBase(metaclass=ABCMeta):
     # ==================================================================
     # Common reactors methods
     # ==================================================================
+
+    @property
+    def _adjetives(self):
+        return self._adjetives_dictionary
 
     @abstractmethod
     def _mass_balance(self) -> None:

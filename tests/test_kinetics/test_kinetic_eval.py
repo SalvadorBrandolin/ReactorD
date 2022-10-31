@@ -87,12 +87,10 @@ def test_user_reaction_enthalpies():
 
     with pytest.raises(IndexError):
 
-        kinetic3 = rd.Kinetics(
+        rd.Kinetics(
             mix=mix2,
             list_of_reactions=[reaction_rate],
             stoichiometry=stoiciometry,
             kinetic_argument="concentration",
             reaction_enthalpies=wrong_reaction_enthalpies,
         )
-
-        print(kinetic3)

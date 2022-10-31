@@ -149,7 +149,7 @@ class Kinetics:
         # FORMATION AND REACTION ENTHALPIES SET
         # ==============================================================
 
-        self._std_reaction_enthalpies = np.zeros(self.list_of_reactions)
+        self._std_reaction_enthalpies = np.zeros(len(self.list_of_reactions))
 
     # ==================================================================
     # PUBLIC METHODS
@@ -199,9 +199,9 @@ class Kinetics:
 
     @std_reaction_enthalpies.setter
     def std_reaction_enthalpies(self):
-
-        self._std_reaction_enthalpies = (
-            self._std_reaction_enthalpies_from_formation()
+        raise NotImplementedError(
+            "The attribute std_reaction_enthalpies doesn't admits direct"
+            "assignation."
         )
 
     @vectorize(signature="(),()->(m)", excluded={0})
@@ -223,6 +223,15 @@ class Kinetics:
     # ==================================================================
     # PRIVATE METHODS
     # ==================================================================
+
+    def _std_reaction_enthalpies_set(self):
+
+        if "reaction_enthalpies" in self.options.keys():
+            pass
+        else:
+            self._std_reaction_enthalpies = (
+                self._std_reaction_enthalpies_from_formation()
+            )
 
     def _std_reaction_enthalpies_from_formation(self):
         """Calculates the standard reaction enthalpy from standard
