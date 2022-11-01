@@ -1,9 +1,9 @@
 from collections.abc import Callable
 
+from reactord.idealreactor.pfr_decorators import StationaryPFR
 from reactord.kinetics import Kinetics
 from reactord.mix import AbstractMix
 from reactord.reactorbase import ReactorBase
-from reactord.idealreactor.pfr_decorators import StationaryPFR
 
 
 class PFR(ReactorBase):
@@ -20,7 +20,7 @@ class PFR(ReactorBase):
 
         # Reactor adjectives
 
-        self._adjetives_dictionary = {
+        self._settings = {
             "reactor_type": "Piston flow reactor (PFR)",
             "time_operation": "",
             "catalytic_operation": "",
@@ -42,16 +42,16 @@ class PFR(ReactorBase):
         self.transversal_area = transversal_area
 
     # ==================================================================
-    # Configuration methods
+    # Configuration methods (returns the decorated PFR)
     # ==================================================================
 
     def set_stationary(
         self, inlet_molar_fluxes: list[float], outlet_molar_fluxes: list[float]
-    ):
+    ) -> StationaryPFR:
 
-        self._adjetives["time_operation"] = "stationary"
-        
-        return StationaryPFR(self)
+        self._settings["time_operation"] = "stationary"
+
+        return StationaryPFR(self, inlet_molar_fluxes, outlet_molar_fluxes)
 
     def set_non_stationary(self):
         raise NotImplementedError("no implemented... yet")
