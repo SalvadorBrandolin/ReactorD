@@ -42,7 +42,7 @@ class PFR(ReactorBase):
         self.transversal_area = transversal_area
 
     # ==================================================================
-    # Configuration methods (returns the decorated PFR)
+    # Configuration methods: returns set_time(PFR)
     # ==================================================================
 
     def set_stationary(

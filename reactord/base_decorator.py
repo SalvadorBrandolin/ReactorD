@@ -7,59 +7,12 @@ class BaseDecorator(ReactorBase):
     Decorators interface
     """
 
-    _reactor: ReactorBase = None
-
     def __init__(self, reactor: ReactorBase) -> None:
         self._reactor: ReactorBase = reactor
 
     @property
     def reactor(self) -> ReactorBase:
         return self._reactor
-
-    # ==================================================================
-    # Specifics for decorators
-    # Created to generate shortcus to the decorators attributes
-    # ==================================================================
-
-    @property
-    def dimensions_settings(self) -> ReactorBase:
-        raise NotImplementedError(
-            "Time settings are not defined yet. Use '.set_stationary()', or"
-            " '.set_non_stationary()'. Check documentation about the reactors"
-            " configuration."
-        )
-
-    @property
-    def time_settings(self) -> ReactorBase:
-        raise NotImplementedError(
-            "Time settings are not defined yet. Use '.set_stationary()', or"
-            " '.set_non_stationary()'. Check documentation about the reactors"
-            " configuration."
-        )
-
-    @property
-    def catalysis_settings(self) -> ReactorBase:
-        raise NotImplementedError(
-            "Catalysis settings are not defined yet. Use '.set_homogeneous()',"
-            " or 'set_heterogeneous()'. Check documentation about the reactors"
-            " configuration."
-        )
-
-    @property
-    def pressure_settings(self) -> ReactorBase:
-        raise NotImplementedError(
-            "Pressure settings are not defined yet. Use '.set_isobaric()',"
-            " or '.set_non_isobaric()'. Check documentation about the reactors"
-            " configuration."
-        )
-
-    @property
-    def thermal_settings(self) -> ReactorBase:
-        raise NotImplementedError(
-            "Thermal settings are not defined yet. Use '.set_isothermal()',"
-            " '.set_adiabatic()' or '.set_non_isothermal()'. Check"
-            " documentation about the reactors configuration."
-        )
 
     # ==================================================================
     # ReactorBase interface

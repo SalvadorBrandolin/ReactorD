@@ -1,7 +1,8 @@
+import numpy as np
+
 from reactord.base_decorator import BaseDecorator
 from reactord.idealreactor import PFR
 from reactord.kinetics import Kinetics
-from reactord.reactorbase import ReactorBase
 
 
 class StationaryPFR(BaseDecorator):
@@ -17,12 +18,19 @@ class StationaryPFR(BaseDecorator):
         self.inlet_molar_fluxes = outlet_molar_fluxes
 
     # ==================================================================
+    # Configuration methods: returns set_catalysis(set_time(PFR))
+    # ==================================================================
+    
+    # ==================================================================
     # ReactorBase interface
     # ODE/PDE reactors general used methods
     # ==================================================================
 
-    def _grid_builder(self, *args, **kargs) -> None:
-        return self.reactor._grid_builder(*args, **kargs)
+    def _grid_builder(self, grid_size: int):
+        dim_array = np.linspace(
+            self.reactor_dims_minmax[0], self.reactor_dims_minmax[1], grid_size
+        )
+        return dim_array
 
     def _border_condition_builder(self, *args, **kargs) -> None:
         return self.reactor._border_condition_builder(*args, **kargs)
