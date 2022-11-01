@@ -18,7 +18,7 @@ class PFR(ReactorBase):
         **options,
     ) -> None:
 
-        # Reactor adjectives
+        # Reactor settings
 
         self._settings = {
             "reactor_type": "Piston flow reactor (PFR)",
@@ -37,7 +37,7 @@ class PFR(ReactorBase):
             options=options,
         )
 
-        # Reactors Atributes instantiation
+        # Reactors dimentions
         self.reactor_dim_minmax = reactor_dim_minmax
         self.transversal_area = transversal_area
 
@@ -49,7 +49,15 @@ class PFR(ReactorBase):
         self, inlet_molar_fluxes: list[float], outlet_molar_fluxes: list[float]
     ) -> StationaryPFR:
 
-        self._settings["time_operation"] = "stationary"
+        self._settings = dict(
+            {
+                "reactor_type": "Piston flow reactor (PFR)",
+                "time_operation": "stationary",
+                "catalytic_operation": "",
+                "thermal_operation": "",
+                "pressure_operation": "",
+            }
+        )
 
         return StationaryPFR(self, inlet_molar_fluxes, outlet_molar_fluxes)
 

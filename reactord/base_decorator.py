@@ -8,7 +8,6 @@ class BaseDecorator(ReactorBase):
     """
 
     _reactor: ReactorBase = None
-    _kinetics: Kinetics = None
 
     def __init__(self, reactor: ReactorBase) -> None:
         self._reactor: ReactorBase = reactor
@@ -23,26 +22,47 @@ class BaseDecorator(ReactorBase):
     # ==================================================================
 
     @property
-    def kinetics(self) -> Kinetics:
-        return self._kinetics
+    def dimensions_settings(self) -> ReactorBase:
+        raise NotImplementedError(
+            "Time settings are not defined yet. Use '.set_stationary()', or"
+            " '.set_non_stationary()'. Check documentation about the reactors"
+            " configuration."
+        )
 
     @property
-    def time_settings(self):
-        raise NotImplementedError()
+    def time_settings(self) -> ReactorBase:
+        raise NotImplementedError(
+            "Time settings are not defined yet. Use '.set_stationary()', or"
+            " '.set_non_stationary()'. Check documentation about the reactors"
+            " configuration."
+        )
 
     @property
-    def catalysis_settings(self):
-        raise NotImplementedError()
+    def catalysis_settings(self) -> ReactorBase:
+        raise NotImplementedError(
+            "Catalysis settings are not defined yet. Use '.set_homogeneous()',"
+            " or 'set_heterogeneous()'. Check documentation about the reactors"
+            " configuration."
+        )
 
     @property
-    def pressure_settings(self):
-        raise NotImplementedError()
+    def pressure_settings(self) -> ReactorBase:
+        raise NotImplementedError(
+            "Pressure settings are not defined yet. Use '.set_isobaric()',"
+            " or '.set_non_isobaric()'. Check documentation about the reactors"
+            " configuration."
+        )
 
     @property
-    def thermal_settings(self):
-        raise NotImplementedError()
+    def thermal_settings(self) -> ReactorBase:
+        raise NotImplementedError(
+            "Thermal settings are not defined yet. Use '.set_isothermal()',"
+            " '.set_adiabatic()' or '.set_non_isothermal()'. Check"
+            " documentation about the reactors configuration."
+        )
 
     # ==================================================================
+    # ReactorBase interface
     # ODE/PDE reactors general used methods
     # ==================================================================
 
@@ -69,6 +89,22 @@ class BaseDecorator(ReactorBase):
     # Common reactors methods
     # ==================================================================
 
+    @property
+    def _settings(self) -> dict:
+        return self.reactor._settings
+
+    @_settings.setter
+    def _settings(self, updated_settings: dict) -> None:
+        self.reactor._settings = dict(updated_settings)
+
+    @property
+    def kinetics(self) -> Kinetics:
+        return self.reactor.kinetics
+
+    @kinetics.setter
+    def kinetics(self, new_kinetics) -> Kinetics:
+        self.reactor.kinetics = new_kinetics
+
     def _mass_balance(self, *args, **kargs) -> None:
         return self.reactor._mass_balance(*args, **kargs)
 
@@ -88,9 +124,11 @@ class BaseDecorator(ReactorBase):
     # Dunders
     # ==================================================================
 
-    def __getattr__(self, name):
-        if not(name in self.__dict__):
-            return getattr(self._reactor, name)
+    def __getattr__(self, name: str):
+        return getattr(self.reactor, name)
+
+    def __setattr__(self, name: str, new_value):
+        if not (name in self.__dict__):
+            return self.reactor.__setattr__(name, new_value)
         else:
-            return object.__getattribute__(self, name)
-         
+            return object.__setattr__(self, name)
