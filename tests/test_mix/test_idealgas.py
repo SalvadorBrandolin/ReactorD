@@ -20,6 +20,14 @@ def test_one_substance_mix():
     temperature = np.array([300, 400, 500, 600])
     pressure = np.array([101325, 150000, 200000, 300000])
 
+    assert mix1._formation_enthalpies_set() == methane.formation_enthalpy_ig
+    assert mix2._formation_enthalpies_set() == oxygen.formation_enthalpy_ig
+    assert mix3._formation_enthalpies_set() == hydrogen.formation_enthalpy_ig
+    
+    #for t in temperature:
+    #assert mix1.formation_enthalpies_correction(t) == methane.formation_entha
+    
+
     for n in compositions:
         assert mix1.mol_fracations(n) == 1.0
         assert mix2.mol_fracations(n) == 1.0
