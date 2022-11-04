@@ -1,7 +1,7 @@
 import numpy as np
 
-from reactord.mix.abstract_mix import AbstractMix
-from reactord.utils import vectorize
+from .mix.abstract_mix import AbstractMix
+from .utils import vectorize
 
 
 class Kinetics:
@@ -78,9 +78,8 @@ class Kinetics:
 
         if not (isinstance(self.mix, AbstractMix)):
             raise TypeError(
-                f"The spplied argument 'mix' with type: {type(self.mix)}"
-                "must be an instance of AbstractMix. See documentation for"
-                "defining mix objects."
+                "The supplied argument 'mix' must be an instance of mixture "
+                "class. See documentation for defining mix objects."
             )
 
         # Get the number of component and reactions from stoichiometry
@@ -215,7 +214,7 @@ class Kinetics:
         )
 
         reaction_enthalpies_correction = np.dot(
-            formation_correction, self.stoichiometry
+            self.stoichiometry, formation_correction
         )
 
         return reaction_enthalpies_correction + self.std_reaction_enthalpies

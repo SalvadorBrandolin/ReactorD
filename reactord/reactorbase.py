@@ -1,19 +1,8 @@
 from abc import ABCMeta, abstractmethod
 
-from reactord.kinetics import Kinetics
-
 
 class ReactorBase(metaclass=ABCMeta):
     """Abstract class interface for each reactor in ReactorD."""
-
-    _kinetics: Kinetics = None
-    _settings = {
-        "reactor_type": "",
-        "time_operation": "",
-        "catalytic_operation": "",
-        "thermal_operation": "",
-        "pressure_operation": "",
-    }
 
     # ==================================================================
     # Abastract methods
@@ -64,14 +53,6 @@ class ReactorBase(metaclass=ABCMeta):
     # ==================================================================
     # Common reactors methods
     # ==================================================================
-
-    @property
-    def kinetics(self) -> Kinetics:
-        return self._kinetics
-
-    @kinetics.setter
-    def kinetics(self, new_kinetics: Kinetics) -> None:
-        self._kinetics = new_kinetics
 
     @abstractmethod
     def _mass_balance(self) -> None:

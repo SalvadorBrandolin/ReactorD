@@ -1,66 +1,47 @@
-import numpy as np
-
 from reactord.decoratorbase import DecoratorBase
-from reactord.idealreactor.pfr_decorators import HomogeneousPFR
 from reactord.reactorbase import ReactorBase
 
 
-class StationaryPFR(DecoratorBase):
+class IsothermicPFR(DecoratorBase):
     def __init__(
-        self,
-        reactor: ReactorBase,
-        inlet_molar_fluxes: list[float],
-        outlet_molar_fluxes: list[float],
+        self, reactor: ReactorBase, isothermic_temperature: float
     ) -> None:
 
         self._reactor = reactor
 
         # Specifics attributes
-        self.in_molar_fluxes = inlet_molar_fluxes
-        self.out_molar_fluxes = outlet_molar_fluxes
-
-        # Validation of fluxes variables
-
-        if np.size(self.in_molar_fluxes) != np.size(self.out_molar_fluxes):
-            raise IndexError(
-                "set_stationary error: inlet_molar_fluxes list "
-                "length must be equal to the outlet_molar_fluxes "
-                "list length."
-            )
-
-        if np.size(self.in_molar_fluxes) != len(self.kinetic.mix):
-            raise IndexError(
-                "set_stationary error: inlet_molar_fluxes list "
-                "and outlet_molar_fluxes_list length must be "
-                "equal to the number of substances in mix "
-            )
+        self.isothermic_temperature = isothermic_temperature
 
     # ==================================================================
-    # Configuration methods: returns set_catalysis(...(SpecificReactor))
+    # Configuration methods: returns set_pressure(...(SpecificReactor))
     # ==================================================================
 
-    def set_homogeneous(self) -> HomogeneousPFR:
+    def set_isobaric(self, isothermic_temperature: float):
 
         self._settings = dict(
             {
                 "reactor_type": "Piston flow reactor (PFR)",
                 "time_operation": "stationary",
                 "catalytic_operation": "homogeneous",
-                "thermal_operation": "",
-                "pressure_operation": "",
+                "thermal_operation": "isothermic",
+                "pressure_operation": "isobaric",
             }
         )
 
-        return HomogeneousPFR(self)
+        return IsobaricPFR(self, isothermic_temperature)
 
-    def set_heterogeneous(self):
-        """Not Implemented... yet
+    def set_isobaric(self):
 
-        Raises
-        ------
-        NotImplementedError
-            method not implemented yet.
-        """
+        self._settings = dict(
+            {
+                "reactor_type": "Piston flow reactor (PFR)",
+                "time_operation": "stationary",
+                "catalytic_operation": "homogeneous",
+                "thermal_operation": "isothermic",
+                "pressure_operation": "non-isobaric",
+            }
+        )
+
         raise NotImplementedError("no implemented... yet")
 
     # ==================================================================
@@ -68,26 +49,8 @@ class StationaryPFR(DecoratorBase):
     # ODE/PDE reactors general used methods
     # ==================================================================
 
-    def _grid_builder(self, grid_size: int):
-        """Builds the grid for the independent variable "z" (reactor's length).
-        The grid goes from the self.reactor_dims_minmax[0] to
-        self.reactor_dims_minmax[1].
-
-        Parameters
-        ----------
-        grid_size : int
-            Number of elements of the grid.
-
-        Returns
-        -------
-        ndarray
-            (grid_size, ) dimension ndarray, containing the reactor's length
-            grid.
-        """
-        dim_array = np.linspace(
-            self.reactor_dims_minmax[0], self.reactor_dims_minmax[1], grid_size
-        )
-        return dim_array
+    def _grid_builder(self, *args, **kargs) -> None:
+        return self._decorated_reactor._grid_builder(*args, **kargs)
 
     def _border_condition_builder(self, *args, **kargs) -> None:
         return self._decorated_reactor._border_condition_builder(

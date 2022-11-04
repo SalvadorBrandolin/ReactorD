@@ -18,16 +18,6 @@ class PFR(ReactorBase):
         **options,
     ) -> None:
 
-        # Reactor settings
-
-        self._settings = {
-            "reactor_type": "Piston flow reactor (PFR)",
-            "time_operation": "",
-            "catalytic_operation": "",
-            "thermal_operation": "",
-            "pressure_operation": "",
-        }
-
         # Kinetic set
         self.kinetics: Kinetics = Kinetics(
             list_of_reactions=list_of_reactions,
@@ -42,7 +32,7 @@ class PFR(ReactorBase):
         self.transversal_area = transversal_area
 
     # ==================================================================
-    # Configuration methods: returns set_time(PFR)
+    # Configuration methods: returns set_time(SpecificReactor)
     # ==================================================================
 
     def set_stationary(

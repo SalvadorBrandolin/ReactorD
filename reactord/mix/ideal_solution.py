@@ -54,7 +54,7 @@ class IdealSolution(AbstractMix):
 
         return enthalpies
 
-    def formation_enthalpies_correction(self):
+    def formation_enthalpies_correction(self, temperature: float, *args):
 
         enthalpies = np.array([])
         for substance in self.substances:
