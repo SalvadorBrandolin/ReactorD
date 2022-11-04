@@ -20,13 +20,36 @@ def test_one_substance_mix():
     temperature = np.array([300, 400, 500, 600])
     pressure = np.array([101325, 150000, 200000, 300000])
 
+    # ------------------- Tests Adrian ----------------------------------------
+    # Test of __str__ method: --Tests Adrian--
+    assert (
+        mix1.__str__()
+        == "The mixture contains the following 1 components:\nMethane\n"
+    )
+    assert (
+        mix2.__str__()
+        == "The mixture contains the following 1 components:\nOxygen\n"
+    )
+    assert (
+        mix3.__str__()
+        == "The mixture contains the following 1 components:\nHydrogen\n"
+    )
+
     assert mix1._formation_enthalpies_set() == methane.formation_enthalpy_ig
     assert mix2._formation_enthalpies_set() == oxygen.formation_enthalpy_ig
     assert mix3._formation_enthalpies_set() == hydrogen.formation_enthalpy_ig
-    
-    #for t in temperature:
-    #assert mix1.formation_enthalpies_correction(t) == methane.formation_entha
-    
+
+    for t in temperature:
+        assert mix1.formation_enthalpies_correction(
+            t
+        ) == methane.heat_capacity_gas_dt_integral(298.15, t)
+        assert mix2.formation_enthalpies_correction(
+            t
+        ) == oxygen.heat_capacity_gas_dt_integral(298.15, t)
+        assert mix3.formation_enthalpies_correction(
+            t
+        ) == hydrogen.heat_capacity_gas_dt_integral(298.15, t)
+    # ----------------------------------------------------------------------
 
     for n in compositions:
         assert mix1.mol_fracations(n) == 1.0
@@ -53,3 +76,8 @@ def test_one_substance_mix():
             assert mix3.mix_heat_capacity(n, t, p) == (
                 hydrogen.heat_capacity_gas(t)
             )
+
+            # Partial pressures of AbstractMix tested: --Tests Adrian--
+            assert mix1.partial_pressures(n, t, p) == p
+            assert mix2.partial_pressures(n, t, p) == p
+            assert mix3.partial_pressures(n, t, p) == p
