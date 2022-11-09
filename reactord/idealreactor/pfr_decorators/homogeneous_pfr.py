@@ -40,7 +40,8 @@ class HomogeneousPFR(DecoratorBase):
     # ODE/PDE reactors general used methods
     # ==================================================================
 
-    def _initial_guess_builder(self, grid_size):...
+    def _initial_guess_builder(self, grid_size):
+        ...
 
     # ==================================================================
     # Common reactors methods

@@ -60,40 +60,46 @@ class PFR(ReactorBase):
     # ODE/PDE reactors general used methods
     # ==================================================================
 
-    def _grid_builder(self) -> None:
+    def _grid_builder(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
-    def _border_condition_builder(self) -> None:
+    def _border_condition_builder(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
-    def _initial_guess_builder(self) -> None:
+    def _initial_guess_builder(self,*args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
     # ==================================================================
     # Heterogeneous reactors methods
     # ==================================================================
 
-    def _catalyst_mass_balance(self) -> None:
+    def _catalyst_mass_balance(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
-    def _catalyst_energy_balance(self) -> None:
+    def _catalyst_energy_balance(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
-    def _refrigerant_energy_balance(self) -> None:
+    def _catalyst_border_conditions(self, *args, **kargs) -> None:
+        raise NotImplementedError("Text missing")
+
+    def _catalyst_initial_guess_builder(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
     # ==================================================================
     # Common reactors methods
     # ==================================================================
 
-    def _mass_balance(self) -> None:
+    def _mass_balance(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
-    def _reactor_energy_balance(self) -> None:
+    def _reactor_energy_balance(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
-    def _pressure_balance(self) -> None:
+    def _pressure_balance(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
-    def simulate(self) -> None:
+    def _refrigerant_energy_balance(self, *args, **kargs) -> None:
+        raise NotImplementedError("Text missing")
+
+    def simulate(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")

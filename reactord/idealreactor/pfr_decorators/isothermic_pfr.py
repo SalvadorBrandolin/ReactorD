@@ -1,6 +1,6 @@
 import numpy as np
 
-from reactord.decoratorbase import DecoratorBase
+from reactord.decorators.decoratorbase import DecoratorBase
 from reactord.idealreactor.pfr_decorators.isobaric_pfr import IsobaricPFR
 from reactord.reactorbase import ReactorBase
 
@@ -31,16 +31,14 @@ class IsothermicPFR(DecoratorBase):
             elif self._settings["catalytic_operation"] == "heterogeneous":
                 self._reactor_energy_balance_func = self.tuki4
 
-
         # ==============================================================
         # Catalyst energy balance
         # ==============================================================
 
         if self._settings["catalytic_operation"] == "homogeneous":
             pass
-        else: 
+        else:
             pass
-
 
     # ==================================================================
     # Configuration methods: returns set_pressure(...(SpecificReactor))
@@ -100,7 +98,7 @@ class IsothermicPFR(DecoratorBase):
     def _catalyst_energy_balance(self, *args, **kargs):
         if self._settings["catalytic_operation"] == "homogeneous":
             pass
-        else: 
+        else:
             self._settings["catalytic_operation"] == "heterogeneous"
 
     # ==================================================================

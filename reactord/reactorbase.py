@@ -50,6 +50,14 @@ class ReactorBase(metaclass=ABCMeta):
     def _catalyst_energy_balance(self) -> None:
         raise NotImplementedError()
 
+    @abstractmethod
+    def _catalyst_border_conditions(self) -> None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def _catalyst_initial_guess_builder(self) -> None:
+        raise NotImplementedError()
+
     # ==================================================================
     # Common reactors methods
     # ==================================================================
