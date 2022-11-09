@@ -81,3 +81,69 @@ def test_one_substance_mix():
             assert mix1.partial_pressures(n, t, p) == p
             assert mix2.partial_pressures(n, t, p) == p
             assert mix3.partial_pressures(n, t, p) == p
+
+
+def test_three_substances_mix():
+    co2 = rd.Substance.from_thermo_database("co2")
+    ethane = rd.Substance.from_thermo_database("ethane")
+    chlorine = rd.Substance.from_thermo_database("chlorine")
+
+    mixture = rd.mix.IdealGas([co2, ethane, chlorine])
+
+    r = 8.31446261815324  # m3⋅Pa/K/mol
+
+    compositions = np.array(
+        [
+            [1, 5, 8],
+            [10, 15, 20],
+            [100, 50, 30],
+            [1000, 8000, 500],
+            [10000, 500, 4000],
+        ]
+    )
+
+    temperature = np.array([300, 400, 500, 600])
+    pressure = np.array([101325, 150000, 200000, 300000])
+
+    for t, p in zip(temperature, pressure):
+        heat_cap_correction = np.array(
+            [
+                co2.heat_capacity_gas_dt_integral(298.15, t),
+                ethane.heat_capacity_gas_dt_integral(298.15, t),
+                chlorine.heat_capacity_gas_dt_integral(298.15, t),
+            ]
+        )
+
+        raw_heat_capacities = np.array(
+            [
+                co2.heat_capacity_gas(t),
+                ethane.heat_capacity_gas(t),
+                chlorine.heat_capacity_gas(t),
+            ]
+        )
+
+        volumes = np.array(
+            [
+                co2.volume_gas(t, p),
+                ethane.volume_gas(t, p),
+                chlorine.volume_gas(t, p),
+            ]
+        )
+
+        raw_densities = p / (r * t)
+
+        for moles in compositions:
+            raw_mol_fractions = np.divide(moles, np.sum(moles, axis=0))
+            raw_concentrations = np.multiply(raw_mol_fractions, raw_densities)
+            assert (
+                raw_concentrations == mixture.concentrations(moles, t, p)
+            ).all()  # OKAY
+
+            # Test of volume method
+
+            vol_mix = mixture.volume(moles, t, p)
+            raw_vol = sum(moles) * r * t / p
+
+            assert vol_mix == raw_vol
+
+            # To do: test mix_heat_capacity, formation_enthalpies_set, formation_enthalpies_correction

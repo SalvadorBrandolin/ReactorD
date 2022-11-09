@@ -1,4 +1,4 @@
-import numpy as np
+"""import numpy as np
 
 import reactord as rd
 
@@ -28,3 +28,4 @@ def test_abstractmix():
     )
     formation_enthalpies_set = d._formation_enthalpies_set()
     mix_heat_capacity = d.mix_heat_capacity(moles, temperature, pressure)
+"""

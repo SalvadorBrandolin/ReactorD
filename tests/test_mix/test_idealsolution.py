@@ -115,8 +115,8 @@ def test_three_substance_mix():
         ).all()  # OKAY
 
         # Test of volume method
-        Vol_mix = mixture.volume(moles, t, pressure)
-        assert Vol_mix == np.dot(volumes, raw_mol_fraction)  # OKAY
+        vol_mix = mixture.volume(moles, t, pressure)
+        assert vol_mix == np.dot(volumes, raw_mol_fraction)  # OKAY
 
         # Test of concentrations method
         total_molar_vol = np.dot(raw_mol_fraction, volumes)

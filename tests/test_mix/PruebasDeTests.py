@@ -1,10 +1,10 @@
 import numpy as np
 
 import reactord as rd
-
 from reactord.mix.abstract_mix import AbstractMix
 from reactord.substance import Substance
 
+r = 8.31446261815324  # m3⋅Pa/K/mol
 temperature = np.array([300, 400, 500, 600])
 methane = rd.Substance.from_thermo_database("methane")
 oxygen = rd.Substance.from_thermo_database("oxygen")
@@ -86,7 +86,9 @@ T_Prueba = 300
 PF_ac_lau = lauric_acid.normal_melting_point
 Cpdt_solido = lauric_acid.heat_capacity_solid_dt_integral(298.15, PF_ac_lau)
 Hfusion = lauric_acid.fusion_enthalpy(PF_ac_lau)
-Cpdt_liquido = lauric_acid.heat_capacity_liquid_dt_integral(PF_ac_lau, T_Prueba)
+Cpdt_liquido = lauric_acid.heat_capacity_liquid_dt_integral(
+    PF_ac_lau, T_Prueba
+)
 print("Caso con PF>298.15 -acido laurico- PF= ", PF_ac_lau)
 print("CpDt del solido: ", Cpdt_solido)
 print("entalpia de fusion: ", Hfusion)
@@ -104,9 +106,68 @@ print(
 
 # print("H Vaporizacion: ", sucrose._vaporization_enthalpy_t(458.65))
 # print(sucrose.vaporization_enthalpy(458.65))
-
 # print(sucrose._sublimation_enthalpy_t (458.65))
-
 # print(sucrose._vaporization_enthalpy_t (460))
-
 # print(sucrose.fusion_enthalpy(400))
+
+
+# TESTS PARA IDEAL_GAS
+print("TESTS PARA IDEAL GAS\n--------------------")
+co2 = rd.Substance.from_thermo_database("co2")
+ethane = rd.Substance.from_thermo_database("ethane")
+chlorine = rd.Substance.from_thermo_database("chlorine")
+
+mixture = rd.mix.IdealGas([co2, ethane, chlorine])
+
+print(mixture)
+
+compositions = np.array(
+    [
+        [1, 1, 1],
+        [10, 15, 20],
+        [100, 50, 30],
+        [1000, 8000, 500],
+        [10000, 500, 4000],
+    ]
+)
+temperature = np.array([300, 400, 500, 600])
+pressure = np.array([101325, 150000, 200000, 300000])
+
+# temperature = np.array([273.15])
+# pressure = np.array([101325])
+
+for t, p in zip(temperature, pressure):
+    heat_cap_correction = np.array(
+        [
+            co2.heat_capacity_gas_dt_integral(298.15, t),
+            ethane.heat_capacity_gas_dt_integral(298.15, t),
+            chlorine.heat_capacity_gas_dt_integral(298.15, t),
+        ]
+    )
+
+    raw_heat_capacities = np.array(
+        [
+            co2.heat_capacity_gas(t),
+            ethane.heat_capacity_gas(t),
+            chlorine.heat_capacity_gas(t),
+        ]
+    )
+
+    volumes = np.array(
+        [
+            co2.volume_gas(t, p),
+            ethane.volume_gas(t, p),
+            chlorine.volume_gas(t, p),
+        ]
+    )
+    raw_densities = p / (r * t)
+
+    for moles in compositions:
+        raw_mol_fractions = np.divide(moles, np.sum(moles))
+        raw_concentrations = np.multiply(raw_mol_fractions, raw_densities)
+        method_conc = mixture.concentrations(moles, t, p)
+        # print ("Raw conc, Method conc: ", raw_concentrations, method_conc)
+
+        vol_mix = mixture.volume(moles, t, p)
+        vol_vikingo = sum(moles) * r * t / p
+        print("Metodo - A lo vikingo: ", vol_mix, "-", vol_vikingo)
