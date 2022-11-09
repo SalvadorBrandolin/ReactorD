@@ -8,51 +8,39 @@ class HomogeneousPFR(DecoratorBase):
     def __init__(self, reactor: ReactorBase) -> None:
         self._reactor: ReactorBase = reactor
 
+        if self._settings["time_operation"] == "stationary":
+            self._massbalance_function = self._stationary_mass_balance
+        else:
+            self._massbalance_function = self._non_stationary_mass_balance
+
     # ==================================================================
     # Configuration methods: returns set_thermal(...(SpecificReactor))
     # ==================================================================
 
-    def set_isothermic(self, isothermic_temperature: float):
+    def set_isothermic(self):
 
-        self._settings = dict(
-            {
-                "reactor_type": "Piston flow reactor (PFR)",
-                "time_operation": "stationary",
-                "catalytic_operation": "homogeneous",
-                "thermal_operation": "isothermic",
-                "pressure_operation": "",
-            }
-        )
+        self._settings["thermal_operation"] = "isothermic"
 
         return IsothermicPFR(self, isothermic_temperature)
 
     def set_adiabatic(self):
 
-        self._settings = dict(
-            {
-                "reactor_type": "Piston flow reactor (PFR)",
-                "time_operation": "stationary",
-                "catalytic_operation": "homogeneous",
-                "thermal_operation": "isothermic",
-                "pressure_operation": "",
-            }
-        )
+        self._settings["thermal_operation"] = "adiabatic"
 
         raise NotImplementedError("no implemented... yet")
 
     def set_non_isothermic(self):
 
-        self._settings = dict(
-            {
-                "reactor_type": "Piston flow reactor (PFR)",
-                "time_operation": "stationary",
-                "catalytic_operation": "homogeneous",
-                "thermal_operation": "isothermic",
-                "pressure_operation": "",
-            }
-        )
+        self._settings["thermal_operation"] = "non_isothermic"
 
         raise NotImplementedError("no implemented... yet")
+
+    # ==================================================================
+    # ReactorBase interface
+    # ODE/PDE reactors general used methods
+    # ==================================================================
+
+    def _initial_guess_builder(self, grid_size):...
 
     # ==================================================================
     # Common reactors methods
@@ -60,5 +48,17 @@ class HomogeneousPFR(DecoratorBase):
 
     @vectorize(signature="()->()", excluded={0})
     def _mass_balance(self, substances_reaction_rates):
+
+        return self._massbalance_function(substances_reaction_rates)
+
+    # ==================================================================
+    # Specifics private methods
+    # ==================================================================
+
+    def _stationary_mass_balance(self, substances_reaction_rates):
         dfi_dz = substances_reaction_rates * self.transversal_area
         return dfi_dz
+
+    def _non_stationary_mass_balance(self, substances_reaction_rates):
+        # TODO
+        raise NotImplementedError()

@@ -31,6 +31,15 @@ class PFR(ReactorBase):
         self.reactor_dim_minmax = reactor_dim_minmax
         self.transversal_area = transversal_area
 
+        # Settings
+        self._settings = {
+            "reactor_type": "Piston flow reactor (PFR)",
+            "time_operation": "",
+            "catalytic_operation": "",
+            "thermal_operation": "",
+            "pressure_operation": "",
+        }
+
     # ==================================================================
     # Configuration methods: returns set_time(SpecificReactor)
     # ==================================================================
@@ -39,19 +48,12 @@ class PFR(ReactorBase):
         self, inlet_molar_fluxes: list[float], outlet_molar_fluxes: list[float]
     ) -> StationaryPFR:
 
-        self._settings = dict(
-            {
-                "reactor_type": "Piston flow reactor (PFR)",
-                "time_operation": "stationary",
-                "catalytic_operation": "",
-                "thermal_operation": "",
-                "pressure_operation": "",
-            }
-        )
+        self._settings["time_operation"] = "stationary"
 
         return StationaryPFR(self, inlet_molar_fluxes, outlet_molar_fluxes)
 
     def set_non_stationary(self):
+        # TODO
         raise NotImplementedError("no implemented... yet")
 
     # ==================================================================
