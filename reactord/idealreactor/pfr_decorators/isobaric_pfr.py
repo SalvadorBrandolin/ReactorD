@@ -1,5 +1,6 @@
-from reactord.decoratorbase import DecoratorBase
+from reactord.decorators.decoratorbase import DecoratorBase
 from reactord.reactorbase import ReactorBase
 
 
-class IsobaricPFR(DecoratorBase): ...
+class IsobaricPFR(DecoratorBase):
+    ...

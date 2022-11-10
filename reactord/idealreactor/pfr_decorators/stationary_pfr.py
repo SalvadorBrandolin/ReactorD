@@ -41,19 +41,12 @@ class StationaryPFR(DecoratorBase):
 
     def set_homogeneous(self) -> HomogeneousPFR:
 
-        self._settings = dict(
-            {
-                "reactor_type": "Piston flow reactor (PFR)",
-                "time_operation": "stationary",
-                "catalytic_operation": "homogeneous",
-                "thermal_operation": "",
-                "pressure_operation": "",
-            }
-        )
+        self._settings["catalytic_operation"] = "homogenerous"
 
         return HomogeneousPFR(self)
 
     def set_heterogeneous(self):
+        # TODO
         """Not Implemented... yet
 
         Raises
@@ -68,10 +61,11 @@ class StationaryPFR(DecoratorBase):
     # ODE/PDE reactors general used methods
     # ==================================================================
 
-    def _grid_builder(self, grid_size: int):
-        """Builds the grid for the independent variable "z" (reactor's length).
-        The grid goes from the self.reactor_dims_minmax[0] to
-        self.reactor_dims_minmax[1].
+    def _grid_builder(self, grid_size: int) -> np.ndarray:
+        """Builds the grid for the independent variable "z" (reactor's
+        length). The grid goes from the self.reactor_dims_minmax[0] to
+        self.reactor_dims_minmax[1] and has a number of elements equal
+        to "grid_size".
 
         Parameters
         ----------
@@ -81,49 +75,28 @@ class StationaryPFR(DecoratorBase):
         Returns
         -------
         ndarray
-            (grid_size, ) dimension ndarray, containing the reactor's length
-            grid.
+            (grid_size, ) dimension ndarray, containing the reactor's
+            length grid.
         """
         dim_array = np.linspace(
             self.reactor_dims_minmax[0], self.reactor_dims_minmax[1], grid_size
         )
         return dim_array
 
-    def _border_condition_builder(self, *args, **kargs) -> None:
-        return self._decorated_reactor._border_condition_builder(
-            *args, **kargs
-        )
+    def _border_condition_builder(
+        self, ya: np.ndarray, yb: np.ndarray
+    ) -> np.ndarray:
 
-    def _initial_guess_builder(self, *args, **kargs) -> None:
-        return self._decorated_reactor._initial_guess_builder(*args, **kargs)
+        # Checks where the border conditions are given by searching
+        # where the values are not np.nan:
 
-    # ==================================================================
-    # Heterogeneous reactors methods
-    # ==================================================================
+        where_not_nan_in = np.invert(np.isnan(self.in_molar_fluxes))
+        where_not_nan_out = np.invert(np.isnan(self.in_molar_fluxes))
 
-    def _catalyst_mass_balance(self, *args, **kargs) -> None:
-        return self._decorated_reactor._catalyst_mass_balance(*args, **kargs)
+        inlet = np.argwhere(where_not_nan_in).ravel()
+        outlet = np.argwhere(where_not_nan_out).ravel()
 
-    def _catalyst_energy_balance(self, *args, **kargs) -> None:
-        return self._decorated_reactor._catalyst_energy_balance(*args, **kargs)
+        bc_inlet = ya[inlet] - self.in_molar_fluxes[inlet]
+        bc_outlet = yb[outlet] - self.out_molar_fluxes[outlet]
 
-    # ==================================================================
-    # Common reactors methods
-    # ==================================================================
-
-    def _mass_balance(self, *args, **kargs) -> None:
-        return self._decorated_reactor._mass_balance(*args, **kargs)
-
-    def _reactor_energy_balance(self, *args, **kargs) -> None:
-        return self._decorated_reactor._reactor_energy_balance(*args, **kargs)
-
-    def _pressure_balance(self, *args, **kargs) -> None:
-        return self._decorated_reactor._pressure_balance(*args, **kargs)
-
-    def _refrigerant_energy_balance(self, *args, **kargs) -> None:
-        return self._decorated_reactor._refrigerant_energy_balance(
-            *args, **kargs
-        )
-
-    def simulate(self, *args, **kargs) -> None:
-        return self._decorated_reactor.simulate(*args, **kargs)
+        return np.append(bc_inlet, bc_outlet)
