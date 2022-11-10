@@ -54,19 +54,22 @@ def test_user_reaction_enthalpies():
     water = rd.Substance.from_thermo_database("water")
     acetate = rd.Substance.from_thermo_database("ethyl acetate")
 
-    list_of_reactions = [acetic, ethanol, acetate, water]
-    stoiciometry = np.array([-1, -1, 1, 1])
+    list_of_components = [acetic, ethanol, acetate, water]
+    stoichiometry_single_reaction = np.array([-1, -1, 1, 1])
 
     def reaction_rate(concentration, temperature):
         return 10
 
-    mix1 = rd.mix.IdealGas(list_of_reactions)
-    mix2 = rd.mix.IdealSolution(list_of_reactions)
+    def reaction_rate2(concentration, temperature):
+        return 15
+
+    mix1 = rd.mix.IdealGas(list_of_components)
+    mix2 = rd.mix.IdealSolution(list_of_components)
 
     kinetic1 = rd.Kinetics(
         mix1,
         list_of_reactions=[reaction_rate],
-        stoichiometry=stoiciometry,
+        stoichiometry=stoichiometry_single_reaction,
         kinetic_argument="concentration",
         reaction_enthalpies=np.array([5]),
     )
@@ -74,23 +77,53 @@ def test_user_reaction_enthalpies():
     kinetic2 = rd.Kinetics(
         mix=mix2,
         list_of_reactions=[reaction_rate],
-        stoichiometry=stoiciometry,
-        kinetic_argument="concentration",
+        stoichiometry=stoichiometry_single_reaction,
+        kinetic_argument="partial_pressure",
         reaction_enthalpies=np.array([5]),
     )
 
     assert kinetic1.reaction_enthalpies(1250, 2) == np.array([5])
-
     assert kinetic2.reaction_enthalpies(1250, 2) == np.array([5])
 
     wrong_reaction_enthalpies = np.array([10, 10])
 
-    with pytest.raises(IndexError):
 
+    # Test there is one reaction enthalpy per reaction
+    with pytest.raises(IndexError):
         rd.Kinetics(
             mix=mix2,
             list_of_reactions=[reaction_rate],
-            stoichiometry=stoiciometry,
+            stoichiometry=stoichiometry_single_reaction,
             kinetic_argument="concentration",
             reaction_enthalpies=wrong_reaction_enthalpies,
         )
+
+    # Test whether there is one reaction in list_of_reactions 
+    # per row in stoichiometry
+    correct_reaction_enthalpies = [20, 20]
+    with pytest.raises(IndexError):
+        rd.Kinetics(
+            mix=mix2,
+            list_of_reactions=[reaction_rate, reaction_rate2],
+            stoichiometry=stoichiometry_single_reaction,
+            kinetic_argument="partial_pressure",
+            reaction_enthalpies=correct_reaction_enthalpies,
+        )
+
+    with pytest.raises(ValueError):
+        rd.Kinetics(
+            mix=mix2,
+            list_of_reactions=[reaction_rate],
+            stoichiometry=stoichiometry_single_reaction,
+            kinetic_argument="Invalid_Argument",
+            reaction_enthalpies=([25])
+        )
+
+    """with pytest.raises(ValueError):
+        rd.Kinetics(
+            mix=mix2,
+            list_of_reactions=[reaction_rate],
+            stoichiometry=stoichiometry_single_reaction,
+            kinetic_argument="partial_pressure",
+            reaction_enthalpies=([25])
+        )"""
