@@ -170,4 +170,47 @@ for t, p in zip(temperature, pressure):
 
         vol_mix = mixture.volume(moles, t, p)
         vol_vikingo = sum(moles) * r * t / p
-        print("Metodo - A lo vikingo: ", vol_mix, "-", vol_vikingo)
+        # print("Metodo - A lo vikingo: ", vol_mix, "-", vol_vikingo)
+
+        # Para test de mix_heat_capacity
+        raw_mix_heat_capacity = np.dot(raw_heat_capacities, raw_mol_fractions)
+        method_mix_heat_capacity = mixture.mix_heat_capacity(moles, t, p)
+        """print(
+            "raw_mix_cp: ",
+            raw_mix_heat_capacity,
+            "method_cp: ",
+            method_mix_heat_capacity,
+        )"""
+
+        # Para test de formation_enthalpies_set
+        raw_enthalpies_set = np.array(
+            [
+                co2.formation_enthalpy_ig,
+                ethane.formation_enthalpy_ig,
+                chlorine.formation_enthalpy_ig,
+            ]
+        )
+        method_enthalpies_set = mixture._formation_enthalpies_set()
+        # print(raw_enthalpies_set, method_enthalpies_set)
+
+        # Para test de formation_enthalpies_correction
+        raw_formation_enthalpies_correction = [
+            co2.heat_capacity_gas_dt_integral(298.15, t),
+            ethane.heat_capacity_gas_dt_integral(298.15, t),
+            chlorine.heat_capacity_gas_dt_integral(298.15, t),
+        ]
+
+        method_formation_enthalpies_correction = (
+            mixture.formation_enthalpies_correction(t)
+        )
+
+        print(
+            "r_H_cor: ",
+            raw_formation_enthalpies_correction,
+            "\nm_H_cor: ",
+            method_formation_enthalpies_correction,
+            "\n",
+            raw_formation_enthalpies_correction
+            == method_formation_enthalpies_correction,
+            "\n",
+        )

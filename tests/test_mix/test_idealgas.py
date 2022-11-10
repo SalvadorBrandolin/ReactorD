@@ -106,7 +106,7 @@ def test_three_substances_mix():
     pressure = np.array([101325, 150000, 200000, 300000])
 
     for t, p in zip(temperature, pressure):
-        heat_cap_correction = np.array(
+        raw_formation_enthalpies_correction = np.array(
             [
                 co2.heat_capacity_gas_dt_integral(298.15, t),
                 ethane.heat_capacity_gas_dt_integral(298.15, t),
@@ -122,28 +122,44 @@ def test_three_substances_mix():
             ]
         )
 
-        volumes = np.array(
-            [
-                co2.volume_gas(t, p),
-                ethane.volume_gas(t, p),
-                chlorine.volume_gas(t, p),
-            ]
-        )
-
         raw_densities = p / (r * t)
 
         for moles in compositions:
             raw_mol_fractions = np.divide(moles, np.sum(moles, axis=0))
             raw_concentrations = np.multiply(raw_mol_fractions, raw_densities)
+
+            # Test of concentrations method
             assert (
                 raw_concentrations == mixture.concentrations(moles, t, p)
             ).all()  # OKAY
 
             # Test of volume method
-
-            vol_mix = mixture.volume(moles, t, p)
             raw_vol = sum(moles) * r * t / p
+            assert mixture.volume(moles, t, p) == raw_vol  # OKAY
 
-            assert vol_mix == raw_vol
+            # Test of mix_heat_capacity method
+            raw_mix_heat_capacity = np.dot(
+                raw_heat_capacities, raw_mol_fractions
+            )
+            assert raw_mix_heat_capacity == mixture.mix_heat_capacity(
+                moles, t, p
+            )  # OKAY
 
-            # To do: test mix_heat_capacity, formation_enthalpies_set, formation_enthalpies_correction
+            # Test of formation_enthalpies_set method
+            raw_enthalpies_set = np.array(
+                [
+                    co2.formation_enthalpy_ig,
+                    ethane.formation_enthalpy_ig,
+                    chlorine.formation_enthalpy_ig,
+                ]
+            )
+
+            assert (
+                mixture._formation_enthalpies_set() == raw_enthalpies_set
+            ).all()  # OKAY
+
+            # Test of formation_enthalpies_correction method
+            assert (
+                raw_formation_enthalpies_correction
+                == mixture.formation_enthalpies_correction(t)
+            ).all()  # OKAY
