@@ -1,0 +1,261 @@
+import numpy as np
+
+from reactord.mix.abstract_mix import AbstractMix
+from reactord.utils import vectorize
+
+
+class Kinetics:
+    """Kinetic object builder
+
+    Parameters
+    ----------
+    list_of_reactions : ndarray or list [function]
+        array that constains user defined python functions with the
+        form: function(composition, temperature) where
+        composition is a (number_of_components) dimension array
+        that contains the partial pressures [Pa] or the concentrations
+        of the substances.
+    mix : Mix object
+        Mix object defined with all the substances present in the system
+    stoichiometry: ndarray or list
+        array or list containing the stoichiometric coefficients of
+        all the substances involved in the reactive system. the
+        substances that do not participate in a reaction but are present
+        in the reactive system, must have a zero as stoichiometric
+        coefficient.
+
+        Example:
+        Consider the following reactions with 4 components and 1
+        inert with the substances order [A, B, C, D, I]:
+        A + B --->  C + 2 D
+        B + C + I ---> D + I
+        the matrix of coefficients must be introduced as:
+
+        stoichiometry = np.array[
+            [-1, -1, 1, 2, 0],
+            [0, -1, -1, 1, 0]
+        ]
+
+        or
+
+        stoichiometry = [
+            [-1, -1, 1, 2, 0],
+            [0, -1, -1, 1, 0]
+        ]
+
+    kinetic_argument : string
+        string that indicates on wich concentration unit meassure the
+        kinetic rate function are evaluated. Avaliable options:
+        'concentration', 'partial_pressure'
+    enthalpy_of_reaction : ndarray or list, optional
+        array that contains the enthalpy of reaction of each reaction
+        in list_of_reactions [j/mol/K]. Elements of the list may be set
+        as None, then, that values are calculated using the heat
+        capacity and enthalpy of formation of the substances on mix.
+        Single None value is accepted and all the values are
+        calculated, default = None.
+    """
+
+    def __init__(
+        self,
+        mix: AbstractMix,
+        list_of_reactions: list,
+        stoichiometry: list,
+        kinetic_argument: str = "concentration",
+        **options,
+    ) -> None:
+
+        self.list_of_reactions = list_of_reactions
+        self.mix = mix
+        self.kinetic_argument = kinetic_argument.lower()
+        self.options = options
+
+        # ==============================================================
+        # DATA VALIDATION
+        # ==============================================================
+
+        # Get the number of component and reactions from stoichiometry
+
+        if np.ndim(stoichiometry) == 1:
+            self.num_reactions = 1
+            self.num_substances = np.shape(stoichiometry)[0]
+        else:
+            self.num_reactions, self.num_substances = np.shape(stoichiometry)
+
+        # Checks that there is a function to eval each reaction
+
+        if self.num_reactions != len(list_of_reactions):
+            raise IndexError(
+                "'stoichiometry' rows number must be equal to"
+                " list_of_reactions' length"
+            )
+
+        # Checks mix and stoichiometry has the same number of substances
+
+        if len(mix) != self.num_substances:
+            raise IndexError(
+                "'stoichiometry' columns number must be equal to substances"
+                " number in 'mix' object"
+            )
+
+        # Checks if reacion_enthalpies option is correct
+
+        if "reaction_enthalpies" in self.options.keys():
+
+            reaction_enthalpies = self.options.get("reaction_enthalpies")
+
+            if len(reaction_enthalpies) != self.num_reactions:
+                raise IndexError(
+                    "The number of reaction enthalpies in the"
+                    " reaction_enthalpies option"
+                    f" [{len(reaction_enthalpies)}] must be equal to"
+                    " the stoichiometry matrix row number"
+                )
+
+        # ==============================================================
+        # Set the dimnesion of stoichiometry matrix explicitly
+        # (needed for single reaction systems)
+        # ==============================================================
+
+        self.stoichiometry = np.array(stoichiometry).reshape(
+            self.num_reactions, self.num_substances
+        )
+
+        # ==============================================================
+        # SETS THE KINETICS COMPOSITIONAL ARGUMENTS
+        # ==============================================================
+
+        if self.kinetic_argument == "concentration":
+            self._composition_calculator = self.mix.concentrations
+
+        elif self.kinetic_argument == "partial_pressure":
+            self._composition_calculator = self.mix.partial_pressures
+
+        else:
+            raise ValueError(
+                f"{self.kinetic_argument} is not a valid kinetic argument"
+            )
+
+        # ==============================================================
+        # FORMATION AND REACTION ENTHALPIES SET
+        # ==============================================================
+
+        if self.options.get("_not_reaction_enthalpies"):
+            self.std_reaction_enthalpies = None
+
+            self._reaction_enthalpies_func = lambda temperature, pressure: (
+                None
+            )
+
+        else:
+            if "reaction_enthalpies" in options.keys():
+
+                self._user_reaction_enthalpies = np.array(
+                    options.get("reaction_enthalpies")
+                )
+
+                self.std_reaction_enthalpies = None
+
+                self._reaction_enthalpies_func = (
+                    self._reaction_enthalpies_from_user
+                )
+
+            else:
+                self.std_reaction_enthalpies = (
+                    self._std_reaction_enthalpies_from_formation()
+                )
+
+                self._reaction_enthalpies_func = (
+                    self._reaction_enthalpies_from_formation
+                )
+
+    # ==================================================================
+    # PUBLIC METHODS
+    # ==================================================================
+
+    @vectorize(signature="(n),(),()->(n),(m)", excluded={0})
+    def kinetic_eval(
+        self, moles: list, temperature: float, pressure: float
+    ) -> np.ndarray:
+        """Method that evaluates the reaction rate for the reaction and
+        for the mix components.
+
+        Parameters
+        ----------
+        moles : ndarray or list
+            moles of each substance
+        temperature : float
+            Temperature [K]
+        pressure : float
+            Pressure [Pa]
+
+        Returns
+        -------
+        ndarray, ndarray
+
+        """
+
+        # The partial pressures or concentrations are calculated:
+        composition = self._composition_calculator(
+            moles, temperature, pressure
+        )
+
+        # Rates for each individual reaction:
+        reaction_rates = np.array(
+            [
+                reaction(composition, temperature)
+                for reaction in self.list_of_reactions
+            ]
+        )
+        # Rates for each compound:
+        rates_i = np.matmul(reaction_rates, self.stoichiometry)
+        return rates_i, reaction_rates
+
+    @vectorize(signature="(),()->(m)", excluded={0})
+    def reaction_enthalpies(self, temperature, pressure):
+        return self._reaction_enthalpies_func(temperature, pressure)
+
+    # ==================================================================
+    # PRIVATE METHODS
+    # ==================================================================
+
+    def _std_reaction_enthalpies_from_formation(self):
+        """Calculates the standard reaction enthalpy from standard
+        formation enthalpies defined from mix object.
+
+        Returns
+        -------
+        ndarray
+            Standar reaction enthalpies. [j/mol/K]
+        """
+        formation_enthalpies = self.mix._formation_enthalpies_set()
+        return np.dot(self.stoichiometry, formation_enthalpies)
+
+    def _reaction_enthalpies_from_formation(self, temperature, pressure):
+        """Calculates the reaction enthalpies from formation enthalpies and
+        the correction of formation enthalpies defined in mix.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature of correction. [K]
+        pressure : float
+            Pressure of correction. [Pa]
+
+        Returns
+        -------
+        ndarray
+            Reaction enthalpies at temperature and pressure. [j/mol/K]
+        """
+
+        formation_correction = self.mix.formation_enthalpies_correction(
+            temperature, pressure
+        )
+
+        reaction_correction = np.dot(formation_correction, self.stoichiometry)
+
+        return reaction_correction + self.std_reaction_enthalpies
+
+    def _reaction_enthalpies_from_user(self, temperature, pressure):
+
+        return self._user_reaction_enthalpies

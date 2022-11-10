@@ -1,0 +1,13 @@
+check-manifest
+flake8-black
+flake8-builtins
+flake8-isort
+ipdb
+numpy>=1.21.5
+pep8-naming
+pytest
+pytest-cov
+py-pde>=0.21.0
+scipy>=1.9.0
+thermo>=0.2.21
+tox

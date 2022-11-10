@@ -1,0 +1,12 @@
+include LICENSE
+include README.md
+include requirements.txt
+
+recursive-include reactord *
+
+exclude tox.ini
+exclude pyproject.toml
+exclude requirements_dev.txt
+recursive-exclude examples *
+recursive-exclude reactord *.mod *.log *.pyc
+recursive-exclude tests *

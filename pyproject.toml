@@ -1,0 +1,44 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools"]
+
+[tool.black]
+line-length = 79
+target-version = ["py310"]
+
+[tool.pytest.ini_options]
+
+testpaths = [
+    "tests",
+]
+
+
+[project]
+name = "reactord"
+version = "0.0.1"
+authors = [{name = "Brandolín, Salvador Eduardo", email = "salvadorebrandolin@mi.unc.edu.ar"},
+           {name = "Parodi, Adrián", email = "parodiadrian@hotmail.com"},
+           {name = "Rovezzi, Juan Pablo", email = "juan.rovezzi@mi.unc.edu.ar"},
+           {name = "Santos, Maricel Del Valle", email = "maricel.santos@mi.unc.edu.ar"},
+           {name = "Scilipoti, José Antonio", email = "jscilipoti@unc.edu.ar"}]
+license = {text = "The MIT License"}
+readme = "README.md"
+description = "Package for the simulation and design of chemical reactors"
+keywords = ["chemical reactor", "reactor design", "reactor simulation", "chemical engineering"]
+classifiers = [
+    "Development Status :: 1 - Alpha",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+]
+urls = {Homepage = "https://github.com/SalvadorBrandolin/reactord"}
+dependencies = [
+    "numpy>=1.21.5", 
+    "py-pde>=0.21.0", 
+    "scipy>=1.9.0", 
+    "thermo>=0.2.21"
+]
