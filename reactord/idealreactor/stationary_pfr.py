@@ -40,10 +40,9 @@ class StationaryPFR(ReactorBase):
         self,
         molar_flux_in: list[float],
         molar_flux_out: list[float],
-    ):
+    ) -> None:
         """Method that recieves and instantiates the neccesary
-        parameters to solve the mass balance in the reactor's bulk
-        phase as attributes of the reactor.
+        parameters to solve the mass balance in the reactor's bulk.
 
         Parameters
         ----------
@@ -58,38 +57,87 @@ class StationaryPFR(ReactorBase):
             at the reactor's outlet. The ordering of the fluxes must be
             identical to the substance order in mixture. For unkown
             fluxes specify as numpy.nan. [mol/s]
+
+        Raises
+        ------
+        IndexError
+            molar_flux_in length must be equal to molar_flux_out
+        IndexError
+            molar_flux_in and molar_flux_out length must be equal to
+            mixture's substance number.
         """
 
         # ==============================================================
         # Validation
         # ==============================================================
 
+        if len(molar_flux_in) != len(molar_flux_out):
+            raise IndexError(
+                "molar_flux_in length must be equal to molar_flux_out"
+            )
+
+        if len(molar_flux_in) != len(self.mix):
+            raise IndexError(
+                "molar_flux_in and molar_flux_out length must be equal to "
+                "mixture's substance number."
+            )
+
         self._molar_flux_in = molar_flux_in
         self._molar_flux_out = molar_flux_out
 
-    def set_energy_balance_data(self):
-        """Method that recieves and instantiates the neccesary
-        parameters to solve the energy balance in the reactor's bulk
-        phase as attributes of the reactor. The method returns None.
+    def set_isothermic_operation(self, isothermic_temperature: float) -> None:
+        def isothermic_energy_balance(*args, **kwargs):
+            return 0
+
+        self._thermal_operation = "isothermic"
+        self._isothermic_temperature = isothermic_temperature
+        self._energy_balance_func = isothermic_energy_balance
+
+    def set_adiabatic_operation(self):
+        """Not implemented
+
+        # TODO
 
         Raises
         ------
         NotImplementedError
-            Abstract method not implemented.
+            Not implemented.
         """
-        raise NotImplementedError("Abstract method not implemented.")
+        raise NotImplementedError("Not implemented.")
 
-    def set_pressure_balance_data(self):
-        """Method that recieves and instantiates the neccesary
-        parameters to solve the pressure balance in the reactor's bulk
-        phase as attributes of the reactor. The method returns None.
+    def set_non_isothermic_operation(self):
+        """Not implemented
+
+        # TODO
 
         Raises
         ------
         NotImplementedError
-            Abstract method not implemented.
+            Not implemented.
         """
-        raise NotImplementedError("Abstract method not implemented.")
+        raise NotImplementedError("Not implemented")
+
+    def set_isobaric_operation(self):
+        """Not implemented
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented
+        """
+        raise NotImplementedError("Not implemented.")
+
+    def set_non_isobaric_operation(self):
+        """Not implemented.
+
+        # TODO
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Not implemented.")
 
     # ==================================================================
     # Solvers aditional data needed - general used methods
@@ -170,7 +218,7 @@ class StationaryPFR(ReactorBase):
         """
         raise NotImplementedError("Abstract method not implemented.")
 
-    def _reactor_energy_balance(self) -> None:
+    def _energy_balance(self) -> None:
         """Method that evals and returns the evaluated reactor's bulk
         energy balance. The format of the method's returns corresponds
         to the specific solver needs.
