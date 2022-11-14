@@ -66,7 +66,7 @@ class PFR(ReactorBase):
     def _border_condition_builder(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
-    def _initial_guess_builder(self,*args, **kargs) -> None:
+    def _initial_guess_builder(self, *args, **kargs) -> None:
         raise NotImplementedError("Text missing")
 
     # ==================================================================

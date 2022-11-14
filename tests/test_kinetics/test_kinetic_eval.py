@@ -87,7 +87,6 @@ def test_user_reaction_enthalpies():
 
     wrong_reaction_enthalpies = np.array([10, 10])
 
-
     # Test there is one reaction enthalpy per reaction
     with pytest.raises(IndexError):
         rd.Kinetics(
@@ -98,7 +97,7 @@ def test_user_reaction_enthalpies():
             reaction_enthalpies=wrong_reaction_enthalpies,
         )
 
-    # Test whether there is one reaction in list_of_reactions 
+    # Test whether there is one reaction in list_of_reactions
     # per row in stoichiometry
     correct_reaction_enthalpies = [20, 20]
     with pytest.raises(IndexError):
@@ -116,7 +115,7 @@ def test_user_reaction_enthalpies():
             list_of_reactions=[reaction_rate],
             stoichiometry=stoichiometry_single_reaction,
             kinetic_argument="Invalid_Argument",
-            reaction_enthalpies=([25])
+            reaction_enthalpies=([25]),
         )
 
     """with pytest.raises(ValueError):
