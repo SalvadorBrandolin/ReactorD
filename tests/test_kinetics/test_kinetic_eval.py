@@ -118,11 +118,14 @@ def test_user_reaction_enthalpies():
             reaction_enthalpies=([25]),
         )
 
-    """with pytest.raises(ValueError):
-        rd.Kinetics(
-            mix=mix2,
-            list_of_reactions=[reaction_rate],
-            stoichiometry=stoichiometry_single_reaction,
-            kinetic_argument="partial_pressure",
-            reaction_enthalpies=([25])
-        )"""
+    # Test for _std_reaction_enthalpies_from_formation method
+    raw_formation_enthalpies = []
+
+    for component in list_of_components:
+        raw_formation_enthalpies.append(component.formation_enthalpy_ig)
+    raw_formation_enthalpies = np.array(raw_formation_enthalpies)
+    formation_enthalpies_method = (
+        kinetic1._std_reaction_enthalpies_from_formation()
+    )
+
+    assert np.allclose(raw_formation_enthalpies, formation_enthalpies_method)
