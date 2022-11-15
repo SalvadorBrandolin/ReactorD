@@ -1,9 +1,10 @@
+"""Substance module."""
 from scipy.integrate import quad
 from thermo.chemical import Chemical
 
 
 class Substance:
-    """Substance object class
+    """Substance object class.
 
     Parameters
     ----------
@@ -119,7 +120,9 @@ class Substance:
 
     @classmethod
     def from_thermo_database(cls, identificator):
-        """Method that use Bell Caleb's thermo library to construct the
+        """Bell Caleb's thermo library.
+        
+        Method that use Bell Caleb's thermo library to construct the
         Substance object. Cite: Caleb Bell and Contributors (2016-2021).
         Thermo: Chemical properties component of Chemical Engineering
         Design Library (ChEDL) https://github.com/CalebBell/thermo.
@@ -159,55 +162,239 @@ class Substance:
         return substance_object
 
     def vaporization_enthalpy(self, temperature):
+        """Return the vaporization enthalpy at a given temperature.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Vaporization enthalpy in Joule per mol [J/mol]
+        """
         return self._vaporization_enthalpy_t(temperature)
 
     def sublimation_enthalpy(self, temperature):
+        """Return the sublimation enthalpy at a given temperature.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Sublimation enthalpy in Joule per mol [J/mol]
+        """
         return self._sublimation_enthalpy_t(temperature)
 
     def fusion_enthalpy(self, temperature):
+        """Return the fusion enthalpy at a given temperature.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Fusion enthalpy in Joule per mol [J/mol]
+        """
         fusion_h = self._sublimation_enthalpy_t(
             temperature
         ) - self._vaporization_enthalpy_t(temperature)
         return fusion_h
 
     def volume_solid(self, temperature):
+        """Return the solid molar volume at a given temperature.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Solid molar volume in cubic meters per mol [m^3/mol]
+        """
         return self._volume_s_t(temperature)
 
     def volume_liquid(self, temperature, pressure):
+        """Return the liquid molar volume at a given temperature.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Liquid molar volume in cubic meters per mol [m^3/mol]
+        """
         return self._volume_l_tp(temperature, pressure)
 
     def volume_gas(self, temperature, pressure):
+        """Return the gas molar volume at a given temperature and pressure.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+        pressure : float
+            Pressure in Pascal [Pa]            
+
+        Returns
+        -------
+        float
+            Liquid molar volume in cubic meters per mol [m^3/mol]
+        """
         return self._volume_g_tp(temperature, pressure)
 
     def heat_capacity_solid(self, temperature):
+        """Return the pure solid heat capacity at a given temperature.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Pure solid heat capacity in Joule per mol per Kelvin [J/mol/K]
+        """
         return self._heat_capacity_s_t(temperature)
 
     def heat_capacity_liquid(self, temperature):
+        """Return the pure liquid heat capacity at a given temperature.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Pure liquid heat capacity in Joule per mol per Kelvin [J/mol/K]
+        """
         return self._heat_capacity_l_t(temperature)
 
     def heat_capacity_gas(self, temperature):
+        """Return the pure gas heat capacity at a given temperature.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Pure gas heat capacity in Joule per mol per Kelvin [J/mol/K]
+        """
         return self._heat_capacity_g_t(temperature)
 
-    # def thermal_conductivity_solid(self, temperature, pressure):
-    # Not implemented (not in thermo library)
-    #    return self._thermal_conductivity_s_tp(temperature, pressure)
 
     def thermal_conductivity_liquid(self, temperature, pressure):
+        """Return the liquid thermal conductivity.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+        pressure : float
+            Pressure in Pascal [Pa]   
+
+        Returns
+        -------
+        float
+            Liquid thermal conductivity in Watts per meter per Kelvin [W/m/K]
+        """
         return self._thermal_conductivity_l_tp(temperature, pressure)
 
     def thermal_conductivity_gas(self, temperature, pressure):
+        """Return the gas thermal conductivity.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+        pressure : float
+            Pressure in Pascal [Pa]   
+
+        Returns
+        -------
+        float
+            Gas thermal conductivity in Watts per meter per Kelvin [W/m/K]
+        """
         return self._thermal_conductivity_g_tp(temperature, pressure)
 
     def viscosity_liquid(self, temperature, pressure):
+        """Return the pure liquid viscosity.
+
+         Pure liquid viscosity as a function of temperature and pressure
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+        pressure : float
+            Pressure in Pascal [Pa]   
+
+        Returns
+        -------
+        float
+            Pure liquid viscosity in [Pa*s]
+        """
         return self._viscosity_l_tp(temperature, pressure)
 
     def viscosity_gas(self, temperature, pressure):
+        """Return the pure gas viscosity.
+
+         Pure gas viscosity as a function of temperature and pressure
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature in Kelvin degrees [K]
+        pressure : float
+            Pressure in Pascal [Pa]   
+
+        Returns
+        -------
+        float
+            Pure gas viscosity in [Pa*s]
+        """
         return self._viscosity_g_tp(temperature, pressure)
 
     def heat_capacity_solid_dt_integral(
         self, temperature1: float, temperature2: float
     ) -> float:
+        """Return the integral of solid heat capacity between two temperatures.
 
+        Calculate the definite integral of solid heat capacity between 
+        temperature1 and temperature2
+
+        Parameters
+        ----------
+        temperature1 : float
+            Temperature 1 in Kelvin degrees [K]
+        temperature2 : float
+            Temperature 2 in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Definite integral of solid heat capacity between temperature1
+            and temperature2 in Joule per mol per Kelvin [J/mol/K]
+        """
         integral, err = quad(
             self.heat_capacity_solid, a=temperature1, b=temperature2
         )
@@ -217,7 +404,24 @@ class Substance:
     def heat_capacity_liquid_dt_integral(
         self, temperature1: float, temperature2: float
     ) -> float:
+        """Return the integral of liquid heat capacity between two temperatures.
 
+        Calculate the definite integral of liquid heat capacity between 
+        temperature1 and temperature2
+
+        Parameters
+        ----------
+        temperature1 : float
+            Temperature 1 in Kelvin degrees [K]
+        temperature2 : float
+            Temperature 2 in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Definite integral of liquid heat capacity between temperature1
+            and temperature2 in Joule per mol per Kelvin [J/mol/K]
+        """
         integral, err = quad(
             self.heat_capacity_liquid, a=temperature1, b=temperature2
         )
@@ -227,7 +431,24 @@ class Substance:
     def heat_capacity_gas_dt_integral(
         self, temperature1: float, temperature2: float
     ) -> float:
+        """Return the integral of gas heat capacity between two temperatures.
 
+        Calculate the definite integral of gas heat capacity between 
+        temperature1 and temperature2
+
+        Parameters
+        ----------
+        temperature1 : float
+            Temperature 1 in Kelvin degrees [K]
+        temperature2 : float
+            Temperature 2 in Kelvin degrees [K]
+
+        Returns
+        -------
+        float
+            Definite integral of gas heat capacity between temperature1
+            and temperature2 in Joule per mol per Kelvin [J/mol/K]
+        """
         integral, err = quad(
             self.heat_capacity_gas, a=temperature1, b=temperature2
         )
