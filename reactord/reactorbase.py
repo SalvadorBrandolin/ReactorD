@@ -9,10 +9,6 @@ from reactord.mix import AbstractMix
 class ReactorBase(metaclass=ABCMeta):
     """Abstract class interface for each reactor in ReactorD."""
 
-    # ==================================================================
-    # Common parameters for all reactors.
-    # ==================================================================
-
     _name: str = ""
     _kinetics: Kinetics = None
     _mix: AbstractMix = None
@@ -20,8 +16,37 @@ class ReactorBase(metaclass=ABCMeta):
     _stoichiometry: list = []
     _kinetic_argument: str = ""
 
+    _catalyst_operation: str = ""
     _thermal_operation: str = ""
     _pressure_operation: str = ""
+
+    _mass_balance_func: Callable = None
+    _temperature_balance_func: Callable = None
+    _pressure_balance_func: Callable = None
+
+    def __init__(
+        self,
+        mix: AbstractMix,
+        list_of_reactions: list[Callable],
+        stoichiometry: list,
+        kinetic_argument: str,
+        **options,
+    ) -> None:
+
+        self.options = options
+        self.options["_not_reaction_enthalpies"] = True
+
+        self._kinetics = Kinetics(
+            list_of_reactions=list_of_reactions,
+            mix=mix,
+            stoichiometry=stoichiometry,
+            kinetic_argument=kinetic_argument,
+            options=self.options,
+        )
+
+    # ==================================================================
+    # Common parameters for all reactors.
+    # ==================================================================
 
     @property
     def kinetics(self):
@@ -388,5 +413,139 @@ class ReactorBase(metaclass=ABCMeta):
         ------
         NotImplementedError
             Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    # ==================================================================
+    # Specifics mass balances
+    # ==================================================================
+
+    @abstractmethod
+    def _homogeneous_mass_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    @abstractmethod
+    def _heterogeneous_mass_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    # ==================================================================
+    # Specifics energy balances
+    # ==================================================================
+
+    @abstractmethod
+    def _isothermic_energy_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    @abstractmethod
+    def _homogeneous_adiabatic_energy_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    @abstractmethod
+    def _heterogeneous_adiabatic_energy_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    def _homogeneous_non_isothermic_energy_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    @abstractmethod
+    def _heterogeneous_non_isothermic_energy_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    # ==================================================================
+    # Specifics pressure balances
+    # ==================================================================
+    @abstractmethod
+    def _isobaric_pressure_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    @abstractmethod
+    def _non_isobaric_pressure_balance(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    # ==================================================================
+    # Specifics solvers
+    # ==================================================================
+    @abstractmethod
+    def _homogeneous_solver(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    @abstractmethod
+    def _heterogeneous_solver(self) -> None:
+        """Not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented.
         """
         raise NotImplementedError("Abstract method not implemented.")
