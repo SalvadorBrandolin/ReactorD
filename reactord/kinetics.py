@@ -10,11 +10,14 @@ class Kinetics:
     Parameters
     ----------
     list_of_reactions : ndarray or list [function]
-        array that constains user defined python functions with the
-        form: function(composition, temperature) where
-        composition is a (number_of_components) dimension array
-        that contains the partial pressures [Pa] or the concentrations
+        array that constains kinetic laws for each reaction defined by user 
+        There are add in form of functions like: 
+        function(composition, temperature) 
+        where composition is a (number_of_components) dimension array 
+        that contains the partial pressures [Pa] or the concentrations 
         of the substances.
+        Example: #TODO
+
     mix : Mix object
         Mix object defined with all the substances present in the system
     stoichiometry: ndarray or list

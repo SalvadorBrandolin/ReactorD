@@ -36,6 +36,9 @@ class ReactorBase(metaclass=ABCMeta):
         **options,
     ) -> None:
 
+        """_summary_
+        """
+
         self.options = options
         self.options["_not_reaction_enthalpies"] = True
 
