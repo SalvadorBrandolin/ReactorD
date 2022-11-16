@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 import reactord as rd
 
@@ -12,6 +11,12 @@ import reactord as rd
 def test_fogler_p1_15a_ivp():
     """Fogler fourth ed. P1.15a as an initial value problem"""
 
+    def volume(temperature, pressure):
+        return 1 / (fa_initial / f_volumetric)
+
+    def kinetic(concentrations, temperature):
+        return k
+
     fa_initial = 5 / 3600  # mol/s
 
     f_volumetric = 10 * 0.001 / 60  # m3/s
@@ -19,12 +24,6 @@ def test_fogler_p1_15a_ivp():
     k = 0.05 / 3600 / 0.001  # mol/s/m3
 
     v_pfr = 99 * 0.001  # m3
-
-    def volume(temperature, pressure):
-        return 1 / (fa_initial / f_volumetric)
-
-    def kinetic(concentrations, temperature):
-        return k
 
     substance_a = rd.Substance()
     substance_a.volume_liquid = volume
@@ -34,18 +33,22 @@ def test_fogler_p1_15a_ivp():
 
     mixture = rd.mix.IdealSolution([substance_a, substance_b])
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[fa_initial, 0],
-        reactor_f_out=[np.nan, np.nan],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
+
+    pfr.set_mass_balance_data(
+        molar_flux_in=[fa_initial, 0], molar_flux_out=[np.nan, np.nan]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
 
     # Fogler's exact solution
 
@@ -65,7 +68,7 @@ def test_fogler_p1_15a_ivp():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -111,18 +114,22 @@ def test_fogler_p1_15a_bvp():
 
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[fa_initial, np.nan],
-        reactor_f_out=[np.nan, fb_out],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
+
+    pfr.set_mass_balance_data(
+        molar_flux_in=[fa_initial, np.nan], molar_flux_out=[np.nan, fb_out]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
 
     # reactord solution
     solution = pfr.simulate()
@@ -133,7 +140,7 @@ def test_fogler_p1_15a_bvp():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -181,18 +188,22 @@ def test_fogler_p1_15a_ivp_outlet():
     fa_out = fogler(v_pfr) * f_volumetric
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[np.nan, np.nan],
-        reactor_f_out=[fa_out, fb_out],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
+
+    pfr.set_mass_balance_data(
+        molar_flux_in=[np.nan, np.nan], molar_flux_out=[fa_out, fb_out]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
 
     # reactord solution
     solution = pfr.simulate()
@@ -203,7 +214,7 @@ def test_fogler_p1_15a_ivp_outlet():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -236,18 +247,22 @@ def test_fogler_p1_15b():
 
     mixture = rd.mix.IdealSolution([substance_a, substance_b])
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[fa_initial, 0],
-        reactor_f_out=[np.nan, np.nan],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
+
+    pfr.set_mass_balance_data(
+        molar_flux_in=[fa_initial, 0], molar_flux_out=[np.nan, np.nan]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
 
     # Fogler's exact solution
 
@@ -268,7 +283,7 @@ def test_fogler_p1_15b():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -315,21 +330,23 @@ def test_fogler_p1_15b_bvp():
 
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[fa_initial, np.nan],
-        reactor_f_out=[np.nan, fb_out],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
 
-    # import ipdb
-    # ipdb.set_trace()
+    pfr.set_mass_balance_data(
+        molar_flux_in=[fa_initial, np.nan], molar_flux_out=[np.nan, fb_out]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
+
     # reactord solution
     solution = pfr.simulate(tol=0.00001)
     reactord_concentrations = np.array([])
@@ -339,7 +356,7 @@ def test_fogler_p1_15b_bvp():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -388,21 +405,23 @@ def test_fogler_p1_15b_ivp_outlet():
     fa_out = fogler(v_pfr) * f_volumetric
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[np.nan, np.nan],
-        reactor_f_out=[fa_out, fb_out],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
 
-    # import ipdb
-    # ipdb.set_trace()
+    pfr.set_mass_balance_data(
+        molar_flux_in=[np.nan, np.nan], molar_flux_out=[fa_out, fb_out]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
+
     # reactord solution
     solution = pfr.simulate(tol=0.00001)
     reactord_concentrations = np.array([])
@@ -412,7 +431,7 @@ def test_fogler_p1_15b_ivp_outlet():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -445,18 +464,22 @@ def test_fogler_p1_15c_ivp():
 
     mixture = rd.mix.IdealSolution([substance_a, substance_b])
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[fa_initial, 0],
-        reactor_f_out=[np.nan, np.nan],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
+
+    pfr.set_mass_balance_data(
+        molar_flux_in=[fa_initial, 0], molar_flux_out=[np.nan, np.nan]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
 
     # Fogler's exact solution
     def fogler(vol):
@@ -476,7 +499,7 @@ def test_fogler_p1_15c_ivp():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -522,18 +545,22 @@ def test_fogler_p1_15c_bvp():
 
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[fa_initial, np.nan],
-        reactor_f_out=[np.nan, fb_out],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
+
+    pfr.set_mass_balance_data(
+        molar_flux_in=[fa_initial, np.nan], molar_flux_out=[np.nan, fb_out]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
 
     # reactord solution
     solution = pfr.simulate(tol=1e-6)
@@ -544,7 +571,7 @@ def test_fogler_p1_15c_bvp():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -591,18 +618,22 @@ def test_fogler_p1_15c_ivp_outlet():
     fa_out = fogler(v_pfr) * f_volumetric
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.pfr_classes.PfrHomogStatIsoth(
+    pfr = rd.idealreactor.StationaryPFR(
         mix=mixture,
         list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        reactor_dims_minmax=[0, v_pfr],
-        transversal_area=1,
-        pressure=101325,
-        reactor_isothermic_temperature=298.15,
-        reactor_f_in=[np.nan, np.nan],
-        reactor_f_out=[fa_out, fb_out],
+        stoichiometry=[-1, 1],
         kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v_pfr],
+        transversal_area=1,
     )
+
+    pfr.set_mass_balance_data(
+        molar_flux_in=[np.nan, np.nan], molar_flux_out=[fa_out, fb_out]
+    )
+
+    pfr.set_isothermic_operation(isothermic_temperature=298.15)
+
+    pfr.set_isobaric_operation(1013025)
 
     # reactord solution
     solution = pfr.simulate(tol=1e-6)
@@ -613,7 +644,7 @@ def test_fogler_p1_15c_ivp_outlet():
     for i, v in enumerate(solution.x):
         reactord_concentrations = np.append(
             reactord_concentrations,
-            mixture.concentrations(solution.y[:, i], 298.15, 101325)[0],
+            mixture.concentrations(solution.y[0:2, i], 298.15, 101325)[0],
         )
 
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
@@ -627,7 +658,4 @@ def test_fogler_p1_15c_ivp_outlet():
 # Example 3.4.1 - page 78
 # ======================================================================
 
-
-@pytest.mark.skip
-def test_davis_3_4_1():
-    return None
+# TODO

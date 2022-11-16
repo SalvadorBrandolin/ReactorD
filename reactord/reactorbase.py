@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 from _collections_abc import Callable
 
-from reactord import Kinetics
+from reactord.kinetics import Kinetics
 from reactord.mix import AbstractMix
 
 
@@ -280,7 +280,9 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _grid_builder(self) -> None:
-        """Method to build the grid of independent variables.
+        """
+
+        Method to build the grid of independent variables.
         Recieves lower and upper boundaries for each independent
         variable and also the number of discretization intervals
         for each defined range.
@@ -307,7 +309,7 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def _border_cond_initial_guesses(self) -> None:
+    def _border_cond_and_initial_guesses(self) -> None:
         """Construct the solver needs.
 
         Constructs the border conditions for the differential

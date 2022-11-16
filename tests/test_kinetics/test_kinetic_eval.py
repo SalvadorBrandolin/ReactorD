@@ -117,15 +117,3 @@ def test_user_reaction_enthalpies():
             kinetic_argument="Invalid_Argument",
             reaction_enthalpies=([25]),
         )
-
-    # Test for _std_reaction_enthalpies_from_formation method
-    raw_formation_enthalpies = []
-
-    for component in list_of_components:
-        raw_formation_enthalpies.append(component.formation_enthalpy_ig)
-    raw_formation_enthalpies = np.array(raw_formation_enthalpies)
-    formation_enthalpies_method = (
-        kinetic1._std_reaction_enthalpies_from_formation()
-    )
-
-    assert np.allclose(raw_formation_enthalpies, formation_enthalpies_method)

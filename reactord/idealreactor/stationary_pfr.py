@@ -1,8 +1,9 @@
 import numpy as np
 from _collections_abc import Callable
+from scipy.integrate import solve_bvp
 
-from reactord import ReactorBase
 from reactord.mix import AbstractMix
+from reactord.reactorbase import ReactorBase
 from reactord.utils import vectorize
 
 
@@ -18,8 +19,7 @@ class StationaryPFR(ReactorBase):
         **options,
     ) -> None:
 
-        super().__init__(
-            self,
+        super(StationaryPFR, self).__init__(
             mix=mix,
             list_of_reactions=list_of_reactions,
             stoichiometry=stoichiometry,
@@ -96,9 +96,11 @@ class StationaryPFR(ReactorBase):
         if catalyst is None:
             self._catalyst_operation = "homogeneous"
             self._mass_balance_func = self._homogeneous_mass_balance
+            self._solver_func = self._homogeneous_solver
         else:
             self._catalyst_operation = "heterogeneous"
             self._mass_balance_func = self._heterogeneous_mass_balance
+            self._solver_func = self._heterogeneous_solver
 
     # Temperature settings
     def set_isothermic_operation(self, isothermic_temperature: float) -> None:
@@ -205,7 +207,7 @@ class StationaryPFR(ReactorBase):
             self.reactor_dim_minmax[0], self.reactor_dim_minmax[1], grid_size
         )
 
-    def _border_cond_initial_guesses(
+    def _border_cond_and_initial_guesses(
         self, grid_size: int
     ) -> tuple[Callable, np.ndarray[float]]:
         """Construct border condition and initial guess for solve_bvp.
@@ -301,7 +303,7 @@ class StationaryPFR(ReactorBase):
                 )
 
                 self._outlet_information = np.append(
-                    self._inlet_information,
+                    self._outlet_information,
                     [
                         np.nan,
                         np.nan,
@@ -346,7 +348,7 @@ class StationaryPFR(ReactorBase):
 
         initial_guess = np.zeros((len(self._inlet_information), grid_size))
 
-        for idx, inlet, outlet in enumerate(
+        for idx, (inlet, outlet) in enumerate(
             zip(self._inlet_information, self._outlet_information)
         ):
             if np.isnan(inlet):
@@ -399,20 +401,124 @@ class StationaryPFR(ReactorBase):
         """
 
         if self._catalyst_operation == "":
-            raise ValueError("set_mass_balance_data method first")
+            raise ValueError("use set_mass_balance_data method first")
         else:
             return self._mass_balance_func(
                 length_coordinate, molar_fluxes, temperature, pressure
             )
 
-    @vectorize(signature="(),(),()->()", excluded={0})
+    @vectorize(signature="(),(n),(),(),()->()", excluded={0})
     def _energy_balance(
         self,
-        length_coordinate: list[float],
-        temperature: list[float],
-        refrigerant_temperature: list[float],
-    ) -> float:
+        length_coordinate: float,
+        molar_fluxes: list[float],
+        temperature: float,
+        refrigerant_temperature: float,
+        pressure,
+    ) -> np.ndarray[float]:
         """Energy balance evaluation for the reactor's bulk phase.
+
+        Parameters
+        ----------
+        length_coordinate : float
+            Reactor's length coordinate.
+        molar_fluxes : list[float]
+            Molar flux of each substances at the length_coordinate.
+            [mol/s]
+        temperature : float
+            Temperature at the length coordinate. [K]
+        refrigerant_temperature : float
+            Refrigerant temperature at the length coordinate. [K]
+        pressure : float
+            Pressure at the length coordinate. [Pa]
+
+        Returns
+        -------
+        float
+            Derivative of reactor's temperature respect to reactor's
+            length. [K/m]
+
+        Raises
+        ------
+        ValueError
+            Triying to simulate without energy balance data setting.
+            Configure energy balance data setting with the method
+            set_isothermic_operation, set_adiabatic_operation or
+            set_non_isothermic_operation.
+        """
+        if self._thermal_operation == "":
+            raise ValueError(
+                "use set_isothermic_operation, set_adiabatic_operation or"
+                " set_non_isothermic_operation method first"
+            )
+
+        return self._energy_balance_func(
+            length_coordinate,
+            molar_fluxes,
+            temperature,
+            refrigerant_temperature,
+            pressure,
+        )
+
+    @vectorize(signature="(),(n),(),()->()", excluded={0})
+    def _pressure_balance(
+        self,
+        length_coordinate: float,
+        molar_fluxes: list[float],
+        temperature: float,
+        pressure: float,
+    ) -> np.ndarray[float]:
+        """Pressure balance evaluation for each substance in mixture.
+
+        latex math: # TODO
+
+        Parameters
+        ----------
+        length_coordinate : float
+            Reactor's length coordinate.
+        molar_fluxes : list or np.ndarray[float]
+            Molar flux of each substances at the length_coordinate.
+            [mol/s]
+        temperature : float
+            Temperature at the length coordinate. [K]
+        pressure : float
+            Pressure at the length coordinate. [Pa]
+
+        Returns
+        -------
+        float
+            Derivative of reactor's pressure respect to reactor's
+            length. [mol/s/m]
+
+        Raises
+        ------
+        ValueError
+            Triying to simulate without pressure balance data setting.
+            Configure pressurebalance data setting with the method
+            set_isobaric_operation or set_non_isobaric_operation.
+        """
+
+        if self._pressure_operation == "":
+            raise ValueError(
+                "use set_isobaric_operation or set_non_isobaric_operation"
+                " method first"
+            )
+
+        return self._pressure_balance_func(
+            length_coordinate, molar_fluxes, temperature, pressure
+        )
+
+    @vectorize(signature="(),(),()->()", excluded={0})
+    def _refrigerant_energy_balance(
+        self,
+        length_coordinate: float,
+        temperature: float,
+        refrigerant_temperature: float,
+    ) -> np.ndarray[float]:
+        """Eval the refrigerant energy balance
+
+        Explain more: TODO
+        non_isothermic : TODO
 
         Parameters
         ----------
@@ -426,83 +532,80 @@ class StationaryPFR(ReactorBase):
         Returns
         -------
         float
-            _description_
+            Derivative of refrigerant temperature respect to reactor's
+            length.
         """
 
-        return self._energy_balance_func(
-            length_coordinate, temperature, refrigerant_temperature
-        )
+        if self._thermal_operation == "non_isothermic":
+            raise NotImplementedError("Not implemented")
+        else:
+            return 0.0
 
-    def _pressure_balance(
-        self,
-    ) -> None:
-        """method that resturns the derivative of pressure respecto to
-        reactors length on each reactor's grid node.
+    def simulate(
+        self, grid_size=1000, tol=0.001, max_nodes=1000, verbose=0
+    ) -> np.ndarray[float]:
+        """Simulate the reactor
 
         Parameters
         ----------
-        z : list or numpy.ndarray[float]
-            Reactor's length grid.
-        temperature : list or numpy.ndarray[float]
-            Temperature on each reactor's grid node. [K]
-        pressure : list or numpy.ndarray[float]
-            Pressure on each reactor's grid node. [Pa]
+        grid_size : int, optional
+            _description_, by default 1000
+        tol : float, optional
+            tolerance argument for scipy.solve_bvp , by default 0.001
+        max_nodes : int, optional
+            max_nodes argument for scipy.solve_bvp, by default 1000
+        verbose : int, optional
+            verbose argument for scipy.solve_bvp. Options 0 (False) or 1
+            (True), by default 0
 
         Returns
         -------
-        list[float]
-            Derivative of pressure respect to reactors length on each
-            reactor's grid node.
-
-        # TODO
-
-        Raises
-        ------
-        NotImplementedError
-            Not implemented yet.
+        np.ndarray[float]
+            Solution matrix.
         """
-        raise NotImplementedError("Abstract method not implemented.")
 
-    def _refrigerant_energy_balance(self) -> None:
-        """Method that evals and returns the evaluated refrigerant
-        energy balance. The format of the method's returns corresponds
-        to the specific solver needs.
-
-        Explain the output: # TODO
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    def simulate(self) -> None:
-        """Simulates the reactor given the mass_balance_data,
-        energy_balance_data, pressure_balance_data.
-
-        Explain the output: # TODO
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
+        return self._solver_func(grid_size, tol, max_nodes, verbose)
 
     # ==================================================================
     # Specifics mass balances
     # ==================================================================
 
-    def _homogeneous_mass_balance(self) -> None:
-        """Not implemented.
+    def _homogeneous_mass_balance(
+        self,
+        length_coordinate: float,
+        molar_fluxes: list[float],
+        temperature: float,
+        pressure: float,
+    ) -> np.ndarray[float]:
+        """Mass balance evaluation for each substance in mixture.
 
-        Raises
-        ------
-        NotImplementedError
-            Not implemented.
+        latex math: # TODO
+
+        Parameters
+        ----------
+        length_coordinate : float
+            Reactor's length coordinate.
+        molar_fluxes : list[float]
+            Molar flux of each substances at the length_coordinate.
+            [mol/s]
+        temperature : float
+            Temperature at the length coordinate. [K]
+        pressure : float
+            Pressure at the length coordinate. [Pa]
+
+        Returns
+        -------
+        np.ndarray[float]
+            Derivatives of mix substances' molar fluxes respect to
+            reactor's length. [mol/s/m]
         """
-        raise NotImplementedError("Abstract method not implemented.")
+
+        (
+            self.substances_reaction_rates,
+            self.reaction_rates,
+        ) = self.kinetics.kinetic_eval(molar_fluxes, temperature, pressure)
+
+        return self.substances_reaction_rates * self.transversal_area
 
     def _heterogeneous_mass_balance(self) -> None:
         """Not implemented.
@@ -520,36 +623,35 @@ class StationaryPFR(ReactorBase):
 
     def _isothermic_energy_balance(
         self,
-        grid: list[float],
-        temperature: list[float],
-        temperature_refrigerant: list[float],
-        pressure: list[float],
+        length_coordinate: float,
+        molar_fluxes: list[float],
+        temperature: float,
+        refrigerant_temperature: float,
+        pressure,
     ) -> np.ndarray[float]:
-        """Returns de derivative of temperature respect to reactor's
-        length for a isothermic PFR.
-
-        # Latex math: TODO
-
-        dT/dz = 0
+        """Energy balance evaluation for the reactor's bulk phase.
 
         Parameters
         ----------
-        grid : list or numpy.ndarray[float]
-            Reactor's length grid.
-        temperature : list or numpy.ndarray[float]
-            Temperature on each reactor's grid node. [K]
-        temperature_refrigerant : list[float]
-            Refrigerant temperature on each reactor's grid node. [K]
-        pressure : list or numpy.ndarray[float]
-            Pressure on each reactor's grid node. [Pa]
+        length_coordinate : float
+            Reactor's length coordinate.
+        molar_fluxes : list[float]
+            Molar flux of each substances at the length_coordinate.
+            [mol/s]
+        temperature : float
+            Temperature at the length coordinate. [K]
+        refrigerant_temperature : float
+            Refrigerant temperature at the length coordinate. [K]
+        pressure : float
+            Pressure at the length coordinate. [Pa]
 
         Returns
         -------
-        np.ndarray[float]
-            Derivative of temperature respect to reactors length on each
-            reactor's grid node. [K/m]
+        float
+            Derivative of reactor's temperature respect to reactor's
+            length. [K/m]
         """
-        return 0
+        return 0.0
 
     def _homogeneous_adiabatic_energy_balance(self) -> None:
         """Not implemented yet.
@@ -605,64 +707,38 @@ class StationaryPFR(ReactorBase):
 
     def _isobaric_pressure_balance(
         self,
-        grid: list[float],
-        temperature: list[float],
-        pressure: list[float],
+        length_coordinate: float,
+        molar_fluxes: list[float],
+        temperature: float,
+        pressure: float,
     ) -> np.ndarray[float]:
-        """Not implemented yet.
+        """Pressure balance evaluation for each substance in mixture.
+
+        latex math: # TODO
 
         Parameters
         ----------
-        grid : list or numpy.ndarray[float]
-            Reactor's length grid.
-        temperature : list or numpy.ndarray[float]
-            Temperature on each reactor's grid node. [K]
-        pressure : list or numpy.ndarray[float]
-            Pressure on each reactor's grid node. [Pa]
-
-        Not implemented yet.
-
-        # TODO
+        length_coordinate : float
+            Reactor's length coordinate.
+        molar_fluxes : list or np.ndarray[float]
+            Molar flux of each substances at the length_coordinate.
+            [mol/s]
+        temperature : float
+            Temperature at the length coordinate. [K]
+        pressure : float
+            Pressure at the length coordinate. [Pa]
 
         Returns
         -------
-        np.ndarray[float]
-            Derivative of pressure respect to reactors length on each
-            reactor's grid node. [Pa/m]
-
-        Raises
-        ------
-        NotImplementedError
-            Not implemented yet.
+        float
+            Derivative of reactor's pressure respect to reactor's
+            length. [mol/s/m]
         """
-        raise NotImplementedError("Not implemented yet.")
 
-    def _non_isobaric_pressure_balance(
-        self,
-        grid: list[float],
-        temperature: list[float],
-        pressure: list[float],
-    ) -> np.ndarray[float]:
+        return 0.0
+
+    def _non_isobaric_pressure_balance(self) -> np.ndarray[float]:
         """Not implemented yet.
-
-        Parameters
-        ----------
-        grid : list or numpy.ndarray[float]
-            Reactor's length grid.
-        temperature : list or numpy.ndarray[float]
-            Temperature on each reactor's grid node. [K]
-        pressure : list or numpy.ndarray[float]
-            Pressure on each reactor's grid node. [Pa]
-
-        Not implemented yet.
-
-        # TODO
-
-        Returns
-        -------
-        np.ndarray[float]
-            Derivative of pressure respect to reactors length on each
-            reactor's grid node. [Pa/m]
 
         Raises
         ------
@@ -675,17 +751,119 @@ class StationaryPFR(ReactorBase):
     # Specifics solvers
     # ==================================================================
 
-    def _homogeneous_solver(self) -> None:
-        """Not implemented yet.
+    def _homogeneous_solver(
+        self, grid_size=1000, tol=0.001, max_nodes=1000, verbose=0
+    ) -> np.ndarray[float]:
+        """Simulate the homogeneous reactor.
 
-        # TODO
+        Parameters
+        ----------
+        grid_size : int, optional
+            _description_, by default 1000
+        tol : float, optional
+            tolerance argument for scipy.solve_bvp , by default 0.001
+        max_nodes : int, optional
+            max_nodes argument for scipy.solve_bvp, by default 1000
+        verbose : int, optional
+            verbose argument for scipy.solve_bvp. Options 0 (False) or 1
+            (True), by default 0
 
-        Raises
-        ------
-        NotImplementedError
-            Not implemented.
+        Returns
+        -------
+        np.ndarray[float]
+            Solution matrix.
         """
-        raise NotImplementedError("Not implemented yet.")
+
+        def odesystem(
+            length_coordinate: list[float], variables: list[float]
+        ) -> np.ndarray[float]:
+            """ODE system for scipy.solve_bvp.
+
+            Parameters
+            ----------
+            length_coordinate : list[float]
+                Reactor's length coordinate. [m]
+            variables : list[float]
+                Dependent variables on a two dimensional array in the
+                order:
+                    variables: [
+                        [flux_1(z1), flux_1(z2), ..., flux_1(zn)],
+                        [flux_2(z1), flux_2(z2), ..., flux_2(zn)],
+                        .
+                        .
+                        .
+                        [flux_m(z1), flux_m(z2), ..., flux_m(zn)],
+                        [   T(z1)  ,   T(z2)   , ...,   T(zn)   ],
+                        [   P(z1)  ,   P(z2)   , ...,   P(zn)   ],
+                        [ Tref(z1) ,  Tref(z2) , ...,  Tref(zn) ],
+                    ]
+
+                where:
+                    flux_i = molar flux of substance i
+                    z_j = length_coordinate j
+                    T = reactor's temperature
+                    P = reactor's pressure
+                    Tref = refrigerant's temperature
+
+            Returns
+            -------
+            np.ndarray[float]
+                Derivatives matrix at each length_coordinate.
+            """
+
+            n_subs = len(self.mix)
+
+            molar_fluxes = np.transpose(variables[0:n_subs, :])
+            temperature = variables[-3, :]
+            pressure = variables[-2, :]
+            refrigerant_temperature = variables[-1, :]
+
+            mass_derivatives = self._mass_balance(
+                length_coordinate, molar_fluxes, temperature, pressure
+            ).T
+
+            temperature_derivatives = self._energy_balance(
+                length_coordinate,
+                molar_fluxes,
+                temperature,
+                refrigerant_temperature,
+                pressure,
+            ).T
+
+            pressure_derivatives = self._pressure_balance(
+                length_coordinate, molar_fluxes, temperature, pressure
+            ).T
+
+            refrigerant_temperature_derivatives = (
+                self._refrigerant_energy_balance(
+                    length_coordinate, temperature, refrigerant_temperature
+                )
+            ).T
+
+            return np.vstack(
+                (
+                    mass_derivatives,
+                    temperature_derivatives,
+                    pressure_derivatives,
+                    refrigerant_temperature_derivatives,
+                )
+            )
+
+        grid = self._grid_builder(grid_size)
+
+        bc, initial_guess = self._border_cond_and_initial_guesses(grid_size)
+
+        simulation = solve_bvp(
+            odesystem,
+            bc,
+            grid,
+            initial_guess,
+            tol=tol,
+            max_nodes=max_nodes,
+            verbose=verbose,
+        )
+
+        return simulation
 
     def _heterogeneous_solver(self) -> None:
         """Not implemented yet.
