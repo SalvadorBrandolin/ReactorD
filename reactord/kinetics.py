@@ -31,10 +31,10 @@ class Kinetics:
         B + C + I ---> D + I
         the matrix of coefficients must be introduced as:
 
-        stoichiometry = np.array[
+        stoichiometry = np.array([
             [-1, -1, 1, 2, 0],
             [0, -1, -1, 1, 0]
-        ]
+        ])
 
         or
 
@@ -116,9 +116,14 @@ class Kinetics:
         # Set the dimnesion of stoichiometry matrix explicitly
         # (needed for single reaction systems)
         # ==============================================================
+        if isinstance (stoichiometry, np.ndarray):
+            self.stoichiometry = stoichiometry.reshape(
+            self.num_substances,
+        )
 
-        self.stoichiometry = np.array(stoichiometry).reshape(
-            self.num_reactions, self.num_substances
+        else:
+            self.stoichiometry = np.array(stoichiometry).reshape(
+            self.num_substances,
         )
 
         # ==============================================================

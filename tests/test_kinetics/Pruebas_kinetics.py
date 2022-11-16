@@ -8,7 +8,7 @@ water = rd.Substance.from_thermo_database("water")
 acetate = rd.Substance.from_thermo_database("ethyl acetate")
 
 list_of_components = [acetic, ethanol, acetate, water]
-stoichiometry_single_reaction = np.array([-1, -1, 1, 1])
+stoichiometry_single_reaction = [-1, -1, 1, 1]
 
 
 def reaction_rate(concentration, temperature):
@@ -57,7 +57,43 @@ esteq = np.reshape(kinetic1.stoichiometry, newshape=(4,))
 # Z = np.reshape(raw_formation_enthalpies, newshape=(4,))
 # print ("Antes de reshape: ", raw_formation_enthalpies)
 # print ("Despues de reshape: ", Z, type(Z))
-print("Despues de reshape: ", esteq, type(esteq))
+#print("Despues de reshape: ", esteq, type(esteq))
 
-raw_reaction_enthalpy = np.dot(raw_formation_enthalpies, esteq)
-print("Raw reaction enthalpy: ", raw_reaction_enthalpy)
+#raw_reaction_enthalpy = np.dot(raw_formation_enthalpies, esteq)
+#print("Raw reaction enthalpy: ", raw_reaction_enthalpy)
+
+
+# Test para _reaction_enthalpies_from_formation
+# (self, temperature, pressure):
+
+ethanol = rd.Substance.from_thermo_database("ethanol")
+acetic = rd.Substance.from_thermo_database("acetic acid")
+water = rd.Substance.from_thermo_database("water")
+acetate = rd.Substance.from_thermo_database("ethyl acetate")
+
+list_of_components = [acetic, ethanol, acetate, water]
+stoichiometry_single_reaction = [-1, -1, 1, 1]
+
+
+def reaction_rate(concentration, temperature):
+    return 10
+
+def reaction_rate2(concentration, temperature):
+    return 15
+
+mix5 = rd.mix.IdealGas(list_of_components)
+#mix2 = rd.mix.IdealSolution(list_of_components)
+
+kinetic5 = rd.Kinetics(
+    mix5,
+    list_of_reactions=[reaction_rate],
+    stoichiometry=stoichiometry_single_reaction,
+    kinetic_argument="concentration",
+    reaction_enthalpies=np.array([5]),
+)
+
+T = 500
+P = 101325
+
+method_reaction_enthalpy = kinetic5._reaction_enthalpies_from_formation(T,P)
+

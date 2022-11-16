@@ -17,7 +17,7 @@ testpaths = [
 name = "reactord"
 version = "0.0.1"
 authors = [{name = "Brandolín, Salvador Eduardo", email = "salvadorebrandolin@mi.unc.edu.ar"},
-           {name = "Parodi, Adrián", email = "parodiadrian@hotmail.com"},
+           {name = "Parodi, Adrián", email = "adrian.parodi@mi.unc.edu.ar"},
            {name = "Rovezzi, Juan Pablo", email = "juan.rovezzi@mi.unc.edu.ar"},
            {name = "Santos, Maricel Del Valle", email = "maricel.santos@mi.unc.edu.ar"},
            {name = "Scilipoti, José Antonio", email = "jscilipoti@unc.edu.ar"}]
