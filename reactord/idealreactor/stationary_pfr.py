@@ -46,7 +46,9 @@ class StationaryPFR(ReactorBase):
         molar_flux_out: list[float],
         catalyst=None,
     ) -> None:
-        """Method that recieves and instantiates the neccesary
+        """Mass balance data setting.
+
+        Method that recieves and instantiates the neccesary
         parameters to solve the mass balance in the reactor's bulk.
 
         Parameters
@@ -112,7 +114,7 @@ class StationaryPFR(ReactorBase):
         self._isothermic_temperature = isothermic_temperature
         self._energy_balance_func = self._isothermic_energy_balance
 
-    def set_adiabatic_operation(self):
+    def set_adiabatic_operation(self) -> None:
         """Not implemented
 
         # TODO
@@ -124,7 +126,7 @@ class StationaryPFR(ReactorBase):
         """
         raise NotImplementedError("Not implemented.")
 
-    def set_non_isothermic_operation(self):
+    def set_non_isothermic_operation(self) -> None:
         """Not implemented
 
         # TODO
@@ -137,8 +139,8 @@ class StationaryPFR(ReactorBase):
         raise NotImplementedError("Not implemented")
 
     # Pressure settings
-    def set_isobaric_operation(self, isobaric_pressure: float):
-        """Sets isobaric operation data needed for energy balance.
+    def set_isobaric_operation(self, isobaric_pressure: float) -> None:
+        """Sets isobaric operation data needed.
 
         Parameters
         ----------
@@ -150,7 +152,7 @@ class StationaryPFR(ReactorBase):
         self._isobaric_pressure = isobaric_pressure
         self._pressure_balance_func = self._isobaric_pressure_balance
 
-    def set_non_isobaric_operation(self):
+    def set_non_isobaric_operation(self) -> None:
         """Not implemented.
 
         # TODO
@@ -167,7 +169,9 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     def _grid_builder(self, grid_size: int) -> np.ndarray[float]:
-        """Method to build the grid of independent variables.
+        """Constructs the reactor's length grid.
+
+        Method to build the grid of independent variables.
         Recieves lower and upper boundaries for each independent
         variable and also the number of discretization intervals
         for each defined range.
@@ -196,81 +200,237 @@ class StationaryPFR(ReactorBase):
         np.ndarray[float]
             Grid for the grid of the reactor's length independent variable.
         """
-        
+
         return np.linspace(
             self.reactor_dim_minmax[0], self.reactor_dim_minmax[1], grid_size
         )
 
-    def _border_condition_builder(self, ya, yb) -> None:
-        """Constructs the border conditions for the differential
-        equations that represents the bulk phase behaviour. The format
-        of the method's output correponds with the reactor's algebra.
+    def _border_cond_initial_guesses(
+        self, grid_size: int
+    ) -> tuple[Callable, np.ndarray[float]]:
+        """Construct border condition and initial guess for solve_bvp.
 
-        Explain the output: # TODO
+        Constructs the border conditions for the differential
+        equations that represents the bulk phase behaviour and the
+        initial guess matrix for scipy.solve_bvp.
+
+        Ordering of border conditions:
+        [flux_1, flux_2, ... , flux_n, temp, pressure, refr_temp]
+
+        temp: reactor's temperature
+        refr_temp: refrigerant's temperature
+        flux_i: molar flux of substance i of mix.
+        pressure: reactor's pressure.
+
+        Parameters
+        ----------
+        grid_size : int
+            Size of the grid of the reactor's length independent variable.
+
+        Returns
+        -------
+        tuple[Callable, np.ndarray[float]]
+            Border condition function needed and initial guess matrix for
+            scipy.solve_bvp.
 
         Raises
         ------
         NotImplementedError
-            Abstract method not implemented.
-        """
-        
-
-    def _initial_guess_builder(self) -> None:
-        """Constructs the initial guess for the differential equation
-        solver that represents the bulk phase behaviour.
-
-        The format
-        of the method's output correponds with the reactor's algebra.
-
-        Explain the output: # TODO
-
-        Raises
-        ------
+            Not implementd.
         NotImplementedError
-            Abstract method not implemented.
+            Not implementd.
+        NotImplementedError
+            Not implementd.
+        NotImplementedError
+            Not implementd.
+        NotImplementedError
+            Not implementd.
+        ValueError
+            Unkmown error. Maybe private attributes were changed?.
+            Restart the reactor configuration.
         """
-        raise NotImplementedError("Abstract method not implemented.")
+
+        # ==============================================================
+        # Border condition building
+        # ==============================================================
+
+        def border_conditions(
+            ya: list[float], yb: list[float]
+        ) -> np.ndarray[float]:
+            """Border condition for scipy.solve_bvp.
+
+            Parameters
+            ----------
+            ya : list[float]
+                Border conditions on reactor's inlet.
+            yb : list[float]
+                Border conditions on reactor's outlet.
+
+            Returns
+            -------
+            np.ndarray[float]
+                Border conditions for scipy.solve_bvp.
+            """
+
+            bc = np.array([])
+
+            for i in self._in_index:
+                bc = np.append(bc, ya[i] - self._inlet_information[i])
+
+            for j in self._out_index:
+                bc = np.append(bc, yb[j] - self._outlet_information[j])
+
+            return bc
+
+        self._inlet_information = self._molar_flux_in
+        self._outlet_information = self._molar_flux_out
+
+        # Isothermic - isobaric
+
+        if self._thermal_operation == "isothermic":
+            if self._pressure_operation == "isobaric":
+
+                # Asign the isothermic and isobaric conditions to inlet
+                self._inlet_information = np.append(
+                    self._inlet_information,
+                    [
+                        self._isothermic_temperature,
+                        self._isobaric_pressure,
+                        0.0,
+                    ],
+                )
+
+                self._outlet_information = np.append(
+                    self._inlet_information,
+                    [
+                        np.nan,
+                        np.nan,
+                        np.nan,
+                    ],
+                )
+
+            elif self._pressure_operation == "non_isobaric":
+                raise NotImplementedError()
+                # TODO
+
+        elif self._thermal_operation == "adiabatic":
+            if self._pressure_operation == "isobaric":
+                raise NotImplementedError()
+                # TODO
+
+            elif self._pressure_operation == "non_isobaric":
+                raise NotImplementedError()
+                # TODO
+
+        elif self._thermal_operation == "non_isothermic":
+            if self._pressure_operation == "isobaric":
+                raise NotImplementedError()
+                # TODO
+
+            elif self._pressure_operation == "non_isobaric":
+                raise NotImplementedError()
+                # TODO
+
+        else:
+            raise ValueError("Thermal and pressure configurations failed.")
+
+        self._in_index = np.invert(np.isnan(self._inlet_information))
+        self._out_index = np.invert(np.isnan(self._outlet_information))
+
+        self._in_index = np.argwhere(self._in_index).ravel()
+        self._out_index = np.argwhere(self._out_index).ravel()
+
+        # ==============================================================
+        # Initial guess building
+        # ==============================================================
+
+        initial_guess = np.zeros((len(self._inlet_information), grid_size))
+
+        for idx, inlet, outlet in enumerate(
+            zip(self._inlet_information, self._outlet_information)
+        ):
+            if np.isnan(inlet):
+                initial_guess[idx, :] = np.full(grid_size, outlet)
+            else:
+                initial_guess[idx, :] = np.full(grid_size, inlet)
+
+        return border_conditions, initial_guess
 
     # ==================================================================
     # Common reactors methods
     # ==================================================================
 
-    def _mass_balance(self, grid, molar_fluxes, temperature, pressure) -> None:
-        """Method that evals and returns the evaluated reactor's bulk
-        mass balances. The format of the method's returns corresponds
-        to the specific solver needs.
+    @vectorize(signature="(),(n),(),()->(n)", excluded={0})
+    def _mass_balance(
+        self,
+        length_coordinate: float,
+        molar_fluxes: list[float],
+        temperature: float,
+        pressure: float,
+    ) -> np.ndarray[float]:
+        """Mass balance evaluation for each substance in mixture.
 
-        Explain the output: # TODO
+        latex math: # TODO
+
+        Parameters
+        ----------
+        length_coordinate : float
+            Reactor's length coordinate.
+        molar_fluxes : list[float]
+            Molar flux of each substances at the length_coordinate.
+            [mol/s]
+        temperature : float
+            Temperature at the length coordinate. [K]
+        pressure : float
+            Pressure at the length coordinate. [Pa]
+
+        Returns
+        -------
+        np.ndarray[float]
+            Derivatives of mix substances' molar fluxes respect to
+            reactor's length. [mol/s/m]
 
         Raises
         ------
-        NotImplementedError
-            Abstract method not implemented.
+        ValueError
+            Triying to simulate without mass balance data setting.
+            Configure mass balance data setting with the method
+            set_mass_balance_data.
         """
 
         if self._catalyst_operation == "":
             raise ValueError("set_mass_balance_data method first")
         else:
-            return self._mass_balance_func()
+            return self._mass_balance_func(
+                length_coordinate, molar_fluxes, temperature, pressure
+            )
 
-    @vectorize(signature="(n),(n),(n)->()", excluded={0})
+    @vectorize(signature="(),(),()->()", excluded={0})
     def _energy_balance(
         self,
-        grid: list[float],
+        length_coordinate: list[float],
         temperature: list[float],
         refrigerant_temperature: list[float],
-    ) -> None:
+    ) -> float:
+        """Energy balance evaluation for the reactor's bulk phase.
 
-        """_summary_
+        Parameters
+        ----------
+        length_coordinate : float
+            Reactor's length coordinate.
+        temperature : float
+            Temperature at the length coordinate. [K]
+        refrigerant_temperature : float
+            Refrigerant temperature at the length coordinate. [K]
 
         Returns
         -------
-        _type_
+        float
             _description_
         """
 
         return self._energy_balance_func(
-            grid, temperature, refrigerant_temperature
+            length_coordinate, temperature, refrigerant_temperature
         )
 
     def _pressure_balance(

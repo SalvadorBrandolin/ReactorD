@@ -307,26 +307,12 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def _border_condition_builder(self) -> None:
-        """Constructs the border conditions for the differential
-        equations that represents the bulk phase behaviour. The format
-        of the method's output correponds with the reactor's algebra.
+    def _border_cond_initial_guesses(self) -> None:
+        """Construct the solver needs.
 
-        Explain the output: # TODO
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def _initial_guess_builder(self) -> None:
-        """Constructs the initial guess for the differential equation
-        solver that represents the bulk phase behaviour.
-
-        The format
+        Constructs the border conditions for the differential
+        equations that represents the bulk phase behaviour. Also, may
+        return intial guesses for the specifics solvers. The format
         of the method's output correponds with the reactor's algebra.
 
         Explain the output: # TODO
