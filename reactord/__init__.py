@@ -4,4 +4,11 @@ from .reactorbase import ReactorBase
 from .substance import Substance
 from .utils import vectorize
 
-__all__ = [idealreactor, mix, Kinetics, ReactorBase, Substance, vectorize]
+__all__ = [
+    idealreactor,
+    mix,
+    Kinetics,
+    ReactorBase,
+    Substance,
+    vectorize,
+]

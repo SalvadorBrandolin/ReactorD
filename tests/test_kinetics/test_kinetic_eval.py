@@ -55,7 +55,8 @@ def test_user_reaction_enthalpies():
     acetate = rd.Substance.from_thermo_database("ethyl acetate")
 
     list_of_components = [acetic, ethanol, acetate, water]
-    stoichiometry_single_reaction = np.array([[-1, -1, 1, 1]])
+
+    stoichiometry_single_reaction = np.array([-1, -1, 1, 1])
 
     def reaction_rate(concentration, temperature):
         return 10
