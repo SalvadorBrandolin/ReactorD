@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 
 from reactord.mix.abstract_mix import AbstractMix
@@ -5,7 +7,7 @@ from reactord.substance import Substance
 
 
 class IdealGas(AbstractMix):
-    def __init__(self, substance_list: list[Substance]):
+    def __init__(self, substance_list: List[Substance]):
         self.substances = substance_list
 
     def concentrations(self, moles, temperature, pressure):

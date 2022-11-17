@@ -1,6 +1,5 @@
 from abc import ABCMeta, abstractmethod
-
-from _collections_abc import Callable
+from typing import Callable, List
 
 from reactord.kinetics import Kinetics
 from reactord.mix import AbstractMix
@@ -12,7 +11,7 @@ class ReactorBase(metaclass=ABCMeta):
     _name: str = ""
     _kinetics: Kinetics = None
     _mix: AbstractMix = None
-    _list_of_reactions: list[Callable] = []
+    _list_of_reactions: List[Callable] = []
     _stoichiometry: list = []
     _kinetic_argument: str = ""
 
@@ -27,7 +26,7 @@ class ReactorBase(metaclass=ABCMeta):
     def __init__(
         self,
         mix: AbstractMix,
-        list_of_reactions: list[Callable],
+        list_of_reactions: List[Callable],
         stoichiometry: list,
         kinetic_argument: str,
         **options,
@@ -115,13 +114,13 @@ class ReactorBase(metaclass=ABCMeta):
 
         Returns
         -------
-        list[Callable]
+        List[Callable]
             List that contains the functions to eval each reaction.
         """
         return self._kinetics.list_of_reactions
 
     @list_of_reactions.setter
-    def list_of_reactions(self, new_list_of_reactions: list[Callable]):
+    def list_of_reactions(self, new_list_of_reactions: List[Callable]):
         """Method to assign a new list of reactions to the reactor. The
         method replaces the list of reactions inside the kinetic object.
 
@@ -129,7 +128,7 @@ class ReactorBase(metaclass=ABCMeta):
 
         Parameters
         ----------
-        new_list_of_reactions : list[Callable]
+        new_list_of_reactions : List[Callable]
             List that contains the functions to eval each reaction.
         """
 

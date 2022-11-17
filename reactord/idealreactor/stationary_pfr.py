@@ -1,4 +1,4 @@
-from _collections_abc import Callable
+from typing import Callable, List
 
 import numpy as np
 
@@ -13,10 +13,10 @@ class StationaryPFR(ReactorBase):
     def __init__(
         self,
         mix: AbstractMix,
-        list_of_reactions: list[Callable],
+        list_of_reactions: List[Callable],
         stoichiometry: list,
         kinetic_argument: str,
-        reactor_dim_minmax: list[float],
+        reactor_dim_minmax: List[float],
         transversal_area: float,
         **options,
     ) -> None:
@@ -44,8 +44,8 @@ class StationaryPFR(ReactorBase):
     # Mass settings
     def set_mass_balance_data(
         self,
-        molar_flux_in: list[float],
-        molar_flux_out: list[float],
+        molar_flux_in: List[float],
+        molar_flux_out: List[float],
         catalyst=None,
     ) -> None:
         """Mass balance data setting.
@@ -55,12 +55,12 @@ class StationaryPFR(ReactorBase):
 
         Parameters
         ----------
-        molar_flux_in : list[float] or numpy.ndarray[float]
+        molar_flux_in : List[float] or numpy.ndarray[float]
             List or or numpy.ndarray containing the known molar fluxes
             at the reactor's inlet. The ordering of the fluxes must be
             identical to the substance order in mixture. For unkown
             fluxes specify as numpy.nan. [mol/s]
-        molar_flux_out : list[float] or numpy.ndarray[float]
+        molar_flux_out : List[float] or numpy.ndarray[float]
             List or or numpy.ndarray containing the known molar fluxes
             at the reactor's outlet. The ordering of the fluxes must be
             identical to the substance order in mixture. For unkown
@@ -172,7 +172,7 @@ class StationaryPFR(ReactorBase):
     # Solvers aditional data needed - general used methods
     # ==================================================================
 
-    def _grid_builder(self, grid_size: int) -> np.ndarray[float]:
+    def _grid_builder(self, grid_size: int) -> List[float]:
         """Constructs the reactor's length grid.
 
         Method to build the grid of independent variables.
@@ -201,7 +201,7 @@ class StationaryPFR(ReactorBase):
 
         Returns
         -------
-        np.ndarray[float]
+        List[float]
             Grid for the grid of the reactor's length independent variable.
         """
 
@@ -211,7 +211,7 @@ class StationaryPFR(ReactorBase):
 
     def _border_cond_and_initial_guesses(
         self, grid_size: int
-    ) -> tuple[Callable, np.ndarray[float]]:
+    ) -> tuple[Callable, List[float]]:
         """Construct border condition and initial guess for solve_bvp.
 
         Constructs the border conditions for the differential
@@ -233,7 +233,7 @@ class StationaryPFR(ReactorBase):
 
         Returns
         -------
-        tuple[Callable, np.ndarray[float]]
+        tuple[Callable, List[float]]
             Border condition function needed and initial guess matrix for
             scipy.solve_bvp.
 
@@ -259,20 +259,20 @@ class StationaryPFR(ReactorBase):
         # ==============================================================
 
         def border_conditions(
-            ya: list[float], yb: list[float]
-        ) -> np.ndarray[float]:
+            ya: List[float], yb: List[float]
+        ) -> List[float]:
             """Border condition for scipy.solve_bvp.
 
             Parameters
             ----------
-            ya : list[float]
+            ya : List[float]
                 Border conditions on reactor's inlet.
-            yb : list[float]
+            yb : List[float]
                 Border conditions on reactor's outlet.
 
             Returns
             -------
-            np.ndarray[float]
+            List[float]
                 Border conditions for scipy.solve_bvp.
             """
 
@@ -368,10 +368,10 @@ class StationaryPFR(ReactorBase):
     def _mass_balance(
         self,
         length_coordinate: float,
-        molar_fluxes: list[float],
+        molar_fluxes: List[float],
         temperature: float,
         pressure: float,
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Mass balance evaluation for each substance in mixture.
 
         latex math: # TODO
@@ -380,7 +380,7 @@ class StationaryPFR(ReactorBase):
         ----------
         length_coordinate : float
             Reactor's length coordinate.
-        molar_fluxes : list[float]
+        molar_fluxes : List[float]
             Molar flux of each substances at the length_coordinate.
             [mol/s]
         temperature : float
@@ -390,7 +390,7 @@ class StationaryPFR(ReactorBase):
 
         Returns
         -------
-        np.ndarray[float]
+        List[float]
             Derivatives of mix substances' molar fluxes respect to
             reactor's length. [mol/s/m]
 
@@ -415,18 +415,18 @@ class StationaryPFR(ReactorBase):
     def _energy_balance(
         self,
         length_coordinate: float,
-        molar_fluxes: list[float],
+        molar_fluxes: List[float],
         temperature: float,
         refrigerant_temperature: float,
         pressure,
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Energy balance evaluation for the reactor's bulk phase.
 
         Parameters
         ----------
         length_coordinate : float
             Reactor's length coordinate.
-        molar_fluxes : list[float]
+        molar_fluxes : List[float]
             Molar flux of each substances at the length_coordinate.
             [mol/s]
         temperature : float
@@ -471,10 +471,10 @@ class StationaryPFR(ReactorBase):
     def _pressure_balance(
         self,
         length_coordinate: float,
-        molar_fluxes: list[float],
+        molar_fluxes: List[float],
         temperature: float,
         pressure: float,
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Pressure balance evaluation for each substance in mixture.
 
         latex math: # TODO
@@ -483,7 +483,7 @@ class StationaryPFR(ReactorBase):
         ----------
         length_coordinate : float
             Reactor's length coordinate.
-        molar_fluxes : list or np.ndarray[float]
+        molar_fluxes : list or List[float]
             Molar flux of each substances at the length_coordinate.
             [mol/s]
         temperature : float
@@ -521,7 +521,7 @@ class StationaryPFR(ReactorBase):
         length_coordinate: float,
         temperature: float,
         refrigerant_temperature: float,
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Eval the refrigerant energy balance
 
         Explain more: TODO
@@ -550,7 +550,7 @@ class StationaryPFR(ReactorBase):
 
     def simulate(
         self, grid_size=1000, tol=0.001, max_nodes=1000, verbose=0
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Simulate the reactor
 
         Parameters
@@ -567,7 +567,7 @@ class StationaryPFR(ReactorBase):
 
         Returns
         -------
-        np.ndarray[float]
+        List[float]
             Solution matrix.
         """
 
@@ -580,10 +580,10 @@ class StationaryPFR(ReactorBase):
     def _homogeneous_mass_balance(
         self,
         length_coordinate: float,
-        molar_fluxes: list[float],
+        molar_fluxes: List[float],
         temperature: float,
         pressure: float,
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Mass balance evaluation for each substance in mixture.
 
         latex math: # TODO
@@ -592,7 +592,7 @@ class StationaryPFR(ReactorBase):
         ----------
         length_coordinate : float
             Reactor's length coordinate.
-        molar_fluxes : list[float]
+        molar_fluxes : List[float]
             Molar flux of each substances at the length_coordinate.
             [mol/s]
         temperature : float
@@ -602,7 +602,7 @@ class StationaryPFR(ReactorBase):
 
         Returns
         -------
-        np.ndarray[float]
+        List[float]
             Derivatives of mix substances' molar fluxes respect to
             reactor's length. [mol/s/m]
         """
@@ -631,18 +631,18 @@ class StationaryPFR(ReactorBase):
     def _isothermic_energy_balance(
         self,
         length_coordinate: float,
-        molar_fluxes: list[float],
+        molar_fluxes: List[float],
         temperature: float,
         refrigerant_temperature: float,
         pressure,
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Energy balance evaluation for the reactor's bulk phase.
 
         Parameters
         ----------
         length_coordinate : float
             Reactor's length coordinate.
-        molar_fluxes : list[float]
+        molar_fluxes : List[float]
             Molar flux of each substances at the length_coordinate.
             [mol/s]
         temperature : float
@@ -715,10 +715,10 @@ class StationaryPFR(ReactorBase):
     def _isobaric_pressure_balance(
         self,
         length_coordinate: float,
-        molar_fluxes: list[float],
+        molar_fluxes: List[float],
         temperature: float,
         pressure: float,
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Pressure balance evaluation for each substance in mixture.
 
         latex math: # TODO
@@ -727,7 +727,7 @@ class StationaryPFR(ReactorBase):
         ----------
         length_coordinate : float
             Reactor's length coordinate.
-        molar_fluxes : list or np.ndarray[float]
+        molar_fluxes : list or List[float]
             Molar flux of each substances at the length_coordinate.
             [mol/s]
         temperature : float
@@ -744,7 +744,7 @@ class StationaryPFR(ReactorBase):
 
         return 0.0
 
-    def _non_isobaric_pressure_balance(self) -> np.ndarray[float]:
+    def _non_isobaric_pressure_balance(self) -> List[float]:
         """Not implemented yet.
 
         Raises
@@ -760,7 +760,7 @@ class StationaryPFR(ReactorBase):
 
     def _homogeneous_solver(
         self, grid_size=1000, tol=0.001, max_nodes=1000, verbose=0
-    ) -> np.ndarray[float]:
+    ) -> List[float]:
         """Simulate the homogeneous reactor.
 
         Parameters
@@ -777,20 +777,20 @@ class StationaryPFR(ReactorBase):
 
         Returns
         -------
-        np.ndarray[float]
+        List[float]
             Solution matrix.
         """
 
         def odesystem(
-            length_coordinate: list[float], variables: list[float]
-        ) -> np.ndarray[float]:
+            length_coordinate: List[float], variables: List[float]
+        ) -> List[float]:
             """ODE system for scipy.solve_bvp.
 
             Parameters
             ----------
-            length_coordinate : list[float]
+            length_coordinate : List[float]
                 Reactor's length coordinate. [m]
-            variables : list[float]
+            variables : List[float]
                 Dependent variables on a two dimensional array in the
                 order:
                     variables: [
@@ -814,7 +814,7 @@ class StationaryPFR(ReactorBase):
 
             Returns
             -------
-            np.ndarray[float]
+            List[float]
                 Derivatives matrix at each length_coordinate.
             """
 
