@@ -1,3 +1,8 @@
+"""ReactorD.
+   
+   Chemical Reactor Simulations and Design."""
+
+
 from . import idealreactor, mix
 from .decoratorbase import DecoratorBase
 from .kinetics import Kinetics
