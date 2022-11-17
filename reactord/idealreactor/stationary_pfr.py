@@ -19,7 +19,7 @@ class StationaryPFR(ReactorBase):
         **options,
     ) -> None:
 
-        super(StationaryPFR, self).__init__(
+        super().__init__(
             mix=mix,
             list_of_reactions=list_of_reactions,
             stoichiometry=stoichiometry,
@@ -400,6 +400,8 @@ class StationaryPFR(ReactorBase):
             set_mass_balance_data.
         """
 
+        # TODO checkit the next if before not on each mass balance call
+
         if self._catalyst_operation == "":
             raise ValueError("use set_mass_balance_data method first")
         else:
@@ -446,6 +448,9 @@ class StationaryPFR(ReactorBase):
             set_isothermic_operation, set_adiabatic_operation or
             set_non_isothermic_operation.
         """
+
+        # TODO checkit the next if before not on each mass balance call
+
         if self._thermal_operation == "":
             raise ValueError(
                 "use set_isothermic_operation, set_adiabatic_operation or"

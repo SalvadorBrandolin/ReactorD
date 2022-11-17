@@ -174,7 +174,7 @@ class ReactorBase(metaclass=ABCMeta):
             "concentration", "partial_pressure".
         """
 
-        return self._kinetics.stoichiometry
+        return self._kinetics.kinetic_argument
 
     @kinetic_argument.setter
     def kinetic_argument(self, new_kinetics_argument: str):
@@ -467,6 +467,7 @@ class ReactorBase(metaclass=ABCMeta):
         """
         raise NotImplementedError("Abstract method not implemented.")
 
+    @abstractmethod
     def _homogeneous_non_isothermic_energy_balance(self) -> None:
         """Not implemented.
 
