@@ -64,10 +64,15 @@ class IdealSolution(AbstractMix):
                 )
                 dhf = substance.fusion_enthalpy(substance.normal_melting_point)
                 dhl = substance.heat_capacity_liquid_dt_integral(
-                    substance.normal_melting_point, 298.15
+                    substance.normal_melting_point, temperature
                 )
 
                 enthalpies = np.append(enthalpies, dhs + dhf + dhl)
             else:
-                enthalpies = np.append(enthalpies, 0.0)
+                enthalpies = np.append(
+                    enthalpies,
+                    substance.heat_capacity_liquid_dt_integral(
+                        298.15, temperature
+                    ),
+                )
         return enthalpies
