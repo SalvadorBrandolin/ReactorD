@@ -1,4 +1,5 @@
 from scipy.integrate import quad
+
 from thermo.chemical import Chemical
 
 

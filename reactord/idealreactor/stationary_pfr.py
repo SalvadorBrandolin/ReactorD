@@ -1,10 +1,12 @@
-import numpy as np
 from _collections_abc import Callable
-from scipy.integrate import solve_bvp
+
+import numpy as np
 
 from reactord.mix import AbstractMix
 from reactord.reactorbase import ReactorBase
 from reactord.utils import vectorize
+
+from scipy.integrate import solve_bvp
 
 
 class StationaryPFR(ReactorBase):
