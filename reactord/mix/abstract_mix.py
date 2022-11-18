@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from typing import List
 
 import numpy as np
 
@@ -8,13 +9,13 @@ class AbstractMix(metaclass=ABCMeta):
 
     Parameters
     ----------
-    substance_list : ndarray or list[Substance objects]
+    substance_list : ndarray or List[Substance objects]
         list or array of Substance objects."""
 
     # ==================================================================
     # Mixtures common methods
     # ==================================================================
-    def mol_fracations(self, moles: list[float]):
+    def mol_fracations(self, moles: List[float]):
         """method that calculates the molar fractions of the mixture
 
         Parameters
@@ -34,7 +35,7 @@ class AbstractMix(metaclass=ABCMeta):
         return zi
 
     def partial_pressures(
-        self, moles: list[float], temperature: float, pressure: float
+        self, moles: List[float], temperature: float, pressure: float
     ):
         """method that calculates the partial pressures of the mixture
 
@@ -75,7 +76,7 @@ class AbstractMix(metaclass=ABCMeta):
 
     @abstractmethod
     def concentrations(
-        self, moles: list[float], temperature: float, pressure: float
+        self, moles: List[float], temperature: float, pressure: float
     ):
         """Concentrations of the mixtures substances at the given moles
         of each compound, temperature and pressure.
