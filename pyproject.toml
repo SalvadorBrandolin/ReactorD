@@ -37,8 +37,7 @@ classifiers = [
 ]
 urls = {Homepage = "https://github.com/SalvadorBrandolin/reactord"}
 dependencies = [
-    "numpy", 
-    "py-pde>=0.21.0", 
+    "numpy",
     "scipy", 
     "thermo>=0.2.21"
 ]
