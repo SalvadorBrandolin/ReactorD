@@ -59,9 +59,7 @@ class ReactorBase(metaclass=ABCMeta):
         kinetic_argument: str,
         **options,
     ) -> None:
-
-
-
+         
         self.options = options
         self.options["_not_reaction_enthalpies"] = True
 

@@ -128,7 +128,7 @@ class Kinetics:
                 )
 
         # ==============================================================
-        # Set the dimnesion of stoichiometry matrix explicitly
+        # Set the dimension of stoichiometry matrix explicitly
         # (needed for single reaction systems)
         # ==============================================================
 
@@ -167,8 +167,8 @@ class Kinetics:
     ) -> np.ndarray:
         """Evaluate kinetic.
 
-        Method that evaluates the reaction rate for the reaction and
-        for the mix components.
+        Method that evaluates the reaction rate for each reaction at
+        concentration, temperature and pressure given.
 
         Parameters
         ----------
@@ -219,14 +219,15 @@ class Kinetics:
         Parameters
         ----------
         temperature : float
-            _description_ #TODO
+            temperature to eval enthalpies
         pressure : float
-            _description_
+            pressure to eval enthalpies
 
         Returns
         -------
-        _type_
-            _description_
+        array, attribute
+            reaction enthalpies with correction acording to the substance and
+            temperature
         """
         if "reaction_enthalpies" in self.options.keys():
             return self.options.get("reaction_enthalpies")
@@ -246,7 +247,7 @@ class Kinetics:
     # ==================================================================
 
     def _std_reaction_enthalpies_set(self):
-        """Eval standar reacion enthalpies."""
+        """Set standar reacion enthalpies."""
         if "reaction_enthalpies" in self.options.keys():
             pass
         else:
@@ -255,10 +256,8 @@ class Kinetics:
             )
 
     def _std_reaction_enthalpies_from_formation(self):
-        """Calculate.
-        
-        #TODO
-        
+        """Calculate standar reaction enthalpies.
+                
         Calculates the standard reaction enthalpy from standard
         formation enthalpies defined from mix object.
 
