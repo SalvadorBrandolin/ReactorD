@@ -118,7 +118,9 @@ class AbstractMix(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def mix_heat_capacity(self, moles, temperature, pressure):
+    def mix_heat_capacity(
+        self, moles: List[float], temperature: float, pressure: float
+    ):
         """Method that returns the heat capacity of the mixture.
 
         Parameters

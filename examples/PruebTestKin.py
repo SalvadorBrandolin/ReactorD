@@ -38,5 +38,3 @@ def test_user_reaction_enthalpies():
             kinetic_argument="concentration",
             reaction_enthalpies=wrong_reaction_enthalpies,
         )
-
-    
