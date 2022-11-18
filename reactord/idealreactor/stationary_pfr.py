@@ -258,9 +258,7 @@ class StationaryPFR(ReactorBase):
         # Border condition building
         # ==============================================================
 
-        def border_conditions(
-            ya: List[float], yb: List[float]
-        ) -> List[float]:
+        def border_conditions(ya: List[float], yb: List[float]) -> List[float]:
             """Border condition for scipy.solve_bvp.
 
             Parameters
