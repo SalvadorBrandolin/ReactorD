@@ -1,3 +1,3 @@
-from . import pfr_classes, str_classes
+from .stationary_pfr import StationaryPFR
 
-__all__ = [pfr_classes, str_classes]
+__all__ = [StationaryPFR]

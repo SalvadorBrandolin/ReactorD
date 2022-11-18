@@ -1,7 +1,7 @@
 check-manifest
 flake8-black
 flake8-builtins
-flake8-isort
+flake8-import-order
 ipdb
 numpy>=1.21.5
 pep8-naming
