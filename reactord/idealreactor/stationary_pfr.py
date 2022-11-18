@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Tuple
 
 import numpy as np
 
@@ -211,7 +211,7 @@ class StationaryPFR(ReactorBase):
 
     def _border_cond_and_initial_guesses(
         self, grid_size: int
-    ) -> tuple[Callable, List[float]]:
+    ) -> Tuple[Callable, List[float]]:
         """Construct border condition and initial guess for solve_bvp.
 
         Constructs the border conditions for the differential
