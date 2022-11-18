@@ -1,3 +1,4 @@
+"""Kinetics module."""
 import numpy as np
 
 from .mix.abstract_mix import AbstractMix
@@ -5,7 +6,7 @@ from .utils import vectorize
 
 
 class Kinetics:
-    """Kinetic object builder
+    """Kinetic object builder.
 
     Parameters
     ----------
@@ -61,6 +62,7 @@ class Kinetics:
         Single None value is accepted and all the values are
         calculated, default = None.
     """
+    
     def __init__(
         self,
         mix: AbstractMix,
@@ -163,7 +165,9 @@ class Kinetics:
     def kinetic_eval(
         self, moles: list, temperature: float, pressure: float
     ) -> np.ndarray:
-        """Method that evaluates the reaction rate for the reaction and
+        """Evaluate kinetic.
+
+        Method that evaluates the reaction rate for the reaction and
         for the mix components.
 
         Parameters
@@ -180,7 +184,6 @@ class Kinetics:
         ndarray, ndarray
 
         """
-
         # The partial pressures or concentrations are calculated:
         composition = self._composition_calculator(
             moles, temperature, pressure
@@ -199,6 +202,7 @@ class Kinetics:
 
     @property
     def std_reaction_enthalpies(self):
+        """Set standar reaction enthalpies."""
         return self._std_reaction_enthalpies
 
     @std_reaction_enthalpies.setter
@@ -210,7 +214,20 @@ class Kinetics:
 
     @vectorize(signature="(),()->(m)", excluded={0})
     def reaction_enthalpies(self, temperature, pressure):
+        """Eval reacion enthalpies.
 
+        Parameters
+        ----------
+        temperature : float
+            _description_ #TODO
+        pressure : float
+            _description_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
         if "reaction_enthalpies" in self.options.keys():
             return self.options.get("reaction_enthalpies")
 
@@ -229,7 +246,7 @@ class Kinetics:
     # ==================================================================
 
     def _std_reaction_enthalpies_set(self):
-
+        """Eval standar reacion enthalpies."""
         if "reaction_enthalpies" in self.options.keys():
             pass
         else:
@@ -238,7 +255,11 @@ class Kinetics:
             )
 
     def _std_reaction_enthalpies_from_formation(self):
-        """Calculates the standard reaction enthalpy from standard
+        """Calculate.
+        
+        #TODO
+        
+        Calculates the standard reaction enthalpy from standard
         formation enthalpies defined from mix object.
 
         Returns
