@@ -1,8 +1,8 @@
 from typing import List
 
-import reactord as rd
-
 import pytest
+
+import reactord as rd
 
 
 def test_abstract_class_type_error():
