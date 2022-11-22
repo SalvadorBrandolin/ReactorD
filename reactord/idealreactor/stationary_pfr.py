@@ -76,6 +76,10 @@ class StationaryPFR(ReactorBase):
         kinetic_argument: str,
         reactor_dim_minmax: List[float],
         transversal_area: float,
+        molar_flux_in: List[float],
+        molar_flux_out: List[float],
+        catalyst=None,
+        isothermic_temperature: float = None,
         **options,
     ) -> None:
 
@@ -87,9 +91,15 @@ class StationaryPFR(ReactorBase):
             options=options,
         )
 
-        # ==============================================================
+        # Mass balance settings
+
+        self._set_mass_balance_data(
+            molar_flux_in=molar_flux_in,
+            molar_flux_out=molar_flux_out,
+            catalyst=catalyst
+        )
+
         # Specifics reactor arguments
-        # ==============================================================
 
         self.reactor_dim_minmax = reactor_dim_minmax
         self.transversal_area = transversal_area
@@ -170,7 +180,7 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     # Mass settings
-    def set_mass_balance_data(
+    def _set_mass_balance_data(
         self,
         molar_flux_in: List[float],
         molar_flux_out: List[float],

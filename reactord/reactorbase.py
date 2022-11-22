@@ -272,7 +272,7 @@ class ReactorBase(metaclass=ABCMeta):
     # ==================================================================
 
     @abstractmethod
-    def set_mass_balance_data(self):
+    def _set_mass_balance_data(self):
         """Method that recieves and instantiates the neccesary
         parameters to solve the mass balance in the reactor's bulk
         phase as attributes of the reactor. The method returns None.
