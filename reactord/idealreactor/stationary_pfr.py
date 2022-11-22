@@ -95,6 +95,76 @@ class StationaryPFR(ReactorBase):
         self.transversal_area = transversal_area
 
     # ==================================================================
+    # Init constructors
+    # ==================================================================
+
+    @classmethod
+    def set_isothermic_isobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    def set_isothermic_noisobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    def set_adiabatic_isobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    def set_adiabatic_noisobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    def set_noisothermic_isobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    def set_noisothermic_noisobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    # ==================================================================
     # Abastract methods
     # Settings for mass, energy and pressure balance.
     # ==================================================================

@@ -191,6 +191,82 @@ class ReactorBase(metaclass=ABCMeta):
         self._kinetics.kinetic_argument = new_kinetics_argument
 
     # ==================================================================
+    # Init constructors
+    # ==================================================================
+
+    @classmethod
+    @abstractmethod
+    def set_isothermic_isobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    @abstractmethod
+    def set_isothermic_noisobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    @abstractmethod
+    def set_adiabatic_isobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    @abstractmethod
+    def set_adiabatic_noisobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    @abstractmethod
+    def set_noisothermic_isobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    @classmethod
+    @abstractmethod
+    def set_noisothermic_noisobaric(self) -> None:
+        """Not implemented yet.
+
+        Raises
+        ------
+        NotADirectoryError
+            Not implemented yet.
+        """
+        raise NotADirectoryError("Not implemented yet")
+
+    # ==================================================================
     # Abastract methods
     # Settings for mass, energy and pressure balance.
     # ==================================================================
