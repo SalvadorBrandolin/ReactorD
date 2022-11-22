@@ -47,7 +47,7 @@ class StationaryPFR(ReactorBase):
             stoichiometry matrix must be the same as the substance
             ordering in the mix.
         kinetic_argument : str
-            Kinetic argument used to eval the reaction defined by the 
+            Kinetic argument used to eval the reaction defined by the
             user. Options:
                 'concentration': substance concentration. [mol/m^3]
                 'partial_pressure': substance partial pressure. [Pa]
