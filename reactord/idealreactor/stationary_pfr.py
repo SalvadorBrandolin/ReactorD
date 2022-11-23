@@ -59,6 +59,18 @@ class StationaryPFR(ReactorBase):
             reactor_dim_minmax = [0, 3]. [m]
         transversal_area : float
             Tranversal area of the reactor. [m^2]
+        molar_flow_in : List[float] or numpy.ndarray[float]
+            List or or numpy.ndarray containing the known molar fluxes
+            at the reactor's inlet. The ordering of the fluxes must be
+            identical to the substance order in mixture. For unkown
+            fluxes specify as numpy.nan. [mol/s]
+        molar_flow_out : List[float] or numpy.ndarray[float]
+            List or or numpy.ndarray containing the known molar fluxes
+            at the reactor's outlet. The ordering of the fluxes must be
+            identical to the substance order in mixture. For unkown
+            fluxes specify as numpy.nan. [mol/s]
+        catalyst : AbstractCatalyst, optional # TODO
+           Stationary catalyst particle, by default None
 
     Attributes
     ----------
@@ -122,7 +134,7 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     @classmethod
-    def set_isothermic_isobaric(self) -> None:
+    def set_isothermic_isobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -133,7 +145,7 @@ class StationaryPFR(ReactorBase):
         raise NotADirectoryError("Not implemented yet")
 
     @classmethod
-    def set_isothermic_noisobaric(self) -> None:
+    def set_isothermic_noisobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -144,7 +156,7 @@ class StationaryPFR(ReactorBase):
         raise NotADirectoryError("Not implemented yet")
 
     @classmethod
-    def set_adiabatic_isobaric(self) -> None:
+    def set_adiabatic_isobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -155,7 +167,7 @@ class StationaryPFR(ReactorBase):
         raise NotADirectoryError("Not implemented yet")
 
     @classmethod
-    def set_adiabatic_noisobaric(self) -> None:
+    def set_adiabatic_noisobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -166,7 +178,7 @@ class StationaryPFR(ReactorBase):
         raise NotADirectoryError("Not implemented yet")
 
     @classmethod
-    def set_noisothermic_isobaric(self) -> None:
+    def set_noisothermic_isobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -177,7 +189,7 @@ class StationaryPFR(ReactorBase):
         raise NotADirectoryError("Not implemented yet")
 
     @classmethod
-    def set_noisothermic_noisobaric(self) -> None:
+    def set_noisothermic_noisobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -193,35 +205,16 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     def _set_catalyst_operation(self) -> None:
-        """Set mass balance configurations.
-
-        Method that recieves and instantiates the neccesary
-        parameters to solve the mass balance in the reactor's bulk.
-
-        Parameters
-        ----------
-        molar_flow_in : List[float] or numpy.ndarray[float]
-            List or or numpy.ndarray containing the known molar fluxes
-            at the reactor's inlet. The ordering of the fluxes must be
-            identical to the substance order in mixture. For unkown
-            fluxes specify as numpy.nan. [mol/s]
-        molar_flow_out : List[float] or numpy.ndarray[float]
-            List or or numpy.ndarray containing the known molar fluxes
-            at the reactor's outlet. The ordering of the fluxes must be
-            identical to the substance order in mixture. For unkown
-            fluxes specify as numpy.nan. [mol/s]
-        catalyst : AbstractCatalyst, optional # TODO
-           Stationary catalyst particle, by default None
+        """_summary_
 
         Raises
         ------
         IndexError
-            molar_flow_in length must be equal to molar_flow_out
+            _description_
         IndexError
-            molar_flow_in and molar_flow_out length must be equal to
-            mixture's substance number.
+            _description_
         """
-        if len(molar_flow_in) != len(molar_flow_out):
+        if len(self.molar_flow_in) != len(self.molar_flow_out):
             raise IndexError(
                 "molar_flow_in length must be equal to molar_flow_out"
             )
