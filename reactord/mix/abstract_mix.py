@@ -1,21 +1,22 @@
+"""Abstract_mix Module."""
 from abc import ABCMeta, abstractmethod
 
 import numpy as np
 
 
 class AbstractMix(metaclass=ABCMeta):
-    """Mixture object abstract class.
+    """Mixture object abstract class."""
 
-    Parameters
-    ----------
-    substance_list : ndarray or list[Substance objects]
-        list or array of Substance objects."""
+###Parameters
+###----------
+###substance_list : ndarray or list[Substance objects]
+###list or array of Substance objects."""
 
     # ==================================================================
     # Mixtures common methods
     # ==================================================================
     def mol_fracations(self, moles: list[float]):
-        """method that calculates the molar fractions of the mixture
+        """Calculate the molar fractions of the mixture.
 
         Parameters
         ----------
@@ -36,7 +37,7 @@ class AbstractMix(metaclass=ABCMeta):
     def partial_pressures(
         self, moles: list[float], temperature: float, pressure: float
     ):
-        """method that calculates the partial pressures of the mixture
+        """Calculate the partial pressures of the mixture.
 
         Parameters
         ----------
@@ -58,6 +59,14 @@ class AbstractMix(metaclass=ABCMeta):
         return partial_pressures
 
     def __len__(self):
+        """Return the number of substances in the mixture.
+
+        Redifine the magic method __len__
+        Returns
+        -------
+        int
+            Number of substances in the mixture
+        """
         return len(self.substances)
 
     def __str__(self):
