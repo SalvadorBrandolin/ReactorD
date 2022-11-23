@@ -272,7 +272,7 @@ class ReactorBase(metaclass=ABCMeta):
     # ==================================================================
 
     @abstractmethod
-    def _set_mass_balance_data(self):
+    def _set_catalyst_operation(self):
         """Method that recieves and instantiates the neccesary
         parameters to solve the mass balance in the reactor's bulk
         phase as attributes of the reactor. The method returns None.
@@ -285,7 +285,7 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def set_isothermic_operation(self):
+    def _set_thermal_operation(self):
         """Method that recieves and instantiates the neccesary
         parameters to solve the isothermic energy balance in the
         reactor's bulk. The method returns None.
@@ -298,48 +298,9 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def set_adiabatic_operation(self):
-        """Method that recieves and instantiates the neccesary
-        parameters to solve the adiabatic energy balance in the
-        reactor's bulk. The method returns None.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def set_non_isothermic_operation(self):
-        """Method that recieves and instantiates the neccesary
-        parameters to solve the non isothermic energy balance in the
-        reactor's bulk. The method returns None.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def set_isobaric_operation(self):
+    def _set_pressure_operation(self):
         """Method that recieves and instantiates the neccesary
         parameters to solve the isobaric pressure balance in the
-        reactor's bulk phase. The method returns None.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def set_non_isobaric_operation(self):
-        """Method that recieves and instantiates the neccesary
-        parameters to solve the non isobaric pressure balance in the
         reactor's bulk phase. The method returns None.
 
         Raises

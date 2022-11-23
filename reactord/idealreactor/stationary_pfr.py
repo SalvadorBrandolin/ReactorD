@@ -13,6 +13,7 @@ import numpy as np
 
 from reactord.mix import AbstractMix
 from reactord.reactorbase import ReactorBase
+from reactord.substance import Substance
 from reactord.utils import vectorize
 
 from scipy.integrate import solve_bvp
@@ -52,9 +53,10 @@ class StationaryPFR(ReactorBase):
                 'concentration': substance concentration. [mol/m^3]
                 'partial_pressure': substance partial pressure. [Pa]
         reactor_dim_minmax : List[float]
-            List containing the minimum and maximum [min, max] boundaries of
-            the reactor's length. E.g: a reactor modeled in the boundaries 0
-            m to 3 m has a reactor dim minmax = [0, 3]. [m]
+            List containing the minimum and maximum [min, max]
+            boundaries of the reactor's length. E.g: a reactor modeled
+            in the boundaries 0 m to 3 m has a
+            reactor_dim_minmax = [0, 3]. [m]
         transversal_area : float
             Tranversal area of the reactor. [m^2]
 
@@ -76,10 +78,22 @@ class StationaryPFR(ReactorBase):
         kinetic_argument: str,
         reactor_dim_minmax: List[float],
         transversal_area: float,
-        molar_flux_in: List[float],
-        molar_flux_out: List[float],
-        catalyst=None,
+        molar_flow_in: List[float],
+        molar_flow_out: List[float],
+        catalyst_particle=None,
         isothermic_temperature: float = None,
+        temperature_in_out: dict = None,
+        refrigerant: AbstractMix = None,
+        refrigerant_molar_flow: float = None,
+        refrigerant_temperature_in: float = None,
+        refrigerant_constant_temperature: bool = False,
+        refrigerant_flow_arrangement: str = "cocurrent",
+        exchanger_wall_material: Substance = None,
+        correlation_heat_transfer: str = "",
+        isobaric_pressure: float = None,
+        pressure_in_out: dict = None,
+        pressure_loss_equation: str = "",
+        packed_bed_porosity: float = 1,
         **options,
     ) -> None:
 
@@ -91,13 +105,12 @@ class StationaryPFR(ReactorBase):
             options=options,
         )
 
-        # Mass balance settings
-
-        self._set_mass_balance_data(
-            molar_flux_in=molar_flux_in,
-            molar_flux_out=molar_flux_out,
-            catalyst=catalyst
-        )
+        # Mass balance arguments and settings:
+        self.molar_flow_in = molar_flow_in
+        self.molar_flow_out = molar_flow_out
+        self.catalyst_particle = catalyst_particle
+        
+        self._set_catalyst_operation()
 
         # Specifics reactor arguments
 
@@ -179,26 +192,20 @@ class StationaryPFR(ReactorBase):
     # Settings for mass, energy and pressure balance.
     # ==================================================================
 
-    # Mass settings
-    def _set_mass_balance_data(
-        self,
-        molar_flux_in: List[float],
-        molar_flux_out: List[float],
-        catalyst=None,
-    ) -> None:
-        """Set Mass balance data.
+    def _set_catalyst_operation(self) -> None:
+        """Set mass balance configurations.
 
         Method that recieves and instantiates the neccesary
         parameters to solve the mass balance in the reactor's bulk.
 
         Parameters
         ----------
-        molar_flux_in : List[float] or numpy.ndarray[float]
+        molar_flow_in : List[float] or numpy.ndarray[float]
             List or or numpy.ndarray containing the known molar fluxes
             at the reactor's inlet. The ordering of the fluxes must be
             identical to the substance order in mixture. For unkown
             fluxes specify as numpy.nan. [mol/s]
-        molar_flux_out : List[float] or numpy.ndarray[float]
+        molar_flow_out : List[float] or numpy.ndarray[float]
             List or or numpy.ndarray containing the known molar fluxes
             at the reactor's outlet. The ordering of the fluxes must be
             identical to the substance order in mixture. For unkown
@@ -209,26 +216,26 @@ class StationaryPFR(ReactorBase):
         Raises
         ------
         IndexError
-            molar_flux_in length must be equal to molar_flux_out
+            molar_flow_in length must be equal to molar_flow_out
         IndexError
-            molar_flux_in and molar_flux_out length must be equal to
+            molar_flow_in and molar_flow_out length must be equal to
             mixture's substance number.
         """
-        if len(molar_flux_in) != len(molar_flux_out):
+        if len(molar_flow_in) != len(molar_flow_out):
             raise IndexError(
-                "molar_flux_in length must be equal to molar_flux_out"
+                "molar_flow_in length must be equal to molar_flow_out"
             )
 
-        if len(molar_flux_in) != len(self.mix):
+        if len(molar_flow_in) != len(self.mix):
             raise IndexError(
-                "molar_flux_in and molar_flux_out length must be equal to "
+                "molar_flow_in and molar_flow_out length must be equal to "
                 "mixture's substance number."
             )
 
-        self._molar_flux_in = molar_flux_in
-        self._molar_flux_out = molar_flux_out
+        self._molar_flow_in = molar_flow_in
+        self._molar_flow_out = molar_flow_out
 
-        if catalyst is None:
+        if catalyst_particle is None:
             self._catalyst_operation = "homogeneous"
             self._mass_balance_func = self._homogeneous_mass_balance
             self._solver_func = self._homogeneous_solver
@@ -237,67 +244,31 @@ class StationaryPFR(ReactorBase):
             self._mass_balance_func = self._heterogeneous_mass_balance
             self._solver_func = self._heterogeneous_solver
 
-    # Temperature settings
-    def set_isothermic_operation(self, isothermic_temperature: float) -> None:
-        """Set isothermic operation data needed for energy balance.
-
-        Parameters
-        ----------
-        isothermic_temperature : float
-            Isothermic reactor's temperature. [K]
-        """
-        self._thermal_operation = "isothermic"
-        self._isothermic_temperature = isothermic_temperature
-        self._energy_balance_func = self._isothermic_energy_balance
-
-    def set_adiabatic_operation(self) -> None:
-        """Not implemented yet.
-
-        # TODO
+    @abstractmethod
+    def _set_thermal_operation(self):
+        """Method that recieves and instantiates the neccesary
+        parameters to solve the isothermic energy balance in the
+        reactor's bulk. The method returns None.
 
         Raises
         ------
         NotImplementedError
-            Not implemented.
+            Abstract method not implemented.
         """
-        raise NotImplementedError("Not implemented.")
+        raise NotImplementedError("Abstract method not implemented.")
 
-    def set_non_isothermic_operation(self) -> None:
-        """Not implemented yet.
-
-        # TODO
+    @abstractmethod
+    def _set_pressure_operation(self):
+        """Method that recieves and instantiates the neccesary
+        parameters to solve the isobaric pressure balance in the
+        reactor's bulk phase. The method returns None.
 
         Raises
         ------
         NotImplementedError
-            Not implemented.
+            Abstract method not implemented.
         """
-        raise NotImplementedError("Not implemented")
-
-    # Pressure settings
-    def set_isobaric_operation(self, isobaric_pressure: float) -> None:
-        """Set isobaric operation data needed.
-
-        Parameters
-        ----------
-        isobaric_pressure : float
-            Isobaric reactor's pressure. [Pa]
-        """
-        self._pressure_operation = "isobaric"
-        self._isobaric_pressure = isobaric_pressure
-        self._pressure_balance_func = self._isobaric_pressure_balance
-
-    def set_non_isobaric_operation(self) -> None:
-        """Not implemented yet.
-
-        # TODO
-
-        Raises
-        ------
-        NotImplementedError
-            Not implemented.
-        """
-        raise NotImplementedError("Not implemented.")
+        raise NotImplementedError("Abstract method not implemented.")
 
     # ==================================================================
     # Solvers aditional data needed - general used methods
@@ -411,8 +382,8 @@ class StationaryPFR(ReactorBase):
 
             return bc
 
-        self._inlet_information = self._molar_flux_in
-        self._outlet_information = self._molar_flux_out
+        self._inlet_information = self._molar_flow_in
+        self._outlet_information = self._molar_flow_out
 
         # Isothermic - isobaric
 
