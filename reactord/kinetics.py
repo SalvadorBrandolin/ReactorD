@@ -11,18 +11,18 @@ class Kinetics:
     Parameters
     ----------
     list_of_reactions : ndarray or list [function]
-        array that constains kinetic laws for each reaction defined by user 
-        Laws are add in form of functions like: 
-        function(composition, temperature) 
-        where composition is a (number_of_components) dimension array 
-        that contains the partial pressures [Pa] or the concentrations 
+        array that constains kinetic laws for each reaction defined by user
+        Laws are add in form of functions like:
+        function(composition, temperature)
+        where composition is a (number_of_components) dimension array
+        that contains the partial pressures [Pa] or the concentrations
         of the substances.
 
     mix : Mix object
         Mix object defined with all the substances present in the system
-        This object represents properties of mixture of substances in 
+        This object represents properties of mixture of substances in
         the reactor
-        
+
     stoichiometry: ndarray or list
         array or list containing the stoichiometric coefficients of
         all the substances involved in the reactive system. the
@@ -53,7 +53,7 @@ class Kinetics:
         string that indicates on wich concentration unit meassure the
         kinetic rate function are evaluated. Avaliable options:
         'concentration', 'partial_pressure'
-    
+
     enthalpy_of_reaction : ndarray or list, optional
         array that contains the enthalpy of reaction of each reaction
         in list_of_reactions [j/mol/K]. Elements of the list may be set
@@ -62,7 +62,7 @@ class Kinetics:
         Single None value is accepted and all the values are
         calculated, default = None.
     """
-    
+
     def __init__(
         self,
         mix: AbstractMix,
@@ -257,7 +257,7 @@ class Kinetics:
 
     def _std_reaction_enthalpies_from_formation(self):
         """Calculate standar reaction enthalpies.
-                
+
         Calculates the standard reaction enthalpy from standard
         formation enthalpies defined from mix object.
 

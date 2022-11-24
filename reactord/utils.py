@@ -6,9 +6,9 @@ import numpy as np
 
 def vectorize(signature: str = None, excluded: set = None) -> Callable:
     """Vectorize.
-   
-    Decorator that receive sequence of objects or numpy arrays and returns a 
-    single numpy array with needed dimensions. 
+
+    Decorator that receive sequence of objects or numpy arrays and returns a
+    single numpy array with needed dimensions.
     Vectorize evaluates user_function over successive input arrays
 
     Parameters
@@ -18,8 +18,8 @@ def vectorize(signature: str = None, excluded: set = None) -> Callable:
         Example:
         (m,n),(n)->(m) for vectorized matrix-vector multiplication
     excluded : set, optional
-        Set of strings or integers representing the positional or keyword 
-        arguments for which the function will not be vectorized. These will be 
+        Set of strings or integers representing the positional or keyword
+        arguments for which the function will not be vectorized. These will be
         passed directly to user_function unmodified. By default None
 
     Returns
@@ -27,6 +27,7 @@ def vectorize(signature: str = None, excluded: set = None) -> Callable:
     Callable
         Array with given dimensions for evaluated user_function
     """
+
     def outer(user_function: Callable) -> Callable:
         def inner(*args, **kwargs):
             f = np.vectorize(
