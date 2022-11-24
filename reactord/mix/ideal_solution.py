@@ -1,3 +1,4 @@
+"""Ideal solution Module."""
 from typing import List
 
 import numpy as np
@@ -7,11 +8,41 @@ from reactord.substance import Substance
 
 
 class IdealSolution(AbstractMix):
-    def __init__(self, substance_list: List[Substance]):
+    """IdealGas object class.
 
+    This class should be used when the mixture is considered an ideal gas.
+
+    Parameters
+    ----------
+    substance_list : list [float]
+        list of substance objects
+
+    Attributes
+    ----------
+    substances : list [float]
+        list of substance objects
+    """
+
+    def __init__(self, substance_list: list[Substance]):
         self.substances = substance_list
 
     def concentrations(self, moles, temperature, pressure):
+        """Calculate concentrations of the mixture.
+
+        Parameters
+        ----------
+        moles : ndarray or list [float]
+            Moles of each substance
+        temperature : float
+            System temperature
+        pressure : float
+            System pressure
+
+        Returns
+        -------
+        ndarray or list [float]
+            Concentration of each substance
+        """
         zi = self.mol_fracations(moles)
         molar_volumes = np.array(
             [
@@ -25,6 +56,22 @@ class IdealSolution(AbstractMix):
         return concentrations
 
     def volume(self, moles, temperature, pressure):
+        """Calculate the volume of the mixture.
+
+        Parameters
+        ----------
+        moles : ndarray or list [float]
+            Moles of each substance
+        temperature : float
+            System temperature
+        pressure : float
+            System pressure
+
+        Returns
+        -------
+        float
+            Volume of the mixture
+        """
         zi = self.mol_fracations(moles)
         pure_volumes = np.array(
             [
@@ -35,6 +82,20 @@ class IdealSolution(AbstractMix):
         return np.dot(pure_volumes, zi)
 
     def mix_heat_capacity(self, moles, temperature, pressure):
+        """Calculate heat capacity of th mixture.
+
+        Parameters
+        ----------
+        moles : ndarray or list [float]
+            Moles of each substance
+        temperature : float
+            System temperature
+
+        Returns
+        -------
+        float
+            Heat capacity of the mixture
+        """
         zi = self.mol_fracations(moles)
         pure_cp = np.array(
             [
@@ -46,8 +107,15 @@ class IdealSolution(AbstractMix):
         return mix_cp
 
     def _formation_enthalpies_set(self):
-        """Method that read the ideal gas formation enthalpies of mix's
-        and returns them in a ordered ndarray.
+        """Return the formation enthalpies in a ordered ndarray.
+
+        Method that read the formation enthalpies of mix and returns
+        them in a ordered ndarray.
+
+        Returns
+        -------
+        ndarray [float]
+            Formation enthalpies of each substance
         """
         enthalpies = np.array([])
 
@@ -57,7 +125,12 @@ class IdealSolution(AbstractMix):
         return enthalpies
 
     def formation_enthalpies_correction(self, temperature: float, *args):
+    """Return corrects the enthalpy of formation of pure substances.
 
+        Method that corrects the enthalpy of formation of pure
+        substances When its melting temperature is greater than 298.
+
+        """
         enthalpies = np.array([])
         for substance in self.substances:
             if substance.normal_melting_point > 298.15:
