@@ -1,4 +1,5 @@
 import numpy as np
+
 import pytest
 
 import reactord as rd
@@ -55,6 +56,7 @@ def test_user_reaction_enthalpies():
     acetate = rd.Substance.from_thermo_database("ethyl acetate")
 
     list_of_components = [acetic, ethanol, acetate, water]
+
     stoichiometry_single_reaction = np.array([-1, -1, 1, 1])
 
     def reaction_rate(concentration, temperature):
@@ -121,11 +123,18 @@ def test_user_reaction_enthalpies():
     # Test for _std_reaction_enthalpies_from_formation method
     raw_formation_enthalpies = []
 
+    # Individual formation enthalpies are retrieved and the list
+    # is converted to a numpy array
     for component in list_of_components:
         raw_formation_enthalpies.append(component.formation_enthalpy_ig)
     raw_formation_enthalpies = np.array(raw_formation_enthalpies)
+
+    # stoichiometry is rehsaped to calculate the dot product
+    stoichiometry = np.reshape(kinetic1.stoichiometry, newshape=(4,))
+    raw_reaction_enthalpy = np.dot(raw_formation_enthalpies, stoichiometry)
+
     formation_enthalpies_method = (
         kinetic1._std_reaction_enthalpies_from_formation()
     )
 
-    assert np.allclose(raw_formation_enthalpies, formation_enthalpies_method)
+    assert np.allclose(raw_reaction_enthalpy, formation_enthalpies_method)

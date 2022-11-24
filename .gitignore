@@ -3,3 +3,5 @@
 *.tox*
 *.coverage*
 *.pytest_cache*
+*.ipynb_checkpoints*
+*.vscode*

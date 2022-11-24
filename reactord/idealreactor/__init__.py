@@ -1,4 +1,9 @@
-from . import pfr_classes, pfr_decorators, str_classes
-from .pfr_start import PFR
+"""idealreactor.
 
-__all__ = [pfr_classes, str_classes, PFR, pfr_decorators]
+Module for ideal reactors simulation. Contains:
+    - StationaryPFR: stationary plug flow reactor.
+"""
+
+from .stationary_pfr import StationaryPFR
+
+__all__ = [StationaryPFR]

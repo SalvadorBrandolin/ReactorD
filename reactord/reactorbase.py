@@ -1,9 +1,8 @@
 """Reactorbase module."""
 from abc import ABCMeta, abstractmethod
+from typing import Callable, List
 
-from _collections_abc import Callable
-
-from reactord import Kinetics
+from reactord.kinetics import Kinetics
 from reactord.mix import AbstractMix
 
 
@@ -39,7 +38,7 @@ class ReactorBase(metaclass=ABCMeta):
     _name: str = ""
     _kinetics: Kinetics = None
     _mix: AbstractMix = None
-    _list_of_reactions: list[Callable] = []
+    _list_of_reactions: List[Callable] = []
     _stoichiometry: list = []
     _kinetic_argument: str = ""
 
@@ -54,7 +53,7 @@ class ReactorBase(metaclass=ABCMeta):
     def __init__(
         self,
         mix: AbstractMix,
-        list_of_reactions: list[Callable],
+        list_of_reactions: List[Callable],
         stoichiometry: list,
         kinetic_argument: str,
         **options,
@@ -157,7 +156,7 @@ class ReactorBase(metaclass=ABCMeta):
 
         Returns
         -------
-        list[Callable]
+        List[Callable]
             List that contains the functions to eval each reaction.
         """
         return self._kinetics.list_of_reactions
@@ -166,13 +165,12 @@ class ReactorBase(metaclass=ABCMeta):
     def list_of_reactions(self, new_list_of_reactions: list[Callable]):
         """Set new list of reactions.
         
-        Method to assign a new list of reactions to the reactor. The
+        Method to assign a new list of reactions to the reactor. The    
         method replaces the list of reactions inside the kinetic object.
-
 
         Parameters
         ----------
-        new_list_of_reactions : list[Callable]
+        new_list_of_reactions : List[Callable]
             List that contains the functions to eval each reaction.
         """
         self._kinetics.list_of_reactions = new_list_of_reactions
@@ -215,7 +213,7 @@ class ReactorBase(metaclass=ABCMeta):
             Argument to eval the kinetic functions. Alternatives:
             "concentration", "partial_pressure".
         """
-        return self._kinetics.stoichiometry
+        return self._kinetics.kinetic_argument
 
     @kinetic_argument.setter
     def kinetic_argument(self, new_kinetics_argument: str):
@@ -364,7 +362,7 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def _border_cond_initial_guesses(self) -> None:
+    def _border_cond_and_initial_guesses(self) -> None:
         """Construct the solver needs.
 
         Constructs the border conditions for the differential
@@ -532,6 +530,7 @@ class ReactorBase(metaclass=ABCMeta):
         """
         raise NotImplementedError("Abstract method not implemented.")
 
+    @abstractmethod
     def _homogeneous_non_isothermic_energy_balance(self) -> None:
         """Eval homogeneous non isothermic energy balance.
 
