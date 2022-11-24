@@ -244,24 +244,60 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     def _set_catalyst_operation(self) -> None:
-        """Not finished"""
+        """Interpret the reactor's attributes and sets the mass balance.
 
+        Method that validates and interprets the reactor's attributes
+        to select the correspondant solver and mass balance methods.
+        The method is called in the reactor's instantiation.
+
+        Raises
+        ------
+        ValueError
+            Not border condition specified for a subtance molar flow.
+        ValueError
+            Two border condition specified for a subtance molar flow.
+        """
+        self._molar_flow_in_asarray = np.array([])
+        self._molar_flow_out_asarray = np.array([])
         # Data validation
         #   All substances must have one and only one border condition:
+        #   Flow data is stored in the two previous private arrays.
+        #   The unexisting molar flux given are stored as None.
+        #   the method _border_cond_and_initial_guesses handle with
+        #   those two arrays.
         for substance in self.mix.substances:
             flow_inlet = self.molar_flow_in.get(substance.name)
             flow_outlet = self.molar_flow_out.get(substance.name)
 
-            if (name_inlet == None) and (name_outlet == None):
+            if (flow_inlet is None) and (flow_outlet is None):
                 raise ValueError(
-                    f'Not molar flux (in or out) given for {substance.name}'
+                    "Not molar flux (in or out) specified for substance: "
+                    f"{substance.name}"
                 )
 
-            if (name_inlet !=)
+            if (flow_inlet is not None) and (flow_outlet is not None):
+                raise ValueError(
+                    "Specify only molar_flow_in or molar_flow_out for "
+                    f"substance: {substance.name}"
+                )
+
+            np.append(self._molar_flow_in_asarray, flow_inlet)
+            np.append(self._molar_flow_in_asarray, flow_outlet)
+
+        # Solver and mas balance setting
+        if self.catalyst_particle is None:
+            self._catalyst_operation = "homogeneous"
+            self._mass_balance_func = self._homogeneous_mass_balance
+            self._solver_func = self._homogeneous_solver
+        else:
+            self._catalyst_operation = "heterogeneous"
+            self._mass_balance_func = self._heterogeneous_mass_balance
+            self._solver_func = self._heterogeneous_solver
 
     def _set_thermal_operation(self):
-        """Method that recieves and instantiates the neccesary
-        parameters to solve the isothermic energy balance in the
+        """Recieves and instantiates the neccesary.
+
+        Parameters to solve the isothermic energy balance in the
         reactor's bulk. The method returns None.
 
         Raises
@@ -269,11 +305,48 @@ class StationaryPFR(ReactorBase):
         NotImplementedError
             Abstract method not implemented.
         """
-        raise NotImplementedError("Abstract method not implemented.")
+
+        non_isothermal_args = [
+            self.temperature_in_out,
+            self.refrigerant,
+            self.refrigerant_molar_flow,
+            self.refrigerant_temperature_in,
+            self.refrigerant_constant_temperature,
+            self.refrigerant_flow_arrangement,
+            self.exchanger_wall_material,
+            self.correlation_heat_transfer,
+        ]
+        
+        if self.isothermic_temperature is not None:
+            # Check isothermal operation:
+            if any(non_isothermal_args):
+                raise ValueError(
+                    "If isothermic_temperature is specified, do not specify:\n"
+                    "    temperature_in_out\n"
+                    "    refrigerant\n"
+                    "    refrigerant_molar_flow\n"
+                    "    refrigerant_temperature_in\n"
+                    "    refrigerant_constant_temperature\n"
+                    "    refrigerant_flow_arrangement\n"
+                    "    exchanger_wall_material\n"
+                    "    correlation_heat_transfer\n"
+                    "Because is ambigous."
+                )
+            else:
+                self._thermal_operation = 'isothermal'
+                self._energy_balance_func = self._isothermic_energy_balance
+        
+        elif any(non_isothermal_args):
+            # Check non isothermal operation:
+            ...
+        else:
+            raise ValueError('No thermal specification were seted.')
+                
 
     def _set_pressure_operation(self):
-        """Method that recieves and instantiates the neccesary
-        parameters to solve the isobaric pressure balance in the
+        """Recieves and instantiates the neccesary.
+
+        Parameters to solve the isobaric pressure balance in the
         reactor's bulk phase. The method returns None.
 
         Raises

@@ -22,8 +22,9 @@ class ReactorBase(metaclass=ABCMeta):
     _pressure_operation: str = ""
 
     _mass_balance_func: Callable = None
-    _temperature_balance_func: Callable = None
+    _energy_balance_func: Callable = None
     _pressure_balance_func: Callable = None
+    _solver_func: Callable = None
 
     # ==================================================================
     # Common parameters for all reactors.
