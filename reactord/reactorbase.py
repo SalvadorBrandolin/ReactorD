@@ -29,18 +29,18 @@ class ReactorBase(metaclass=ABCMeta):
         list_of_reactions: List[Callable],
         stoichiometry: list,
         kinetic_argument: str,
-        **options,
+        **configurations,
     ) -> None:
 
-        self.options = options
-        self.options["_not_reaction_enthalpies"] = True
+        self.configurations = configurations
+        self.configurations["_not_reaction_enthalpies"] = True
 
         self._kinetics = Kinetics(
             list_of_reactions=list_of_reactions,
             mix=mix,
             stoichiometry=stoichiometry,
             kinetic_argument=kinetic_argument,
-            options=self.options,
+            configurations=self.configurations,
         )
 
     # ==================================================================
@@ -196,7 +196,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_isothermic_isobaric(self) -> None:
+    def set_isothermic_isobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -208,7 +208,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_isothermic_noisobaric(self) -> None:
+    def set_isothermic_noisobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -220,7 +220,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_adiabatic_isobaric(self) -> None:
+    def set_adiabatic_isobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -232,7 +232,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_adiabatic_noisobaric(self) -> None:
+    def set_adiabatic_noisobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -244,7 +244,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_noisothermic_isobaric(self) -> None:
+    def set_noisothermic_isobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -256,7 +256,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_noisothermic_noisobaric(self) -> None:
+    def set_noisothermic_noisobaric(cls) -> None:
         """Not implemented yet.
 
         Raises

@@ -3,6 +3,8 @@ from typing import List
 
 import numpy as np
 
+from reactord.substance import Substance
+
 
 class AbstractMix(metaclass=ABCMeta):
     """Mixture object abstract class.
@@ -11,6 +13,8 @@ class AbstractMix(metaclass=ABCMeta):
     ----------
     substance_list : ndarray or List[Substance objects]
         list or array of Substance objects."""
+
+    substances: List[Substance] = []
 
     # ==================================================================
     # Mixtures common methods

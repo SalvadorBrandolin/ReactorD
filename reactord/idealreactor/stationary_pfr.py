@@ -20,7 +20,14 @@ from scipy.integrate import solve_bvp
 
 
 class StationaryPFR(ReactorBase):
-    """Stationary plug flow reactor class.
+    """Stationary plug flow reactor class. For instantiation is 
+    recommended to use the setter methods:
+        set_isothermic_isobaric
+        set_isothermic_noisobaric
+        set_adiabatic_isobaric
+        set_adiabatic_noisobaric
+        set_noisothermic_isobaric
+        set_noisothermic_noisobaric
 
     Parameters
     ----------
@@ -59,18 +66,19 @@ class StationaryPFR(ReactorBase):
             reactor_dim_minmax = [0, 3]. [m]
         transversal_area : float
             Tranversal area of the reactor. [m^2]
-        molar_flow_in : List[float] or numpy.ndarray[float]
-            List or or numpy.ndarray containing the known molar fluxes
-            at the reactor's inlet. The ordering of the fluxes must be
-            identical to the substance order in mixture. For unkown
-            fluxes specify as numpy.nan. [mol/s]
-        molar_flow_out : List[float] or numpy.ndarray[float]
-            List or or numpy.ndarray containing the known molar fluxes
-            at the reactor's outlet. The ordering of the fluxes must be
-            identical to the substance order in mixture. For unkown
-            fluxes specify as numpy.nan. [mol/s]
-        catalyst : AbstractCatalyst, optional # TODO
-           Stationary catalyst particle, by default None
+        **configurations : dict
+            molar_flow_in : List[float] or numpy.ndarray[float]
+                List or or numpy.ndarray containing the known molar 
+                fluxes at the reactor's inlet. The ordering of the 
+                fluxes must be identical to the substance order in 
+                mixture. For unkown fluxes specify as numpy.nan. [mol/s]
+            molar_flow_out : List[float] or numpy.ndarray[float]
+                List or or numpy.ndarray containing the known molar 
+                fluxes at the reactor's outlet. The ordering of the 
+                fluxes must be identical to the substance order in 
+                mixture. For unkown fluxes specify as numpy.nan. [mol/s]
+            catalyst_particle : AbstractCatalyst, optional # TODO
+            Stationary catalyst particle, by default None
 
     Attributes
     ----------
@@ -81,6 +89,22 @@ class StationaryPFR(ReactorBase):
     transversal_area : float
         Tranversal area of the reactor. [m^2]
     """
+    molar_flow_in: dict = {}
+    molar_flow_out: dict = {}
+    catalyst_particle=None
+    isothermic_temperature: float = None
+    temperature_in_out: dict = None
+    refrigerant: AbstractMix = None
+    refrigerant_molar_flow: float = None
+    refrigerant_temperature_in: float = None
+    refrigerant_constant_temperature: bool = False
+    refrigerant_flow_arrangement: str = "cocurrent"
+    exchanger_wall_material: Substance = None
+    correlation_heat_transfer: str = ""
+    isobaric_pressure: float = None
+    pressure_in_out: dict = None
+    pressure_loss_equation: str = ""
+    packed_bed_porosity: float = 1
 
     def __init__(
         self,
@@ -90,23 +114,7 @@ class StationaryPFR(ReactorBase):
         kinetic_argument: str,
         reactor_dim_minmax: List[float],
         transversal_area: float,
-        molar_flow_in: List[float],
-        molar_flow_out: List[float],
-        catalyst_particle=None,
-        isothermic_temperature: float = None,
-        temperature_in_out: dict = None,
-        refrigerant: AbstractMix = None,
-        refrigerant_molar_flow: float = None,
-        refrigerant_temperature_in: float = None,
-        refrigerant_constant_temperature: bool = False,
-        refrigerant_flow_arrangement: str = "cocurrent",
-        exchanger_wall_material: Substance = None,
-        correlation_heat_transfer: str = "",
-        isobaric_pressure: float = None,
-        pressure_in_out: dict = None,
-        pressure_loss_equation: str = "",
-        packed_bed_porosity: float = 1,
-        **options,
+        **configurations,
     ) -> None:
 
         super().__init__(
@@ -114,20 +122,19 @@ class StationaryPFR(ReactorBase):
             list_of_reactions=list_of_reactions,
             stoichiometry=stoichiometry,
             kinetic_argument=kinetic_argument,
-            options=options,
+            configurations=configurations,
         )
 
-        # Mass balance arguments and settings:
-        self.molar_flow_in = molar_flow_in
-        self.molar_flow_out = molar_flow_out
-        self.catalyst_particle = catalyst_particle
-        
-        self._set_catalyst_operation()
-
         # Specifics reactor arguments
-
+        self._name = 'StationaryPFR'
         self.reactor_dim_minmax = reactor_dim_minmax
         self.transversal_area = transversal_area
+        self._configurations = configurations.copy()
+
+        # Configure the reactor
+        self._set_catalyst_operation()
+        self._set_thermal_operation()
+        self._set_pressure_operation()
 
     # ==================================================================
     # Init constructors
@@ -205,37 +212,14 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     def _set_catalyst_operation(self) -> None:
-        """_summary_
-
-        Raises
-        ------
-        IndexError
-            _description_
-        IndexError
-            _description_
+        """Not finished
         """
-        if len(self.molar_flow_in) != len(self.molar_flow_out):
-            raise IndexError(
-                "molar_flow_in length must be equal to molar_flow_out"
-            )
+        
+        # Data validation
+        #   All substances must have a border condition:
+        for substace in self.mix.substances:
+            self.molar_flow_in
 
-        if len(molar_flow_in) != len(self.mix):
-            raise IndexError(
-                "molar_flow_in and molar_flow_out length must be equal to "
-                "mixture's substance number."
-            )
-
-        self._molar_flow_in = molar_flow_in
-        self._molar_flow_out = molar_flow_out
-
-        if catalyst_particle is None:
-            self._catalyst_operation = "homogeneous"
-            self._mass_balance_func = self._homogeneous_mass_balance
-            self._solver_func = self._homogeneous_solver
-        else:
-            self._catalyst_operation = "heterogeneous"
-            self._mass_balance_func = self._heterogeneous_mass_balance
-            self._solver_func = self._heterogeneous_solver
 
     @abstractmethod
     def _set_thermal_operation(self):
