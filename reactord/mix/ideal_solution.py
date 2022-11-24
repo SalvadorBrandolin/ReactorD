@@ -14,7 +14,7 @@ class IdealSolution(AbstractMix):
     ----------
     substance_list : list [float]
         list of substance objects
-        
+
     Attributes
     ----------
     substances : list [float]
