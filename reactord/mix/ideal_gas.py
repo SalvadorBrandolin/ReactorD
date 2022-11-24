@@ -23,7 +23,7 @@ class IdealGas(AbstractMix):
         list of substance objects
     """
 
-    def __init__(self, substance_list: list[Substance]):
+    def __init__(self, substance_list: List[Substance]):
         self.substances = substance_list
 
     def concentrations(self, moles, temperature, pressure):
@@ -54,7 +54,7 @@ class IdealGas(AbstractMix):
 
         Parameters
         ----------
-        moles : ndarray or list [float]
+        moles : ndarray or list[float]
             Moles of each substance
         temperature : float
             System temperature

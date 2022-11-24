@@ -8,7 +8,7 @@ import numpy as np
 class AbstractMix(metaclass=ABCMeta):
     """Mixture object abstract class."""
 
-    def mol_fracations(self, moles: list[float]):
+    def mol_fracations(self, moles: List[float]):
         """Calculate the molar fractions of the mixture.
 
         Parameters
@@ -132,7 +132,7 @@ class AbstractMix(metaclass=ABCMeta):
     def mix_heat_capacity(
         self, moles: List[float], temperature: float, pressure: float
     ):
-       """Return the heat capacity of the mixture.
+        """Return the heat capacity of the mixture.
 
         Parameters
         ----------

@@ -23,7 +23,7 @@ class IdealSolution(AbstractMix):
         list of substance objects
     """
 
-    def __init__(self, substance_list: list[Substance]):
+    def __init__(self, substance_list: List[Substance]):
         self.substances = substance_list
 
     def concentrations(self, moles, temperature, pressure):
@@ -31,7 +31,7 @@ class IdealSolution(AbstractMix):
 
         Parameters
         ----------
-        moles : ndarray or list [float]
+        moles : ndarray or list[float]
             Moles of each substance
         temperature : float
             System temperature
@@ -125,7 +125,7 @@ class IdealSolution(AbstractMix):
         return enthalpies
 
     def formation_enthalpies_correction(self, temperature: float, *args):
-    """Return corrects the enthalpy of formation of pure substances.
+        """Return corrects the enthalpy of formation of pure substances.
 
         Method that corrects the enthalpy of formation of pure
         substances When its melting temperature is greater than 298.
