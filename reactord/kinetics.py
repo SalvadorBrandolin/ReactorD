@@ -45,7 +45,7 @@ class Kinetics:
 
     kinetic_argument : string
         string that indicates on wich concentration unit meassure the
-        kinetic rate function are evaluated. Avaliable options:
+        kinetic rate function are evaluated. Avaliable kwargs:
         'concentration', 'partial_pressure'
     enthalpy_of_reaction : ndarray or list, optional
         array that contains the enthalpy of reaction of each reaction
@@ -62,13 +62,13 @@ class Kinetics:
         list_of_reactions: list,
         stoichiometry: list,
         kinetic_argument: str = "concentration",
-        **options,
+        **kwargs,
     ) -> None:
 
         self.list_of_reactions = list_of_reactions
         self.mix = mix
         self.kinetic_argument = kinetic_argument.lower()
-        self.options = options
+        self.kwargs = kwargs
 
         # ==============================================================
         # DATA VALIDATION
@@ -108,9 +108,9 @@ class Kinetics:
 
         # Checks if reacion_enthalpies option is correct
 
-        if "reaction_enthalpies" in self.options.keys():
+        if "reaction_enthalpies" in self.kwargs.keys():
 
-            reaction_enthalpies = self.options.get("reaction_enthalpies")
+            reaction_enthalpies = self.kwargs.get("reaction_enthalpies")
 
             if len(reaction_enthalpies) != self.num_reactions:
                 raise IndexError(
@@ -148,7 +148,7 @@ class Kinetics:
         # FORMATION AND REACTION ENTHALPIES SET
         # ==============================================================
 
-        self._std_reaction_enthalpies = np.zeros(len(self.list_of_reactions))
+        self._std_reaction_enthalpies = None
 
     # ==================================================================
     # PUBLIC METHODS
@@ -206,8 +206,8 @@ class Kinetics:
     @vectorize(signature="(),()->(m)", excluded={0})
     def reaction_enthalpies(self, temperature, pressure):
 
-        if "reaction_enthalpies" in self.options.keys():
-            return self.options.get("reaction_enthalpies")
+        if "reaction_enthalpies" in self.kwargs.keys():
+            return self.kwargs.get("reaction_enthalpies")
 
         formation_correction = self.mix.formation_enthalpies_correction(
             temperature, pressure
@@ -225,7 +225,7 @@ class Kinetics:
 
     def _std_reaction_enthalpies_set(self):
 
-        if "reaction_enthalpies" in self.options.keys():
+        if "reaction_enthalpies" in self.kwargs.keys():
             pass
         else:
             self._std_reaction_enthalpies = (

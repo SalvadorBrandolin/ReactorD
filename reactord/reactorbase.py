@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import Callable, List
 
+import numpy
+
 from reactord.kinetics import Kinetics
 from reactord.mix import AbstractMix
 
@@ -23,43 +25,23 @@ class ReactorBase(metaclass=ABCMeta):
     _temperature_balance_func: Callable = None
     _pressure_balance_func: Callable = None
 
-    def __init__(
-        self,
-        mix: AbstractMix,
-        list_of_reactions: List[Callable],
-        stoichiometry: list,
-        kinetic_argument: str,
-        **configurations,
-    ) -> None:
-
-        self.configurations = configurations
-        self.configurations["_not_reaction_enthalpies"] = True
-
-        self._kinetics = Kinetics(
-            list_of_reactions=list_of_reactions,
-            mix=mix,
-            stoichiometry=stoichiometry,
-            kinetic_argument=kinetic_argument,
-            configurations=self.configurations,
-        )
-
     # ==================================================================
     # Common parameters for all reactors.
     # ==================================================================
 
     @property
-    def kinetics(self):
+    def kinetics(self) -> Kinetics:
         """Kinetics class instantiation
 
         Returns
         -------
         Kinetics
-            Kinetics class instantiation.
+            Kinetics class instance.
         """
         return self._kinetics
 
     @kinetics.setter
-    def kinetics(self, new_kinetics):
+    def kinetics(self, new_kinetics: Kinetics) -> None:
         """Method to asign a new instantiation of the reactor kinetics.
         Validates that the asigned object is acctualy a Kinetics
         instantiation.
@@ -83,7 +65,7 @@ class ReactorBase(metaclass=ABCMeta):
             )
 
     @property
-    def mix(self):
+    def mix(self) -> AbstractMix:
         """Mixture object that is stored only on the Kinetics object to
         prevent multiple mixture objects on the same reactor.
 
@@ -95,7 +77,7 @@ class ReactorBase(metaclass=ABCMeta):
         return self._kinetics.mix
 
     @mix.setter
-    def mix(self, new_mix: AbstractMix):
+    def mix(self, new_mix: AbstractMix) -> None:
         """Method to assign a new mixture object to the reactor. The
         method replaces the mixture inside the kinetic object.
 
@@ -107,7 +89,7 @@ class ReactorBase(metaclass=ABCMeta):
         self._kinetics.mix = new_mix
 
     @property
-    def list_of_reactions(self):
+    def list_of_reactions(self) -> List[Callable]:
         """List that contains the functions to eval each reaction.
 
         Explain more: # TODO
@@ -135,7 +117,7 @@ class ReactorBase(metaclass=ABCMeta):
         self._kinetics.list_of_reactions = new_list_of_reactions
 
     @property
-    def stoichiometry(self):
+    def stoichiometry(self) -> numpy.ndarray:
         """Stoichimetry matrix.
 
         Explain more: # TODO
@@ -149,7 +131,7 @@ class ReactorBase(metaclass=ABCMeta):
         return self._kinetics.stoichiometry
 
     @stoichiometry.setter
-    def stoichiometry(self, new_stoichiometry):
+    def stoichiometry(self, new_stoichiometry: List[float]) -> None:
         """Stoichimetry matrix replaces on the Kinetics object.
 
         Explain more: # TODO
@@ -163,7 +145,7 @@ class ReactorBase(metaclass=ABCMeta):
         self._kinetics.stoichiometry = new_stoichiometry
 
     @property
-    def kinetic_argument(self):
+    def kinetic_argument(self) -> str:
         """Argument to eval the kinetics function.
 
         Returns
@@ -176,7 +158,7 @@ class ReactorBase(metaclass=ABCMeta):
         return self._kinetics.kinetic_argument
 
     @kinetic_argument.setter
-    def kinetic_argument(self, new_kinetics_argument: str):
+    def kinetic_argument(self, new_kinetics_argument: str) -> None:
         """Argument to eval the kinetics function replaced in the
         Kinetics object.
 

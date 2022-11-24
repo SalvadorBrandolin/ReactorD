@@ -11,6 +11,7 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 
+from reactord.kinetics import Kinetics
 from reactord.mix import AbstractMix
 from reactord.reactorbase import ReactorBase
 from reactord.substance import Substance
@@ -20,14 +21,18 @@ from scipy.integrate import solve_bvp
 
 
 class StationaryPFR(ReactorBase):
-    """Stationary plug flow reactor class. For instantiation is 
-    recommended to use the setter methods:
+    """Stationary plug flow reactor class.
+
+    For instantiation is recommended to use the setter class methods:
         set_isothermic_isobaric
         set_isothermic_noisobaric
         set_adiabatic_isobaric
         set_adiabatic_noisobaric
         set_noisothermic_isobaric
         set_noisothermic_noisobaric
+
+    For example:
+        pfr = StationaryPFR.set_isothermic_isobaric(...)
 
     Parameters
     ----------
@@ -66,16 +71,16 @@ class StationaryPFR(ReactorBase):
             reactor_dim_minmax = [0, 3]. [m]
         transversal_area : float
             Tranversal area of the reactor. [m^2]
-        **configurations : dict
+        **kwargs : dict
             molar_flow_in : List[float] or numpy.ndarray[float]
-                List or or numpy.ndarray containing the known molar 
-                fluxes at the reactor's inlet. The ordering of the 
-                fluxes must be identical to the substance order in 
+                List or or numpy.ndarray containing the known molar
+                fluxes at the reactor's inlet. The ordering of the
+                fluxes must be identical to the substance order in
                 mixture. For unkown fluxes specify as numpy.nan. [mol/s]
             molar_flow_out : List[float] or numpy.ndarray[float]
-                List or or numpy.ndarray containing the known molar 
-                fluxes at the reactor's outlet. The ordering of the 
-                fluxes must be identical to the substance order in 
+                List or or numpy.ndarray containing the known molar
+                fluxes at the reactor's outlet. The ordering of the
+                fluxes must be identical to the substance order in
                 mixture. For unkown fluxes specify as numpy.nan. [mol/s]
             catalyst_particle : AbstractCatalyst, optional # TODO
             Stationary catalyst particle, by default None
@@ -89,22 +94,6 @@ class StationaryPFR(ReactorBase):
     transversal_area : float
         Tranversal area of the reactor. [m^2]
     """
-    molar_flow_in: dict = {}
-    molar_flow_out: dict = {}
-    catalyst_particle=None
-    isothermic_temperature: float = None
-    temperature_in_out: dict = None
-    refrigerant: AbstractMix = None
-    refrigerant_molar_flow: float = None
-    refrigerant_temperature_in: float = None
-    refrigerant_constant_temperature: bool = False
-    refrigerant_flow_arrangement: str = "cocurrent"
-    exchanger_wall_material: Substance = None
-    correlation_heat_transfer: str = ""
-    isobaric_pressure: float = None
-    pressure_in_out: dict = None
-    pressure_loss_equation: str = ""
-    packed_bed_porosity: float = 1
 
     def __init__(
         self,
@@ -114,24 +103,67 @@ class StationaryPFR(ReactorBase):
         kinetic_argument: str,
         reactor_dim_minmax: List[float],
         transversal_area: float,
-        **configurations,
+        **kwargs,
     ) -> None:
 
-        super().__init__(
-            mix=mix,
+        self._kinetics = Kinetics(
             list_of_reactions=list_of_reactions,
+            mix=mix,
             stoichiometry=stoichiometry,
             kinetic_argument=kinetic_argument,
-            configurations=configurations,
         )
-
+        # ==============================================================
         # Specifics reactor arguments
-        self._name = 'StationaryPFR'
+        # ==============================================================
+        self._name = "StationaryPFR"
         self.reactor_dim_minmax = reactor_dim_minmax
         self.transversal_area = transversal_area
-        self._configurations = configurations.copy()
 
+        # ==============================================================
+        # Mass balance data
+        # ==============================================================
+        self.molar_flow_in: dict = kwargs.get("molar_flow_in")
+        self.molar_flow_out: dict = kwargs.get("molar_flow_out")
+        self.catalyst_particle = kwargs.get("catalyst_particle")
+
+        # ==============================================================
+        # Energy balance data
+        # ==============================================================
+        self.isothermic_temperature: float = kwargs.get(
+            "isothermic_temperature"
+        )
+        self.temperature_in_out: dict = kwargs.get("temperature_in_out")
+        self.refrigerant: AbstractMix = kwargs.get("refrigerant")
+        self.refrigerant_molar_flow: float = kwargs.get(
+            "refrigerant_molar_flow"
+        )
+        self.refrigerant_temperature_in: float = kwargs.get(
+            "refrigerant_temperature_in"
+        )
+        self.refrigerant_constant_temperature: bool = kwargs.get(
+            "refrigerant_constant_temperature"
+        )
+        self.refrigerant_flow_arrangement: str = kwargs.get(
+            "refrigerant_flow_arrangement"
+        )
+        self.exchanger_wall_material: Substance = kwargs.get(
+            "exchanger_wall_material"
+        )
+        self.correlation_heat_transfer: str = kwargs.get(
+            "correlation_heat_transfer"
+        )
+
+        # ==============================================================
+        # Pressure balance data
+        # ==============================================================
+        self.isobaric_pressure: float = kwargs.get("isobaric_pressure")
+        self.pressure_in_out: dict = kwargs.get("pressure_in_out")
+        self.pressure_loss_equation: str = kwargs.get("pressure_loss_equation")
+        self.packed_bed_porosity: float = kwargs.get("packed_bed_porosity")
+
+        # ==============================================================
         # Configure the reactor
+        # ==============================================================
         self._set_catalyst_operation()
         self._set_thermal_operation()
         self._set_pressure_operation()
@@ -212,16 +244,21 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     def _set_catalyst_operation(self) -> None:
-        """Not finished
-        """
-        
+        """Not finished"""
+
         # Data validation
-        #   All substances must have a border condition:
-        for substace in self.mix.substances:
-            self.molar_flow_in
+        #   All substances must have one and only one border condition:
+        for substance in self.mix.substances:
+            flow_inlet = self.molar_flow_in.get(substance.name)
+            flow_outlet = self.molar_flow_out.get(substance.name)
 
+            if (name_inlet == None) and (name_outlet == None):
+                raise ValueError(
+                    f'Not molar flux (in or out) given for {substance.name}'
+                )
 
-    @abstractmethod
+            if (name_inlet !=)
+
     def _set_thermal_operation(self):
         """Method that recieves and instantiates the neccesary
         parameters to solve the isothermic energy balance in the
@@ -234,7 +271,6 @@ class StationaryPFR(ReactorBase):
         """
         raise NotImplementedError("Abstract method not implemented.")
 
-    @abstractmethod
     def _set_pressure_operation(self):
         """Method that recieves and instantiates the neccesary
         parameters to solve the isobaric pressure balance in the
@@ -409,7 +445,7 @@ class StationaryPFR(ReactorBase):
                 # TODO
 
         else:
-            raise ValueError("Thermal and pressure configurations failed.")
+            raise ValueError("Thermal and pressure kwargs failed.")
 
         self._in_index = np.invert(np.isnan(self._inlet_information))
         self._out_index = np.invert(np.isnan(self._outlet_information))
