@@ -12,7 +12,12 @@ class IdealGas(AbstractMix):
 
     Parameters
     ----------
-    list
+    substance_list : list [float]
+        list of substance objects
+        
+    Attributes
+    ----------
+    substances : list [float]
         list of substance objects
     """
 
@@ -92,7 +97,7 @@ class IdealGas(AbstractMix):
 
     def _formation_enthalpies_set(self):
         """Return the ideal gas formation enthalpies in a ordered ndarray.
-        
+
         Method that read the ideal gas formation enthalpies of mix
         and returns them in a ordered ndarray.
 
@@ -110,9 +115,9 @@ class IdealGas(AbstractMix):
 
     def formation_enthalpies_correction(self, temperature: float, *args):
         """Calculate the enthalpy of formation at the specified temperature.
-        
-        Method that corrects the enthalpy of formation of pure 
-        substances of 298.15 K 100000 Pa at the specified temperature 
+
+        Method that corrects the enthalpy of formation of pure
+        substances of 298.15 K 100000 Pa at the specified temperature
         using Kirchhoff's equation.
 
         Parameters

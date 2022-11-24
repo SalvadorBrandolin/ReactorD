@@ -7,14 +7,6 @@ import numpy as np
 class AbstractMix(metaclass=ABCMeta):
     """Mixture object abstract class."""
 
-###Parameters
-###----------
-###substance_list : ndarray or list[Substance objects]
-###list or array of Substance objects."""
-
-    # ==================================================================
-    # Mixtures common methods
-    # ==================================================================
     def mol_fracations(self, moles: list[float]):
         """Calculate the molar fractions of the mixture.
 
@@ -162,7 +154,7 @@ class AbstractMix(metaclass=ABCMeta):
         pressure: float,
     ):
         """Calculate the correction therm for the formation enthalpy.
-        
+
         Method that calculates the correction therm for the formation
         enthalpy of the pure substances from 298.15 K and 100000 Pa to
         temperature and pressure

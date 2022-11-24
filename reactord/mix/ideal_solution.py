@@ -6,17 +6,21 @@ from reactord.substance import Substance
 
 
 class IdealSolution(AbstractMix):
-    """IdealSolution object class.
+    """IdealGas object class.
 
-    This class should be used when the mixture is considered an ideal 
-    solution.
+    This class should be used when the mixture is considered an ideal gas.
 
     Parameters
     ----------
-    list
+    substance_list : list [float]
+        list of substance objects
+        
+    Attributes
+    ----------
+    substances : list [float]
         list of substance objects
     """
-    
+
     def __init__(self, substance_list: list[Substance]):
         self.substances = substance_list
 
@@ -36,7 +40,7 @@ class IdealSolution(AbstractMix):
         -------
         ndarray or list [float]
             Concentration of each substance
-        """        
+        """
         zi = self.mol_fracations(moles)
         molar_volumes = np.array(
             [
@@ -65,7 +69,7 @@ class IdealSolution(AbstractMix):
         -------
         float
             Volume of the mixture
-        """        
+        """
         zi = self.mol_fracations(moles)
         pure_volumes = np.array(
             [
@@ -89,7 +93,7 @@ class IdealSolution(AbstractMix):
         -------
         float
             Heat capacity of the mixture
-        """        
+        """
         zi = self.mol_fracations(moles)
         pure_cp = np.array(
             [
@@ -102,8 +106,8 @@ class IdealSolution(AbstractMix):
 
     def _formation_enthalpies_set(self):
         """Return the formation enthalpies in a ordered ndarray.
-        
-        Method that read the formation enthalpies of mix and returns 
+
+        Method that read the formation enthalpies of mix and returns
         them in a ordered ndarray.
 
         Returns
@@ -120,8 +124,8 @@ class IdealSolution(AbstractMix):
 
     def formation_enthalpies_correction(self):
         """Return corrects the enthalpy of formation of pure substances.
-        
-        Method that corrects the enthalpy of formation of pure 
+
+        Method that corrects the enthalpy of formation of pure
         substances When its melting temperature is greater than 298.
 
         """

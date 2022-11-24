@@ -1,5 +1,6 @@
 """Substance module."""
 from scipy.integrate import quad
+
 from thermo.chemical import Chemical
 
 
@@ -121,7 +122,7 @@ class Substance:
     @classmethod
     def from_thermo_database(cls, identificator):
         """Bell Caleb's thermo library.
-        
+
         Method that use Bell Caleb's thermo library to construct the
         Substance object. Cite: Caleb Bell and Contributors (2016-2021).
         Thermo: Chemical properties component of Chemical Engineering
@@ -247,7 +248,7 @@ class Substance:
         temperature : float
             Temperature in Kelvin degrees [K]
         pressure : float
-            Pressure in Pascal [Pa]            
+            Pressure in Pascal [Pa]
 
         Returns
         -------
@@ -301,7 +302,6 @@ class Substance:
         """
         return self._heat_capacity_g_t(temperature)
 
-
     def thermal_conductivity_liquid(self, temperature, pressure):
         """Return the liquid thermal conductivity.
 
@@ -310,7 +310,7 @@ class Substance:
         temperature : float
             Temperature in Kelvin degrees [K]
         pressure : float
-            Pressure in Pascal [Pa]   
+            Pressure in Pascal [Pa]
 
         Returns
         -------
@@ -327,7 +327,7 @@ class Substance:
         temperature : float
             Temperature in Kelvin degrees [K]
         pressure : float
-            Pressure in Pascal [Pa]   
+            Pressure in Pascal [Pa]
 
         Returns
         -------
@@ -346,7 +346,7 @@ class Substance:
         temperature : float
             Temperature in Kelvin degrees [K]
         pressure : float
-            Pressure in Pascal [Pa]   
+            Pressure in Pascal [Pa]
 
         Returns
         -------
@@ -365,7 +365,7 @@ class Substance:
         temperature : float
             Temperature in Kelvin degrees [K]
         pressure : float
-            Pressure in Pascal [Pa]   
+            Pressure in Pascal [Pa]
 
         Returns
         -------
@@ -379,7 +379,7 @@ class Substance:
     ) -> float:
         """Return the integral of solid heat capacity between two temperatures.
 
-        Calculate the definite integral of solid heat capacity between 
+        Calculate the definite integral of solid heat capacity between
         temperature1 and temperature2
 
         Parameters
@@ -404,9 +404,9 @@ class Substance:
     def heat_capacity_liquid_dt_integral(
         self, temperature1: float, temperature2: float
     ) -> float:
-        """Return the integral of liquid heat capacity between two temperatures.
+        """Return the integral of liq. heat capacity between two temperatures.
 
-        Calculate the definite integral of liquid heat capacity between 
+        Calculate the definite integral of liquid heat capacity between
         temperature1 and temperature2
 
         Parameters
@@ -433,7 +433,7 @@ class Substance:
     ) -> float:
         """Return the integral of gas heat capacity between two temperatures.
 
-        Calculate the definite integral of gas heat capacity between 
+        Calculate the definite integral of gas heat capacity between
         temperature1 and temperature2
 
         Parameters
