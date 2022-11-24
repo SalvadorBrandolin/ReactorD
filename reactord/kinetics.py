@@ -116,15 +116,15 @@ class Kinetics:
         # Set the dimnesion of stoichiometry matrix explicitly
         # (needed for single reaction systems)
         # ==============================================================
-        if isinstance (stoichiometry, np.ndarray):
+        if isinstance(stoichiometry, np.ndarray):
             self.stoichiometry = stoichiometry.reshape(
-            self.num_substances,
-        )
+                self.num_reactions, self.num_substances
+            )
 
         else:
             self.stoichiometry = np.array(stoichiometry).reshape(
-            self.num_substances,
-        )
+                self.num_reactions, self.num_substances
+            )
 
         # ==============================================================
         # SETS THE KINETICS COMPOSITIONAL ARGUMENTS
@@ -157,6 +157,13 @@ class Kinetics:
 
                 self._user_reaction_enthalpies = np.array(
                     options.get("reaction_enthalpies")
+                )
+
+                # HAGO UN RESHAPE DE LAS ENTALPIAS DE REACCION
+                self._user_reaction_enthalpies = (
+                    self._user_reaction_enthalpies.reshape(
+                        1, self.num_reactions
+                    )
                 )
 
                 self.std_reaction_enthalpies = None
@@ -257,6 +264,11 @@ class Kinetics:
             temperature, pressure
         )
 
+        print("formation_correction (antes): ", formation_correction, np.shape(formation_correction))
+        formation_correction = formation_correction.reshape(
+            self.num_reactions,self.num_substances)
+        print("formation_correction (despues): ", formation_correction, np.shape(formation_correction))
+        print("Estequiometria:", self.stoichiometry, np.shape(self.stoichiometry) )
         reaction_correction = np.dot(formation_correction, self.stoichiometry)
 
         return reaction_correction + self.std_reaction_enthalpies
