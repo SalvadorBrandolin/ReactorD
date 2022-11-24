@@ -1,5 +1,6 @@
 """Abstract_mix Module."""
 from abc import ABCMeta, abstractmethod
+from typing import List
 
 import numpy as np
 
@@ -27,7 +28,7 @@ class AbstractMix(metaclass=ABCMeta):
         return zi
 
     def partial_pressures(
-        self, moles: list[float], temperature: float, pressure: float
+        self, moles: List[float], temperature: float, pressure: float
     ):
         """Calculate the partial pressures of the mixture.
 
@@ -83,7 +84,7 @@ class AbstractMix(metaclass=ABCMeta):
 
     @abstractmethod
     def concentrations(
-        self, moles: list[float], temperature: float, pressure: float
+        self, moles: List[float], temperature: float, pressure: float
     ):
         """Concentrations of the mixtures substances.
 
@@ -128,8 +129,10 @@ class AbstractMix(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def mix_heat_capacity(self, moles, temperature, pressure):
-        """Return the heat capacity of the mixture.
+    def mix_heat_capacity(
+        self, moles: List[float], temperature: float, pressure: float
+    ):
+       """Return the heat capacity of the mixture.
 
         Parameters
         ----------

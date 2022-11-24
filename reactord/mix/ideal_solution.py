@@ -1,4 +1,6 @@
 """Ideal solution Module."""
+from typing import List
+
 import numpy as np
 
 from reactord.mix.abstract_mix import AbstractMix
@@ -122,8 +124,8 @@ class IdealSolution(AbstractMix):
 
         return enthalpies
 
-    def formation_enthalpies_correction(self):
-        """Return corrects the enthalpy of formation of pure substances.
+    def formation_enthalpies_correction(self, temperature: float, *args):
+    """Return corrects the enthalpy of formation of pure substances.
 
         Method that corrects the enthalpy of formation of pure
         substances When its melting temperature is greater than 298.
@@ -137,10 +139,15 @@ class IdealSolution(AbstractMix):
                 )
                 dhf = substance.fusion_enthalpy(substance.normal_melting_point)
                 dhl = substance.heat_capacity_liquid_dt_integral(
-                    substance.normal_melting_point, 298.15
+                    substance.normal_melting_point, temperature
                 )
 
                 enthalpies = np.append(enthalpies, dhs + dhf + dhl)
             else:
-                enthalpies = np.append(enthalpies, 0.0)
+                enthalpies = np.append(
+                    enthalpies,
+                    substance.heat_capacity_liquid_dt_integral(
+                        298.15, temperature
+                    ),
+                )
         return enthalpies

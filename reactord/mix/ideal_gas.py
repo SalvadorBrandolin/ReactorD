@@ -1,4 +1,6 @@
 """Ideal gas Module."""
+from typing import List
+
 import numpy as np
 
 from reactord.mix.abstract_mix import AbstractMix
