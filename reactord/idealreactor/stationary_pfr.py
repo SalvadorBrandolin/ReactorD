@@ -231,10 +231,10 @@ class StationaryPFR(ReactorBase):
         isobaric_pressure : float
             Reactor's pressure. [Pa]
         molar_flow_in : dict, optional
-            Dictionary containing the known inlet molar flow of the 
+            Dictionary containing the known inlet molar flow of the
             substances, by default {}.  TODO
         molar_flow_out : dict, optional
-            Dictionary containing the known outlet molar flow of the 
+            Dictionary containing the known outlet molar flow of the
             substances, by default {}. TODO
         catalyst_particle : _type_, optional
             CatalystParticle object, by default None TODO
