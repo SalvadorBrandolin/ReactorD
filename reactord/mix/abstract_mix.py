@@ -4,10 +4,18 @@ from typing import List
 
 import numpy as np
 
+from reactord.substance import Substance
+
 
 class AbstractMix(metaclass=ABCMeta):
     """Mixture object abstract class."""
 
+    substances: List[Substance] = []
+
+    # ==================================================================
+    # Mixtures common methods
+    # ==================================================================
+    
     def mol_fracations(self, moles: List[float]):
         """Calculate the molar fractions of the mixture.
 

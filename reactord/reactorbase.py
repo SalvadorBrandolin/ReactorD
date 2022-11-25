@@ -2,6 +2,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import Callable, List
 
+import numpy
+
 from reactord.kinetics import Kinetics
 from reactord.mix import AbstractMix
 
@@ -47,49 +49,30 @@ class ReactorBase(metaclass=ABCMeta):
     _pressure_operation: str = ""
 
     _mass_balance_func: Callable = None
-    _temperature_balance_func: Callable = None
+    _energy_balance_func: Callable = None
     _pressure_balance_func: Callable = None
-
-    def __init__(
-        self,
-        mix: AbstractMix,
-        list_of_reactions: List[Callable],
-        stoichiometry: list,
-        kinetic_argument: str,
-        **options,
-    ) -> None:
-
-        self.options = options
-        self.options["_not_reaction_enthalpies"] = True
-
-        self._kinetics = Kinetics(
-            list_of_reactions=list_of_reactions,
-            mix=mix,
-            stoichiometry=stoichiometry,
-            kinetic_argument=kinetic_argument,
-            options=self.options,
-        )
+    _solver_func: Callable = None
 
     # ==================================================================
     # Common parameters for all reactors.
     # ==================================================================
 
     @property
-    def kinetics(self):
+    def kinetics(self) -> Kinetics:
         """Get Kinetics.
 
-        Method to Kinetics class instantiation
+        Return reactor's _kinetic attribute
 
         Returns
         -------
         Kinetics
-            Kinetics class instantiation.
+            Kinetics class instance.
         """
         return self._kinetics
 
     @kinetics.setter
-    def kinetics(self, new_kinetics):
-        """Set knew kinetics object.
+    def kinetics(self, new_kinetics: Kinetics) -> None:
+        """Set new kinetics object.
 
         Method to asign a new instantiation of the reactor kinetics.
         Validates that the asigned object is acctualy a Kinetics
@@ -114,7 +97,7 @@ class ReactorBase(metaclass=ABCMeta):
             )
 
     @property
-    def mix(self):
+    def mix(self) -> AbstractMix:
         """Get mix.
 
         Method to instance Mixture object
@@ -129,7 +112,7 @@ class ReactorBase(metaclass=ABCMeta):
         return self._kinetics.mix
 
     @mix.setter
-    def mix(self, new_mix: AbstractMix):
+    def mix(self, new_mix: AbstractMix) -> None:
         """Set New Mix object.
 
         Method to assign a new mixture object to the reactor. The
@@ -148,7 +131,7 @@ class ReactorBase(metaclass=ABCMeta):
         self._kinetics.mix = new_mix
 
     @property
-    def list_of_reactions(self):
+    def list_of_reactions(self) -> List[Callable]:
         """Get list of reactions.
 
         List that contains the functions to eval each law kinetic reaction.
@@ -176,12 +159,11 @@ class ReactorBase(metaclass=ABCMeta):
         self._kinetics.list_of_reactions = new_list_of_reactions
 
     @property
-    def stoichiometry(self):
+    def stoichiometry(self) -> numpy.ndarray:
         """Get stoichiometry.
 
         Array with stoichimetry information.
         Method to store list_of_reactions in Kinetics object
-
 
         Returns
         -------
@@ -191,7 +173,7 @@ class ReactorBase(metaclass=ABCMeta):
         return self._kinetics.stoichiometry
 
     @stoichiometry.setter
-    def stoichiometry(self, new_stoichiometry):
+    def stoichiometry(self, new_stoichiometry: List[float]) -> None:
         """Set new stoichiometry.
 
         Stoichimetry array replaces on the Kinetics object.
@@ -204,7 +186,7 @@ class ReactorBase(metaclass=ABCMeta):
         self._kinetics.stoichiometry = new_stoichiometry
 
     @property
-    def kinetic_argument(self):
+    def kinetic_argument(self) -> str:
         """Argument to eval the kinetics function.
 
         Returns
@@ -216,7 +198,7 @@ class ReactorBase(metaclass=ABCMeta):
         return self._kinetics.kinetic_argument
 
     @kinetic_argument.setter
-    def kinetic_argument(self, new_kinetics_argument: str):
+    def kinetic_argument(self, new_kinetics_argument: str) -> None:
         """Eval kinetic with new argument.
 
         Argument to eval the kinetics function replaced in the
@@ -233,17 +215,93 @@ class ReactorBase(metaclass=ABCMeta):
         self._kinetics.kinetic_argument = new_kinetics_argument
 
     # ==================================================================
+    # Init constructors
+    # ==================================================================
+
+    @classmethod
+    @abstractmethod
+    def set_isothermic_isobaric(cls) -> None:
+        """Abstract method not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented")
+
+    @classmethod
+    @abstractmethod
+    def set_isothermic_noisobaric(cls) -> None:
+        """Abstract method not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented")
+
+    @classmethod
+    @abstractmethod
+    def set_adiabatic_isobaric(cls) -> None:
+        """Abstract method not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented")
+
+    @classmethod
+    @abstractmethod
+    def set_adiabatic_noisobaric(cls) -> None:
+        """Abstract method not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented")
+
+    @classmethod
+    @abstractmethod
+    def set_noisothermic_isobaric(cls) -> None:
+        """Abstract method not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented")
+
+    @classmethod
+    @abstractmethod
+    def set_noisothermic_noisobaric(cls) -> None:
+        """Abstract method not implemented.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented")
+
+    # ==================================================================
     # Abastract methods
     # Settings for mass, energy and pressure balance.
     # ==================================================================
 
     @abstractmethod
-    def set_mass_balance_data(self):
-        """Receive mass balance parameters.
-
-        Method that receives and instantiates the neccesary
+    def _set_catalyst_operation(self) -> None:
+        """Configure the mass balance settings.
+        
+        Method that recieves and instantiates the neccesary
         parameters to solve the mass balance in the reactor's bulk
-        phase as attributes of the reactor. The method returns None.
+        phase.
 
         Raises
         ------
@@ -253,12 +311,12 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def set_isothermic_operation(self):
-        """Receive isothermic parameters.
-
+    def _set_thermal_operation(self) -> None:
+        """Configure the energy balance settings.
+        
         Method that receives and instantiates the neccesary
-        parameters to solve the isothermic energy balance in the
-        reactor's bulk. The method returns None.
+        parameters to solve the energy balance in the
+        reactor's bulk phase.
 
         Raises
         ------
@@ -268,54 +326,9 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def set_adiabatic_operation(self):
-        """Receive adiabatic parameters.
-
-        Method that receives and instantiates the neccesary
-        parameters to solve the adiabatic energy balance in the
-        reactor's bulk. The method returns None.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def set_non_isothermic_operation(self):
-        """Receive non isothermic parameters.
-
-        Method that receives and instantiates the neccesary
-        parameters to solve the non isothermic energy balance in the
-        reactor's bulk. The method returns None.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def set_isobaric_operation(self):
-        """Receive isobaric parameters.
-
-        Method that receives and instantiates the neccesary
-        parameters to solve the isobaric pressure balance in the
-        reactor's bulk phase. The method returns None.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def set_non_isobaric_operation(self):
-        """Receive non isobaric operation.
-
+    def _set_pressure_operation(self):
+        """Configure the pressure balance settings.
+        
         Method that receives and instantiates the neccesary
         parameters to solve the non isobaric pressure balance in the
         reactor's bulk phase. The method returns None.

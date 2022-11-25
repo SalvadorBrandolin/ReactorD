@@ -58,27 +58,39 @@ def test_heritage_methods():
 def test_not_implemented_error():
     "Test for not implemented error of reactor's intherphase methods."
 
-    def kinetic(conc, temperature):
-        return 10
-
     class SpecificReactor(rd.ReactorBase):
-        def set_mass_balance_data(self):
-            return super().set_mass_balance_data()
+        @classmethod
+        def set_isothermic_isobaric(cls) -> None:
+            return super().set_isothermic_isobaric()
 
-        def set_isothermic_operation(self):
-            return super().set_isothermic_operation()
+        @classmethod
+        def set_isothermic_noisobaric(cls) -> None:
+            return super().set_isothermic_noisobaric()
 
-        def set_adiabatic_operation(self):
-            return super().set_adiabatic_operation()
+        @classmethod
+        def set_adiabatic_isobaric(cls) -> None:
+            return super().set_adiabatic_isobaric()
 
-        def set_non_isothermic_operation(self):
-            return super().set_non_isothermic_operation()
+        @classmethod
+        def set_adiabatic_noisobaric(cls) -> None:
+            return super().set_adiabatic_noisobaric()
 
-        def set_isobaric_operation(self):
-            return super().set_isobaric_operation()
+        @classmethod
+        def set_noisothermic_isobaric(cls) -> None:
+            return super().set_noisothermic_isobaric()
 
-        def set_non_isobaric_operation(self):
-            return super().set_non_isobaric_operation()
+        @classmethod
+        def set_noisothermic_noisobaric(cls) -> None:
+            return super().set_noisothermic_noisobaric()
+
+        def _set_catalyst_operation(self):
+            return super()._set_catalyst_operation()
+
+        def _set_thermal_operation(self):
+            return super()._set_thermal_operation()
+
+        def _set_pressure_operation(self):
+            return super()._set_pressure_operation()
 
         def _grid_builder(self) -> None:
             return super()._grid_builder()
@@ -134,35 +146,34 @@ def test_not_implemented_error():
         def _heterogeneous_solver(self) -> None:
             return super()._heterogeneous_solver()
 
-    a = rd.Substance()
-    b = rd.Substance()
-
-    mixture = rd.mix.IdealSolution([a, b])
-
-    reactor = SpecificReactor(
-        mix=mixture,
-        list_of_reactions=[kinetic],
-        stoichiometry=[-1, 1],
-        kinetic_argument="concentration",
-    )
+    reactor = SpecificReactor()
 
     with pytest.raises(NotImplementedError):
-        reactor.set_mass_balance_data()
+        SpecificReactor.set_isothermic_isobaric()
 
     with pytest.raises(NotImplementedError):
-        reactor.set_isothermic_operation()
+        SpecificReactor.set_isothermic_noisobaric()
 
     with pytest.raises(NotImplementedError):
-        reactor.set_adiabatic_operation()
+        SpecificReactor.set_adiabatic_isobaric()
 
     with pytest.raises(NotImplementedError):
-        reactor.set_non_isothermic_operation()
+        SpecificReactor.set_adiabatic_noisobaric()
 
     with pytest.raises(NotImplementedError):
-        reactor.set_isobaric_operation()
+        SpecificReactor.set_noisothermic_isobaric()
 
     with pytest.raises(NotImplementedError):
-        reactor.set_non_isobaric_operation()
+        SpecificReactor.set_noisothermic_noisobaric()
+
+    with pytest.raises(NotImplementedError):
+        reactor._set_catalyst_operation()
+
+    with pytest.raises(NotImplementedError):
+        reactor._set_thermal_operation()
+
+    with pytest.raises(NotImplementedError):
+        reactor._set_pressure_operation()
 
     with pytest.raises(NotImplementedError):
         reactor._grid_builder()
@@ -229,23 +240,53 @@ def test_asignation_kinetics_arguments():
         return 200
 
     class SpecificReactor(rd.ReactorBase):
-        def set_mass_balance_data(self):
-            return super().set_mass_balance_data()
+        def __init__(
+            self,
+            mix,
+            list_of_reactions,
+            stoichiometry,
+            kinetic_argument,
+        ):
 
-        def set_isothermic_operation(self):
-            return super().set_isothermic_operation()
+            self._kinetics = rd.Kinetics(
+                list_of_reactions=list_of_reactions,
+                mix=mix,
+                stoichiometry=stoichiometry,
+                kinetic_argument=kinetic_argument,
+            )
 
-        def set_adiabatic_operation(self):
-            return super().set_adiabatic_operation()
+        @classmethod
+        def set_isothermic_isobaric(cls) -> None:
+            return super().set_isothermic_isobaric()
 
-        def set_non_isothermic_operation(self):
-            return super().set_non_isothermic_operation()
+        @classmethod
+        def set_isothermic_noisobaric(cls) -> None:
+            return super().set_isothermic_noisobaric()
 
-        def set_isobaric_operation(self):
-            return super().set_isobaric_operation()
+        @classmethod
+        def set_adiabatic_isobaric(cls) -> None:
+            return super().set_adiabatic_isobaric()
 
-        def set_non_isobaric_operation(self):
-            return super().set_non_isobaric_operation()
+        @classmethod
+        def set_adiabatic_noisobaric(cls) -> None:
+            return super().set_adiabatic_noisobaric()
+
+        @classmethod
+        def set_noisothermic_isobaric(cls) -> None:
+            return super().set_noisothermic_isobaric()
+
+        @classmethod
+        def set_noisothermic_noisobaric(cls) -> None:
+            return super().set_noisothermic_noisobaric()
+
+        def _set_catalyst_operation(self):
+            return super()._set_catalyst_operation()
+
+        def _set_thermal_operation(self):
+            return super()._set_thermal_operation()
+
+        def _set_pressure_operation(self):
+            return super()._set_pressure_operation()
 
         def _grid_builder(self) -> None:
             return super()._grid_builder()
