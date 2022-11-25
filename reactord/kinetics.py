@@ -1,3 +1,4 @@
+"""Kinetics module."""
 import numpy as np
 
 from .mix.abstract_mix import AbstractMix
@@ -5,18 +6,23 @@ from .utils import vectorize
 
 
 class Kinetics:
-    """Kinetic object builder
+    """Kinetic object builder.
 
     Parameters
     ----------
     list_of_reactions : ndarray or list [function]
-        array that constains user defined python functions with the
-        form: function(composition, temperature) where
-        composition is a (number_of_components) dimension array
+        array that constains kinetic laws for each reaction defined by user
+        Laws are add in form of functions like:
+        function(composition, temperature)
+        where composition is a (number_of_components) dimension array
         that contains the partial pressures [Pa] or the concentrations
         of the substances.
+
     mix : Mix object
         Mix object defined with all the substances present in the system
+        This object represents properties of mixture of substances in
+        the reactor
+
     stoichiometry: ndarray or list
         array or list containing the stoichiometric coefficients of
         all the substances involved in the reactive system. the
@@ -47,6 +53,7 @@ class Kinetics:
         string that indicates on wich concentration unit meassure the
         kinetic rate function are evaluated. Avaliable kwargs:
         'concentration', 'partial_pressure'
+
     enthalpy_of_reaction : ndarray or list, optional
         array that contains the enthalpy of reaction of each reaction
         in list_of_reactions [j/mol/K]. Elements of the list may be set
@@ -121,7 +128,7 @@ class Kinetics:
                 )
 
         # ==============================================================
-        # Set the dimnesion of stoichiometry matrix explicitly
+        # Set the dimension of stoichiometry matrix explicitly
         # (needed for single reaction systems)
         # ==============================================================
 
@@ -158,8 +165,10 @@ class Kinetics:
     def kinetic_eval(
         self, moles: list, temperature: float, pressure: float
     ) -> np.ndarray:
-        """Method that evaluates the reaction rate for the reaction and
-        for the mix components.
+        """Evaluate kinetic.
+
+        Method that evaluates the reaction rate for each reaction at
+        concentration, temperature and pressure given.
 
         Parameters
         ----------
@@ -175,7 +184,6 @@ class Kinetics:
         ndarray, ndarray
 
         """
-
         # The partial pressures or concentrations are calculated:
         composition = self._composition_calculator(
             moles, temperature, pressure
@@ -194,6 +202,7 @@ class Kinetics:
 
     @property
     def std_reaction_enthalpies(self):
+        """Set standar reaction enthalpies."""
         return self._std_reaction_enthalpies
 
     @std_reaction_enthalpies.setter
@@ -205,7 +214,21 @@ class Kinetics:
 
     @vectorize(signature="(),()->(m)", excluded={0})
     def reaction_enthalpies(self, temperature, pressure):
+        """Eval reacion enthalpies.
+        
+        Parameters
+        ----------
+        temperature : float
+            temperature to eval enthalpies
+        pressure : float
+            pressure to eval enthalpies
 
+        Returns
+        -------
+        array, attribute
+            reaction enthalpies with correction acording to the substance and
+            temperature
+        """
         if "reaction_enthalpies" in self.kwargs.keys():
             return self.kwargs.get("reaction_enthalpies")
 
@@ -224,7 +247,6 @@ class Kinetics:
     # ==================================================================
 
     def _std_reaction_enthalpies_set(self):
-
         if "reaction_enthalpies" in self.kwargs.keys():
             pass
         else:
@@ -233,7 +255,9 @@ class Kinetics:
             )
 
     def _std_reaction_enthalpies_from_formation(self):
-        """Calculates the standard reaction enthalpy from standard
+        """Calculate standar reaction enthalpies.
+
+        Calculates the standard reaction enthalpy from standard
         formation enthalpies defined from mix object.
 
         Returns
