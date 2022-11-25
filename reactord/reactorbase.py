@@ -184,10 +184,10 @@ class ReactorBase(metaclass=ABCMeta):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     @abstractmethod
@@ -196,10 +196,10 @@ class ReactorBase(metaclass=ABCMeta):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     @abstractmethod
@@ -208,10 +208,10 @@ class ReactorBase(metaclass=ABCMeta):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     @abstractmethod
@@ -220,10 +220,10 @@ class ReactorBase(metaclass=ABCMeta):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     @abstractmethod
@@ -232,10 +232,10 @@ class ReactorBase(metaclass=ABCMeta):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     @abstractmethod
@@ -244,10 +244,10 @@ class ReactorBase(metaclass=ABCMeta):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     # ==================================================================
     # Abastract methods

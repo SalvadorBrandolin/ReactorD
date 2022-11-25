@@ -1,4 +1,4 @@
-"""idealreactor
+"""idealreactor module.
 
 Module for ideal reactors simulation. Contains:
     - StationaryPFR: stationary plug flow reactor.

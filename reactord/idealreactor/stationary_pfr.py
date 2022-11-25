@@ -173,15 +173,35 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     @classmethod
-    def set_isothermic_isobaric(cls) -> None:
-        """Not implemented yet.
+    def set_isothermic_isobaric(
+        cls,
+        mix: AbstractMix,
+        list_of_reactions: List[Callable],
+        stoichiometry: List[float],
+        kinetic_argument: str,
+        reactor_dim_minmax: List[float],
+        transversal_area: float,
+        isothermic_temperature: float,
+        isobaric_pressure: float,
+        molar_flow_in: dict = {},
+        molar_flow_out: dict = {},
+        catalyst_particle=None,
+    ) -> ReactorBase:
 
-        Raises
-        ------
-        NotADirectoryError
-            Not implemented yet.
-        """
-        raise NotADirectoryError("Not implemented yet")
+        isothermic_isobaric_pfr = cls(
+            mix=mix,
+            list_of_reactions=list_of_reactions,
+            stoichiometry=stoichiometry,
+            kinetic_argument=kinetic_argument,
+            reactor_dim_minmax=reactor_dim_minmax,
+            transversal_area=transversal_area,
+            molar_flow_in=molar_flow_in,
+            molar_flow_out=molar_flow_out,
+            catalyst_particle=catalyst_particle,
+            isothermic_temperature=isothermic_temperature,
+            isobaric_pressure=isobaric_pressure,
+        )
+        return isothermic_isobaric_pfr
 
     @classmethod
     def set_isothermic_noisobaric(cls) -> None:
@@ -244,7 +264,7 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
 
     def _set_catalyst_operation(self) -> None:
-        """Interpret the reactor's attributes and sets the mass balance.
+        """Interpret the reactor's attributes to set the mass balance.
 
         Method that validates and interprets the reactor's attributes
         to select the correspondant solver and mass balance methods.
@@ -257,8 +277,8 @@ class StationaryPFR(ReactorBase):
         ValueError
             Two border condition specified for a subtance molar flow.
         """
-        self._molar_flow_in_asarray = np.array([])
-        self._molar_flow_out_asarray = np.array([])
+        self._molar_flow_in_for_bc = []
+        self._molar_flow_out_for_bc = []
         # Data validation
         #   All substances must have one and only one border condition:
         #   Flow data is stored in the two previous private arrays.
@@ -281,8 +301,8 @@ class StationaryPFR(ReactorBase):
                     f"substance: {substance.name}"
                 )
 
-            np.append(self._molar_flow_in_asarray, flow_inlet)
-            np.append(self._molar_flow_in_asarray, flow_outlet)
+            self._molar_flow_in_for_bc.append(flow_inlet)
+            self._molar_flow_out_for_bc.append(flow_outlet)
 
         # Solver and mas balance setting
         if self.catalyst_particle is None:
@@ -295,18 +315,23 @@ class StationaryPFR(ReactorBase):
             self._solver_func = self._heterogeneous_solver
 
     def _set_thermal_operation(self):
-        """Recieves and instantiates the neccesary.
+        """Interpret the reactor's attributes to set the energy balance.
 
-        Parameters to solve the isothermic energy balance in the
-        reactor's bulk. The method returns None.
+        Method that validates and interprets the reactor's attributes
+        to select the correspondant solver and mass balance methods.
+        The method is called in the reactor's instantiation.
 
         Raises
         ------
+        ValueError
+            Both isothermic and no isothermic configuration set is
+            ambiguous.
         NotImplementedError
-            Abstract method not implemented.
+            No isothermic operation implemented yet.
+        ValueError
+            No thermal configuration seted.
         """
-
-        non_isothermal_args = [
+        no_isothermic_args = [
             self.temperature_in_out,
             self.refrigerant,
             self.refrigerant_molar_flow,
@@ -316,12 +341,13 @@ class StationaryPFR(ReactorBase):
             self.exchanger_wall_material,
             self.correlation_heat_transfer,
         ]
-        
+
         if self.isothermic_temperature is not None:
             # Check isothermal operation:
-            if any(non_isothermal_args):
+            if any(no_isothermic_args):
                 raise ValueError(
-                    "If isothermic_temperature is specified, do not specify:\n"
+                    "If isothermic_temperature is specified, don't specify"
+                    " any:\n"
                     "    temperature_in_out\n"
                     "    refrigerant\n"
                     "    refrigerant_molar_flow\n"
@@ -330,31 +356,71 @@ class StationaryPFR(ReactorBase):
                     "    refrigerant_flow_arrangement\n"
                     "    exchanger_wall_material\n"
                     "    correlation_heat_transfer\n"
-                    "Because is ambigous."
+                    "because thermal operation becomes ambigous."
                 )
             else:
-                self._thermal_operation = 'isothermal'
+                self._thermal_operation = "isothermal"
                 self._energy_balance_func = self._isothermic_energy_balance
-        
-        elif any(non_isothermal_args):
+                self._temperature_in_for_bc = self.isothermic_temperature
+                self._temperature_out_for_bc = None
+                self._refrigerant_temperature_in_for_bc = 0
+                self._refrigerant_temperature_out_for_bc = None
+
+        elif any(no_isothermic_args):
             # Check non isothermal operation:
-            ...
+            raise NotImplementedError(
+                "No isothermic operation not implemented yet"
+            )
         else:
-            raise ValueError('No thermal specification were seted.')
-                
+            raise ValueError("No thermal specification where seted.")
 
     def _set_pressure_operation(self):
-        """Recieves and instantiates the neccesary.
+        """Interpret the reactor's attributes to set the energy balance.
 
-        Parameters to solve the isobaric pressure balance in the
-        reactor's bulk phase. The method returns None.
+        Method that validates and interprets the reactor's attributes
+        to select the correspondant solver and mass balance methods.
+        The method is called in the reactor's instantiation.
 
         Raises
         ------
+        ValueError
+            Both isobaric and no isobaric configuration set is
+            ambiguous.
         NotImplementedError
-            Abstract method not implemented.
+            No isobaric operation implemented yet.
+        ValueError
+            No pressure configuration seted.
         """
-        raise NotImplementedError("Abstract method not implemented.")
+        no_isobaric_args = [
+            self.pressure_in_out,
+            self.pressure_loss_equation,
+            self.packed_bed_porosity,
+        ]
+
+        if self.isobaric_pressure is not None:
+            # Check isobaric operation:
+            if any(no_isobaric_args):
+                raise ValueError(
+                    "If isobaric_pressure is specified, don't specify"
+                    " any:\n"
+                    "    self.pressure_in_out\n"
+                    "    self.pressure_loss_equation\n"
+                    "    packed_bed_porosity\n"
+                    "because pressure operation becomes ambigous."
+                )
+            else:
+                self._pressure_operation = "isobaric"
+                self._pressure_balance_func = self._isobaric_pressure_balance
+                self._pressure_in_for_bc = self.isobaric_pressure
+                self._pressure_out_for_bc = None
+
+        elif any(no_isobaric_args):
+            # Check no isobaric operation:
+            raise NotImplementedError(
+                "No isobaric operation not implemented yet"
+            )
+        else:
+            raise ValueError("No pressure specification where seted.")
 
     # ==================================================================
     # Solvers aditional data needed - general used methods
@@ -468,63 +534,29 @@ class StationaryPFR(ReactorBase):
 
             return bc
 
-        self._inlet_information = self._molar_flow_in
-        self._outlet_information = self._molar_flow_out
+        self._inlet_information = np.append(
+            self._molar_flow_in_for_bc,
+            (
+                self._temperature_in_for_bc,
+                self._pressure_in_for_bc,
+                self._refrigerant_temperature_in_for_bc,
+            ),
+        )
+        self._outlet_information = np.append(
+            self._molar_flow_out_for_bc,
+            (
+                self._temperature_out_for_bc,
+                self._pressure_out_for_bc,
+                self._refrigerant_temperature_out_for_bc,
+            ),
+        )
 
-        # Isothermic - isobaric
-
-        if self._thermal_operation == "isothermic":
-            if self._pressure_operation == "isobaric":
-
-                # Asign the isothermic and isobaric conditions to inlet
-                self._inlet_information = np.append(
-                    self._inlet_information,
-                    [
-                        self._isothermic_temperature,
-                        self._isobaric_pressure,
-                        0.0,
-                    ],
-                )
-
-                self._outlet_information = np.append(
-                    self._outlet_information,
-                    [
-                        np.nan,
-                        np.nan,
-                        np.nan,
-                    ],
-                )
-
-            elif self._pressure_operation == "non_isobaric":
-                raise NotImplementedError()
-                # TODO
-
-        elif self._thermal_operation == "adiabatic":
-            if self._pressure_operation == "isobaric":
-                raise NotImplementedError()
-                # TODO
-
-            elif self._pressure_operation == "non_isobaric":
-                raise NotImplementedError()
-                # TODO
-
-        elif self._thermal_operation == "non_isothermic":
-            if self._pressure_operation == "isobaric":
-                raise NotImplementedError()
-                # TODO
-
-            elif self._pressure_operation == "non_isobaric":
-                raise NotImplementedError()
-                # TODO
-
-        else:
-            raise ValueError("Thermal and pressure kwargs failed.")
-
-        self._in_index = np.invert(np.isnan(self._inlet_information))
-        self._out_index = np.invert(np.isnan(self._outlet_information))
-
-        self._in_index = np.argwhere(self._in_index).ravel()
-        self._out_index = np.argwhere(self._out_index).ravel()
+        self._in_index = np.argwhere(
+            np.not_equal(self._inlet_information, None)
+        ).ravel()
+        self._out_index = np.argwhere(
+            np.not_equal(self._outlet_information, None)
+        ).ravel()
 
         # ==============================================================
         # Initial guess building
@@ -535,7 +567,7 @@ class StationaryPFR(ReactorBase):
         for idx, (inlet, outlet) in enumerate(
             zip(self._inlet_information, self._outlet_information)
         ):
-            if np.isnan(inlet):
+            if inlet is None:
                 initial_guess[idx, :] = np.full(grid_size, outlet)
             else:
                 initial_guess[idx, :] = np.full(grid_size, inlet)
@@ -546,7 +578,6 @@ class StationaryPFR(ReactorBase):
     # Common reactors methods
     # ==================================================================
 
-    @vectorize(signature="(),(n),(),()->(n)", excluded={0})
     def _mass_balance(
         self,
         length_coordinate: float,
@@ -583,15 +614,10 @@ class StationaryPFR(ReactorBase):
             Configure mass balance data setting with the method
             set_mass_balance_data.
         """
-        # TODO check the next if before, not on each mass balance call
-        if self._catalyst_operation == "":
-            raise ValueError("use set_mass_balance_data method first")
-        else:
-            return self._mass_balance_func(
-                length_coordinate, molar_fluxes, temperature, pressure
-            )
+        return self._mass_balance_func(
+            length_coordinate, molar_fluxes, temperature, pressure
+        )
 
-    @vectorize(signature="(),(n),(),(),()->()", excluded={0})
     def _energy_balance(
         self,
         length_coordinate: float,
@@ -645,7 +671,6 @@ class StationaryPFR(ReactorBase):
             pressure,
         )
 
-    @vectorize(signature="(),(n),(),()->()", excluded={0})
     def _pressure_balance(
         self,
         length_coordinate: float,
@@ -692,7 +717,6 @@ class StationaryPFR(ReactorBase):
             length_coordinate, molar_fluxes, temperature, pressure
         )
 
-    @vectorize(signature="(),(),()->()", excluded={0})
     def _refrigerant_energy_balance(
         self,
         length_coordinate: float,
@@ -719,10 +743,8 @@ class StationaryPFR(ReactorBase):
             Derivative of refrigerant temperature respect to reactor's
             length.
         """
-        if self._thermal_operation == "non_isothermic":
-            raise NotImplementedError("Not implemented")
-        else:
-            return 0.0
+        grid_length = np.size(length_coordinate)
+        return np.zeros(grid_length)
 
     def simulate(
         self, grid_size=1000, tol=0.001, max_nodes=1000, verbose=0
@@ -754,6 +776,7 @@ class StationaryPFR(ReactorBase):
     # Specifics mass balances
     # ==================================================================
 
+    @vectorize(signature="(),(n),(),()->(n)", excluded={0})
     def _homogeneous_mass_balance(
         self,
         length_coordinate: float,
@@ -836,7 +859,8 @@ class StationaryPFR(ReactorBase):
             Derivative of reactor's temperature respect to reactor's
             length. [K/m]
         """
-        return 0.0
+        grid_length = np.size(length_coordinate)
+        return np.zeros(grid_length)
 
     def _homogeneous_adiabatic_energy_balance(self) -> None:
         """Not implemented yet.
@@ -919,7 +943,8 @@ class StationaryPFR(ReactorBase):
             Derivative of reactor's pressure respect to reactor's
             length. [mol/s/m]
         """
-        return 0.0
+        grid_length = np.size(length_coordinate)
+        return np.zeros(grid_length)
 
     def _non_isobaric_pressure_balance(self) -> List[float]:
         """Not implemented yet.
