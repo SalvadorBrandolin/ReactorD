@@ -215,7 +215,7 @@ class Kinetics:
     @vectorize(signature="(),()->(m)", excluded={0})
     def reaction_enthalpies(self, temperature, pressure):
         """Eval reacion enthalpies.
-        
+
         Parameters
         ----------
         temperature : float

@@ -298,7 +298,7 @@ class ReactorBase(metaclass=ABCMeta):
     @abstractmethod
     def _set_catalyst_operation(self) -> None:
         """Configure the mass balance settings.
-        
+
         Method that recieves and instantiates the neccesary
         parameters to solve the mass balance in the reactor's bulk
         phase.
@@ -313,7 +313,7 @@ class ReactorBase(metaclass=ABCMeta):
     @abstractmethod
     def _set_thermal_operation(self) -> None:
         """Configure the energy balance settings.
-        
+
         Method that receives and instantiates the neccesary
         parameters to solve the energy balance in the
         reactor's bulk phase.
@@ -328,7 +328,7 @@ class ReactorBase(metaclass=ABCMeta):
     @abstractmethod
     def _set_pressure_operation(self):
         """Configure the pressure balance settings.
-        
+
         Method that receives and instantiates the neccesary
         parameters to solve the non isobaric pressure balance in the
         reactor's bulk phase. The method returns None.

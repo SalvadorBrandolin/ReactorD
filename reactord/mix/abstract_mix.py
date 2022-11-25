@@ -15,7 +15,7 @@ class AbstractMix(metaclass=ABCMeta):
     # ==================================================================
     # Mixtures common methods
     # ==================================================================
-    
+
     def mol_fracations(self, moles: List[float]):
         """Calculate the molar fractions of the mixture.
 
