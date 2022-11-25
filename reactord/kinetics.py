@@ -168,7 +168,7 @@ class Kinetics:
         """Evaluate kinetic.
 
         Method that evaluates the reaction rate for each reaction at
-        concentration, temperature and pressure given. Agrego mas texto
+        concentration, temperature and pressure given.
 
         Parameters
         ----------
