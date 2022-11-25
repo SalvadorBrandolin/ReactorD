@@ -187,7 +187,63 @@ class StationaryPFR(ReactorBase):
         molar_flow_out: dict = {},
         catalyst_particle=None,
     ) -> ReactorBase:
+        """Instantiate isothermic isobaric StationaryPFR.
 
+        Parameters
+        ----------
+        mix : AbstractMix
+            Mixture object.
+        list_of_reactions : List[Callable]
+            List containing functions to eval the reaction rates, each
+            defined by the user with the form:
+                callable(
+                    concentration_unit: list[float], temperature: float
+                ) -> float
+            Where concentration_unit refers to the oncentration unit of
+            measure that is argument of the kinetic law, eg:
+            concentration [mol/m^3], partial pressure [Pa]. The return
+            of the function must be single value with units: [mol/s/m^3]
+        stoichiometry : List[float]
+            Stoichiometry matrix of the reactive system. Each row
+            represents each reaction contained in the list_of_reactions
+            parameter, each column represents each substance in the mix
+            parameter. The stoichiometry matrix entrances are the
+            stoichiometric coefficients of each substance in each
+            reaction. The ordering of the stochiometry matrix rows must
+            be the same as the ordering of the reaction functions in
+            list_of_reactions. Also, the order of the columns of the
+            stoichiometry matrix must be the same as the substance
+            ordering in the mix.
+        kinetic_argument : str
+            Kinetic argument used to eval the reaction defined by the
+            user. Options:
+                'concentration': substance concentration. [mol/m^3]
+                'partial_pressure': substance partial pressure. [Pa]
+        reactor_dim_minmax : List[float]
+            List containing the minimum and maximum [min, max]
+            boundaries of the reactor's length. E.g: a reactor modeled
+            in the boundaries 0 m to 3 m has a
+            reactor_dim_minmax = [0, 3]. [m]
+        transversal_area : float
+            Tranversal area of the reactor. [m^2]
+        isothermic_temperature : float
+            Reactor's temperature. [K]
+        isobaric_pressure : float
+            Reactor's pressure. [Pa]
+        molar_flow_in : dict, optional
+            Dictionary containing the known inlet molar flow of the 
+            substances, by default {}.  TODO
+        molar_flow_out : dict, optional
+            Dictionary containing the known outlet molar flow of the 
+            substances, by default {}. TODO
+        catalyst_particle : _type_, optional
+            CatalystParticle object, by default None TODO
+
+        Returns
+        -------
+        ReactorBase
+            Instantiated isothermic isobaric StationaryPFR.
+        """
         isothermic_isobaric_pfr = cls(
             mix=mix,
             list_of_reactions=list_of_reactions,
