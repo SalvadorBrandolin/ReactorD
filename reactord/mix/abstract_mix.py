@@ -1,22 +1,23 @@
+"""Abstract_mix Module."""
 from abc import ABCMeta, abstractmethod
 from typing import List
 
 import numpy as np
 
+from reactord.substance import Substance
+
 
 class AbstractMix(metaclass=ABCMeta):
-    """Mixture object abstract class.
+    """Mixture object abstract class."""
 
-    Parameters
-    ----------
-    substance_list : ndarray or List[Substance objects]
-        list or array of Substance objects."""
+    substances: List[Substance] = []
 
     # ==================================================================
     # Mixtures common methods
     # ==================================================================
+
     def mol_fracations(self, moles: List[float]):
-        """method that calculates the molar fractions of the mixture
+        """Calculate the molar fractions of the mixture.
 
         Parameters
         ----------
@@ -37,7 +38,7 @@ class AbstractMix(metaclass=ABCMeta):
     def partial_pressures(
         self, moles: List[float], temperature: float, pressure: float
     ):
-        """method that calculates the partial pressures of the mixture
+        """Calculate the partial pressures of the mixture.
 
         Parameters
         ----------
@@ -59,9 +60,24 @@ class AbstractMix(metaclass=ABCMeta):
         return partial_pressures
 
     def __len__(self):
+        """Return the number of substances in the mixture.
+
+        Redifine the magic method __len__
+        Returns
+        -------
+        int
+            Number of substances in the mixture
+        """
         return len(self.substances)
 
     def __str__(self):
+        """Return a text whit information about the components of the mixture.
+
+        Returns
+        -------
+        str
+            Text whit information about the components of the mixture.
+        """
         string = (
             f"The mixture contains the following"
             f" {len(self.substances)} components:\n"
@@ -78,10 +94,13 @@ class AbstractMix(metaclass=ABCMeta):
     def concentrations(
         self, moles: List[float], temperature: float, pressure: float
     ):
-        """Concentrations of the mixtures substances at the given moles
+        """Concentrations of the mixtures substances.
+
+        Concentrations of the mixtures substances at the given moles
         of each compound, temperature and pressure.
 
-        Parameters:
+        Parameters
+        ----------
         moles: ndarray or list [float]
             moles of each substance
         temperature: float
@@ -99,7 +118,7 @@ class AbstractMix(metaclass=ABCMeta):
 
     @abstractmethod
     def volume(self):
-        """Method that returns the volume of the mixture.
+        """Return the volume of the mixture.
 
         Parameters
         ----------
@@ -118,8 +137,10 @@ class AbstractMix(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def mix_heat_capacity(self, moles, temperature, pressure):
-        """Method that returns the heat capacity of the mixture.
+    def mix_heat_capacity(
+        self, moles: List[float], temperature: float, pressure: float
+    ):
+        """Return the heat capacity of the mixture.
 
         Parameters
         ----------
@@ -134,9 +155,7 @@ class AbstractMix(metaclass=ABCMeta):
 
     @abstractmethod
     def _formation_enthalpies_set(self):
-        """Method that obtains or calculates the formation enthalpy of the
-        mixture's substances.
-        """
+        """Calculate the formation enthalpy of the mixture's substances."""
         raise NotImplementedError()
 
     @abstractmethod
@@ -145,7 +164,9 @@ class AbstractMix(metaclass=ABCMeta):
         temperature: float,
         pressure: float,
     ):
-        """Method that calculates the correction therm for the formation
+        """Calculate the correction therm for the formation enthalpy.
+
+        Method that calculates the correction therm for the formation
         enthalpy of the pure substances from 298.15 K and 100000 Pa to
         temperature and pressure
 

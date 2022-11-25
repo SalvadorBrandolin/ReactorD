@@ -51,13 +51,33 @@ print(
     type(kinetic1.stoichiometry),
     np.shape(kinetic1.stoichiometry),
     np.size(kinetic1.stoichiometry),
+    "\n",
 )
 
 esteq = np.reshape(kinetic1.stoichiometry, newshape=(4,))
 # Z = np.reshape(raw_formation_enthalpies, newshape=(4,))
 # print ("Antes de reshape: ", raw_formation_enthalpies)
 # print ("Despues de reshape: ", Z, type(Z))
-print("Despues de reshape: ", esteq, type(esteq))
+# print("Despues de reshape: ", esteq, type(esteq))
 
 raw_reaction_enthalpy = np.dot(raw_formation_enthalpies, esteq)
-print("Raw reaction enthalpy: ", raw_reaction_enthalpy)
+# print("Raw reaction enthalpy: ", raw_reaction_enthalpy)
+
+
+# COPIAR LO DE ABAJO ANTES DE HACER PULL DE LO DE SALVA
+# Test de la funcion reaction_enthalpies
+
+mix5 = rd.mix.IdealGas(list_of_components)
+stoichiometry = np.array([-1, -1, 1, 1])
+kinetic5 = rd.Kinetics(
+    mix5,
+    list_of_reactions=[reaction_rate],
+    stoichiometry=stoichiometry,
+    kinetic_argument="concentration",
+    # reaction_enthalpies=np.array([5]),
+)
+T = 500
+P = 101325
+
+method_reaction_enthalpy = kinetic5.reaction_enthalpies(T, P)
+print(method_reaction_enthalpy)

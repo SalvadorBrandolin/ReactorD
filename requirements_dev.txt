@@ -5,9 +5,9 @@ flake8-import-order
 ipdb
 numpy>=1.21.5
 pep8-naming
+pydocstyle
 pytest
 pytest-cov
-py-pde>=0.21.0
 scipy>=1.9.0
 thermo>=0.2.21
 tox
