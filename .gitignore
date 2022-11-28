@@ -5,3 +5,5 @@
 *.pytest_cache*
 *.ipynb_checkpoints*
 *.vscode*
+
+/docs/build

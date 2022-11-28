@@ -24,75 +24,49 @@ class StationaryPFR(ReactorBase):
     """Stationary plug flow reactor class.
 
     For instantiation is recommended to use the setter class methods:
-        set_isothermic_isobaric
-        set_isothermic_noisobaric
-        set_adiabatic_isobaric
-        set_adiabatic_noisobaric
-        set_noisothermic_isobaric
-        set_noisothermic_noisobaric
+    set_isothermic_isobaric
+    set_isothermic_noisobaric
+    set_adiabatic_isobaric
+    set_adiabatic_noisobaric
+    set_noisothermic_isobaric
+    set_noisothermic_noisobaric
 
     For example:
-        pfr = StationaryPFR.set_isothermic_isobaric(...)
+    pfr = StationaryPFR.set_isothermic_isobaric(...)
 
     Parameters
     ----------
-        mix : AbstractMix
-            Mixture object.
-        list_of_reactions : List[Callable]
-            List containing functions to eval the reaction rates, each
-            defined by the user with the form:
-                callable(
-                    concentration_unit: list[float], temperature: float
-                ) -> float
-            Where concentration_unit refers to the oncentration unit of
-            measure that is argument of the kinetic law, eg:
-            concentration [mol/m^3], partial pressure [Pa]. The return
-            of the function must be single value with units: [mol/s/m^3]
-        stoichiometry : List[float]
-            Stoichiometry matrix of the reactive system. Each row
-            represents each reaction contained in the list_of_reactions
-            parameter, each column represents each substance in the mix
-            parameter. The stoichiometry matrix entrances are the
-            stoichiometric coefficients of each substance in each
-            reaction. The ordering of the stochiometry matrix rows must
-            be the same as the ordering of the reaction functions in
-            list_of_reactions. Also, the order of the columns of the
-            stoichiometry matrix must be the same as the substance
-            ordering in the mix.
-        kinetic_argument : str
-            Kinetic argument used to eval the reaction defined by the
-            user. Options:
-                'concentration': substance concentration. [mol/m^3]
-                'partial_pressure': substance partial pressure. [Pa]
-        reactor_dim_minmax : List[float]
-            List containing the minimum and maximum [min, max]
-            boundaries of the reactor's length. E.g: a reactor modeled
-            in the boundaries 0 m to 3 m has a
-            reactor_dim_minmax = [0, 3]. [m]
-        transversal_area : float
-            Tranversal area of the reactor. [m^2]
-        **kwargs : dict
-            molar_flow_in : List[float] or numpy.ndarray[float]
-                List or or numpy.ndarray containing the known molar
-                fluxes at the reactor's inlet. The ordering of the
-                fluxes must be identical to the substance order in
-                mixture. For unkown fluxes specify as numpy.nan. [mol/s]
-            molar_flow_out : List[float] or numpy.ndarray[float]
-                List or or numpy.ndarray containing the known molar
-                fluxes at the reactor's outlet. The ordering of the
-                fluxes must be identical to the substance order in
-                mixture. For unkown fluxes specify as numpy.nan. [mol/s]
-            catalyst_particle : AbstractCatalyst, optional # TODO
-            Stationary catalyst particle, by default None
+    mix : AbstractMix
+        Mixture object.
+    list_of_reactions : List[Callable]
+        List containing functions to eval the reaction rates, each
+        defined by the user with the form:
+        callable(concentration_unit: list[float], temperature: float
+        ) -> float. Where concentration_unit refers to the 
+        concentration unit of measure that is argument of the 
+        kinetic law.
+    stoichiometry : List[float]
+        Stoichiometry matrix of the reactive system. Each row
+        represents each reaction contained in the list_of_reactions
+        parameter, each column represents each substance in the mix
+        parameter. The stoichiometry matrix entrances are the
+        stoichiometric coefficients of each substance in each
+        reaction.
+    kinetic_argument : str
+        Kinetic argument used to eval the reaction defined by the
+        user. Options:
+        'concentration': substance concentration. [mol/m^3]
+        'partial_pressure': substance partial pressure. [Pa]
+    reactor_dim_minmax : List[float]
+        List containing the minimum and maximum [min, max]
+        boundaries of the reactor's length. E.g: a reactor modeled
+        in the boundaries 0 m to 3 m has a
+        reactor_dim_minmax = [0, 3]. [m]
+    transversal_area : float
+        Transversal area of the reactor. [m^2]
 
     Attributes
     ----------
-    reactor_dim_minmax : List[float]
-        List containing the minimum and maximum [min, max] boundaries of
-        the reactor's length. E.g: a reactor modeled in the boundaries 0
-        m to 3 m has a reactor dim minmax = [0, 3]. [m]
-    transversal_area : float
-        Tranversal area of the reactor. [m^2]
     """
 
     def __init__(
@@ -196,36 +170,29 @@ class StationaryPFR(ReactorBase):
         list_of_reactions : List[Callable]
             List containing functions to eval the reaction rates, each
             defined by the user with the form:
-                callable(
-                    concentration_unit: list[float], temperature: float
-                ) -> float
-            Where concentration_unit refers to the oncentration unit of
-            measure that is argument of the kinetic law, eg:
-            concentration [mol/m^3], partial pressure [Pa]. The return
-            of the function must be single value with units: [mol/s/m^3]
+            callable(concentration_unit: list[float], temperature: float
+            ) -> float. Where concentration_unit refers to the 
+            concentration unit of measure that is argument of the 
+            kinetic law.
         stoichiometry : List[float]
             Stoichiometry matrix of the reactive system. Each row
             represents each reaction contained in the list_of_reactions
             parameter, each column represents each substance in the mix
             parameter. The stoichiometry matrix entrances are the
             stoichiometric coefficients of each substance in each
-            reaction. The ordering of the stochiometry matrix rows must
-            be the same as the ordering of the reaction functions in
-            list_of_reactions. Also, the order of the columns of the
-            stoichiometry matrix must be the same as the substance
-            ordering in the mix.
+            reaction.
         kinetic_argument : str
             Kinetic argument used to eval the reaction defined by the
             user. Options:
-                'concentration': substance concentration. [mol/m^3]
-                'partial_pressure': substance partial pressure. [Pa]
+            'concentration': substance concentration. [mol/m^3]
+            'partial_pressure': substance partial pressure. [Pa]
         reactor_dim_minmax : List[float]
             List containing the minimum and maximum [min, max]
             boundaries of the reactor's length. E.g: a reactor modeled
             in the boundaries 0 m to 3 m has a
             reactor_dim_minmax = [0, 3]. [m]
         transversal_area : float
-            Tranversal area of the reactor. [m^2]
+            Transversal area of the reactor. [m^2]
         isothermic_temperature : float
             Reactor's temperature. [K]
         isobaric_pressure : float
