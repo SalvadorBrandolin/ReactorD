@@ -16,8 +16,8 @@ class Kinetics:
         List containing functions to eval the reaction rates, each
         defined by the user with the form:
         callable(concentration_unit: list[float], temperature: float
-        ) -> float. Where concentration_unit refers to the 
-        concentration unit of measure that is argument of the 
+        ) -> float. Where concentration_unit refers to the
+        concentration unit of measure that is argument of the
         kinetic law.
     stoichiometry : List[float]
         Stoichiometry matrix of the reactive system. Each row
