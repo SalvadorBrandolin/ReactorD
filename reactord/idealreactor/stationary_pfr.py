@@ -64,9 +64,6 @@ class StationaryPFR(ReactorBase):
         reactor_dim_minmax = [0, 3]. [m]
     transversal_area : float
         Transversal area of the reactor. [m^2]
-
-    Attributes
-    ----------
     """
 
     def __init__(
