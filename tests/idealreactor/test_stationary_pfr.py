@@ -40,7 +40,7 @@ def test_fogler_p1_15a_ivp():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
         mix=mixture,
@@ -101,7 +101,7 @@ def test_fogler_p1_15a_bvp():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     fogler_concentrations = np.array([])
 
@@ -170,7 +170,7 @@ def test_fogler_p1_15a_ivp_outlet():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     fogler_concentrations = np.array([])
 
@@ -237,7 +237,7 @@ def test_fogler_p1_15b():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
         mix=mixture,
@@ -299,7 +299,7 @@ def test_fogler_p1_15b_bvp():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     fogler_concentrations = np.array([])
 
@@ -367,7 +367,7 @@ def test_fogler_p1_15b_ivp_outlet():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     fogler_concentrations = np.array([])
 
@@ -435,7 +435,7 @@ def test_fogler_p1_15c_ivp():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
         mix=mixture,
@@ -498,7 +498,7 @@ def test_fogler_p1_15c_bvp():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     fogler_concentrations = np.array([])
 
@@ -567,7 +567,7 @@ def test_fogler_p1_15c_ivp_outlet():
     substance_b = rd.Substance(name="B")
     substance_b.volume_liquid = volume
 
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
     fogler_concentrations = np.array([])
 

@@ -7,10 +7,6 @@ import reactord as rd
 
 def test_simple_evaluation1():
 
-    # substance_a = rd.Substance.from_thermo_database("water")
-    # substance_b = rd.Substance.from_thermo_database("ethanol")
-    # substance_c = rd.Substance.from_thermo_database("acetone")
-
     mix = rd.mix.IdealSolution(A="water", B="ethanol", C="acetone")
 
     def law1(concentrations, temperature):
@@ -129,7 +125,7 @@ def test_user_reaction_enthalpies():
 
     # Individual formation enthalpies are retrieved and the list
     # is converted to a numpy array
-    for component in list_of_components:
+    for component in mix1.substances:
         raw_formation_enthalpies.append(component.formation_enthalpy_ig)
     raw_formation_enthalpies = np.array(raw_formation_enthalpies)
 
