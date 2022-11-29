@@ -13,10 +13,11 @@ class Substance:
     """Substance object class.
 
     Class to define a substance object. Specific attributes definition will be
-    required for the reactor's operations, describe in each reactor
-    documentation. For example, an adiabatic reactor will require that
-    substances define a heat capacity function, when using isothermic reactors
-    Substance has the .from_thermo_data_base alternative construction method.
+    required for the reactors, described in each reactor documentation. For 
+    example, an adiabatic reactor will require that substances define a heat 
+    capacity function, on the other hand, when using isothermic reactors will 
+    not be necessary. Substance has the .from_thermo_data_base alternative 
+    construction method.
     E.g:
 
     water = Substance.from_thermo_data_base('water')
@@ -179,7 +180,7 @@ class Substance:
     def from_thermo_database(cls, identification: str):
         """Substance instance from Bell Caleb's thermo library.
 
-        Method that uses Bell Caleb's thermo library to construct the
+        Method that uses Bell Caleb's thermo library to construct the 
         Substance object.
 
         Bibliography:
