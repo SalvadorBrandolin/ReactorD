@@ -6,4 +6,4 @@ Module for ideal reactors simulation. Contains:
 
 from .stationary_pfr import StationaryPFR
 
-__all__ = [StationaryPFR]
+__all__ = ["StationaryPFR"]
