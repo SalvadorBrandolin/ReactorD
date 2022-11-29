@@ -9,10 +9,10 @@ from .substance import Substance
 from .utils import vectorize
 
 __all__ = [
-    idealreactor,
-    mix,
-    Kinetics,
-    ReactorBase,
-    Substance,
-    vectorize,
+    "idealreactor",
+    "mix",
+    "Kinetics",
+    "ReactorBase",
+    "Substance",
+    "vectorize",
 ]
