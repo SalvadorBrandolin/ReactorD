@@ -10,3 +10,4 @@ exclude requirements_dev.txt
 recursive-exclude examples *
 recursive-exclude reactord *.mod *.log *.pyc
 recursive-exclude tests *
+recursive-exclude docs *
