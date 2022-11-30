@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>reactord.substance &mdash; ReactorD 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> ReactorD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">reactord</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ReactorD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">reactord.substance</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for reactord.substance</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Substance module.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">quad</span>
+
+<span class="kn">from</span> <span class="nn">thermo.chemical</span> <span class="kn">import</span> <span class="n">Chemical</span>
+
+
+<div class="viewcode-block" id="Substance"><a class="viewcode-back" href="../../reactord.html#reactord.Substance">[docs]</a><span class="k">class</span> <span class="nc">Substance</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Substance object class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : string</span>
+<span class="sd">        Name of the substance, by default None</span>
+<span class="sd">    mw : float</span>
+<span class="sd">        Molecular weigth of the substance [g/mol], by default None</span>
+<span class="sd">    tc : float</span>
+<span class="sd">        Critical temperature of the substance [K], by default None</span>
+<span class="sd">    pc : float</span>
+<span class="sd">        Critical pressure of the substance [Pa], by default None</span>
+<span class="sd">    omega : float</span>
+<span class="sd">        Acentric factor of the substance, by default None</span>
+<span class="sd">    formation_enthalpy : float</span>
+<span class="sd">        Standard state molar enthalpy of formation [J/mol], by default</span>
+<span class="sd">        None.</span>
+<span class="sd">    formation_enthalpy_ig : float</span>
+<span class="sd">        Ideal-gas molar enthalpy of formation [J/mol], by default None</span>
+<span class="sd">    formation_gibbs : float</span>
+<span class="sd">        Standard state molar change of Gibbs energy of formation [J/mol]</span>
+<span class="sd">        , by default None</span>
+<span class="sd">    formation_gibbs_ig : float</span>
+<span class="sd">        Ideal-gas molar change of Gibbs energy of formation [J/mol], by</span>
+<span class="sd">        default None</span>
+<span class="sd">    volume_s_t : function</span>
+<span class="sd">        Solid molar volume as a python function of temperature</span>
+<span class="sd">        volume_solid(T) [m^3/mol], by default None</span>
+<span class="sd">    volume_l_tp : function</span>
+<span class="sd">        Liquid molar volume as a python function of temperature [K]</span>
+<span class="sd">        and pressure [Pa], volume_liquid(T, P) [m^3/mol], by default</span>
+<span class="sd">        None</span>
+<span class="sd">    volume_g_tp : function</span>
+<span class="sd">        Gas molar volume as a python function of temperature [K]</span>
+<span class="sd">        and pressure [Pa], volume_gas(T, P) [m^3/mol], by default None</span>
+<span class="sd">    heat_capacity_s_t : function</span>
+<span class="sd">        Solid heat capacity as a python function of temperature</span>
+<span class="sd">        [K], heat_capacity_solid(T) [J/mol/K], by default None</span>
+<span class="sd">    heat_capacity_l_t : function</span>
+<span class="sd">        Liquid heat capacity as a python function of temperature</span>
+<span class="sd">        [K], heat_capacity_liquid(T) [J/mol/K], by default None</span>
+<span class="sd">    heat_capacity_g_t : function</span>
+<span class="sd">        Ideal-gas heat capacity as a python function of temperature</span>
+<span class="sd">        [K], heat_capacity_gas(T) [J/mol/K], by default None</span>
+<span class="sd">    thermal_conductivity_l_tp : function</span>
+<span class="sd">        Liquid thermal conductivity as a python function of temperature</span>
+<span class="sd">        [K] and pressure [Pa], thermal_conductivity_liquid(T) [W/m/K],</span>
+<span class="sd">        by default None</span>
+<span class="sd">    thermal_conductivity_g_tp : function</span>
+<span class="sd">        Gas thermal conductivity as a python function of temperature [K]</span>
+<span class="sd">        and pressure [Pa], thermal_conductivity_liquid(T) [W/m/K], by</span>
+<span class="sd">        default None</span>
+<span class="sd">    viscosity_l_tp : function</span>
+<span class="sd">        Liquid viscocity as a python function of temperature [K] and</span>
+<span class="sd">        pressure [Pa], viscosity_liquid(T) [W/m/K], by default None</span>
+<span class="sd">    viscosity_g_tp : function</span>
+<span class="sd">        Gas viscocity as a python function of temperature [K] and</span>
+<span class="sd">        pressure [Pa], viscosity_gas(T) [W/m/K], by default None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">normal_boiling_point</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">normal_melting_point</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">pc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">omega</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">formation_enthalpy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">formation_enthalpy_ig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">formation_gibbs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">formation_gibbs_ig</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">vaporization_enthalpy_t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sublimation_enthalpy_t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">volume_s_t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">volume_l_tp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">volume_g_tp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">heat_capacity_s_t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">heat_capacity_l_t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">heat_capacity_g_t</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">thermal_conductivity_l_tp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">thermal_conductivity_g_tp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">viscosity_l_tp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">viscosity_g_tp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="c1"># Pure compound properties:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mw</span> <span class="o">=</span> <span class="n">mw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normal_boiling_point</span> <span class="o">=</span> <span class="n">normal_boiling_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normal_melting_point</span> <span class="o">=</span> <span class="n">normal_melting_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tc</span> <span class="o">=</span> <span class="n">tc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pc</span> <span class="o">=</span> <span class="n">pc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">omega</span> <span class="o">=</span> <span class="n">omega</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formation_enthalpy</span> <span class="o">=</span> <span class="n">formation_enthalpy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formation_enthalpy_ig</span> <span class="o">=</span> <span class="n">formation_enthalpy_ig</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formation_gibbs</span> <span class="o">=</span> <span class="n">formation_gibbs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formation_gibbs_ig</span> <span class="o">=</span> <span class="n">formation_gibbs_ig</span>
+        <span class="c1"># Temperature dependent properties calculation functions:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vaporization_enthalpy_t</span> <span class="o">=</span> <span class="n">vaporization_enthalpy_t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sublimation_enthalpy_t</span> <span class="o">=</span> <span class="n">sublimation_enthalpy_t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_volume_s_t</span> <span class="o">=</span> <span class="n">volume_s_t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_volume_l_tp</span> <span class="o">=</span> <span class="n">volume_l_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_volume_g_tp</span> <span class="o">=</span> <span class="n">volume_g_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_heat_capacity_s_t</span> <span class="o">=</span> <span class="n">heat_capacity_s_t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_heat_capacity_l_t</span> <span class="o">=</span> <span class="n">heat_capacity_l_t</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_heat_capacity_g_t</span> <span class="o">=</span> <span class="n">heat_capacity_g_t</span>
+        <span class="c1"># self._thermal_conductivity_s_tp = thermal_conductivity_s_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thermal_conductivity_l_tp</span> <span class="o">=</span> <span class="n">thermal_conductivity_l_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_thermal_conductivity_g_tp</span> <span class="o">=</span> <span class="n">thermal_conductivity_g_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viscosity_l_tp</span> <span class="o">=</span> <span class="n">viscosity_l_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_viscosity_g_tp</span> <span class="o">=</span> <span class="n">viscosity_g_tp</span>
+
+<div class="viewcode-block" id="Substance.from_thermo_database"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.from_thermo_database">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_thermo_database</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">identificator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Bell Caleb&#39;s thermo library.</span>
+
+<span class="sd">        Method that use Bell Caleb&#39;s thermo library to construct the</span>
+<span class="sd">        Substance object. Cite: Caleb Bell and Contributors (2016-2021).</span>
+<span class="sd">        Thermo: Chemical properties component of Chemical Engineering</span>
+<span class="sd">        Design Library (ChEDL) https://github.com/CalebBell/thermo.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        identificator : string</span>
+<span class="sd">            Name or CAS number of the substance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chemobj</span> <span class="o">=</span> <span class="n">Chemical</span><span class="p">(</span><span class="n">identificator</span><span class="p">)</span>
+
+        <span class="n">substance_object</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">mw</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">MW</span><span class="p">,</span>
+            <span class="n">normal_boiling_point</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">Tb</span><span class="p">,</span>
+            <span class="n">normal_melting_point</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">Tm</span><span class="p">,</span>
+            <span class="n">tc</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">Tc</span><span class="p">,</span>
+            <span class="n">pc</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">Pc</span><span class="p">,</span>
+            <span class="n">omega</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">omega</span><span class="p">,</span>
+            <span class="n">formation_enthalpy</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">Hfm</span><span class="p">,</span>
+            <span class="n">formation_enthalpy_ig</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">Hfgm</span><span class="p">,</span>
+            <span class="n">formation_gibbs</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">Gfm</span><span class="p">,</span>
+            <span class="n">formation_gibbs_ig</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">Gfgm</span><span class="p">,</span>
+            <span class="n">vaporization_enthalpy_t</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">EnthalpyVaporization</span><span class="p">,</span>
+            <span class="n">sublimation_enthalpy_t</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">EnthalpySublimation</span><span class="p">,</span>
+            <span class="n">volume_s_t</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">VolumeSolid</span><span class="p">,</span>
+            <span class="n">volume_l_tp</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">VolumeLiquid</span><span class="p">,</span>
+            <span class="n">volume_g_tp</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">VolumeGas</span><span class="p">,</span>
+            <span class="n">heat_capacity_s_t</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">HeatCapacitySolid</span><span class="p">,</span>
+            <span class="n">heat_capacity_l_t</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">HeatCapacityLiquid</span><span class="p">,</span>
+            <span class="n">heat_capacity_g_t</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">HeatCapacityGas</span><span class="p">,</span>
+            <span class="n">thermal_conductivity_l_tp</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">ThermalConductivityLiquid</span><span class="p">,</span>
+            <span class="n">thermal_conductivity_g_tp</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">ThermalConductivityGas</span><span class="p">,</span>
+            <span class="n">viscosity_l_tp</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">ViscosityLiquid</span><span class="p">,</span>
+            <span class="n">viscosity_g_tp</span><span class="o">=</span><span class="n">chemobj</span><span class="o">.</span><span class="n">ViscosityGas</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">substance_object</span></div>
+
+<div class="viewcode-block" id="Substance.vaporization_enthalpy"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.vaporization_enthalpy">[docs]</a>    <span class="k">def</span> <span class="nf">vaporization_enthalpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the vaporization enthalpy at a given temperature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Vaporization enthalpy in Joule per mol [J/mol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vaporization_enthalpy_t</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.sublimation_enthalpy"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.sublimation_enthalpy">[docs]</a>    <span class="k">def</span> <span class="nf">sublimation_enthalpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the sublimation enthalpy at a given temperature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Sublimation enthalpy in Joule per mol [J/mol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sublimation_enthalpy_t</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.fusion_enthalpy"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.fusion_enthalpy">[docs]</a>    <span class="k">def</span> <span class="nf">fusion_enthalpy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the fusion enthalpy at a given temperature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Fusion enthalpy in Joule per mol [J/mol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fusion_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sublimation_enthalpy_t</span><span class="p">(</span>
+            <span class="n">temperature</span>
+        <span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vaporization_enthalpy_t</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fusion_h</span></div>
+
+<div class="viewcode-block" id="Substance.volume_solid"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.volume_solid">[docs]</a>    <span class="k">def</span> <span class="nf">volume_solid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the solid molar volume at a given temperature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Solid molar volume in cubic meters per mol [m^3/mol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_volume_s_t</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.volume_liquid"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.volume_liquid">[docs]</a>    <span class="k">def</span> <span class="nf">volume_liquid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the liquid molar volume at a given temperature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Liquid molar volume in cubic meters per mol [m^3/mol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_volume_l_tp</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.volume_gas"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.volume_gas">[docs]</a>    <span class="k">def</span> <span class="nf">volume_gas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the gas molar volume at a given temperature and pressure.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+<span class="sd">        pressure : float</span>
+<span class="sd">            Pressure in Pascal [Pa]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Liquid molar volume in cubic meters per mol [m^3/mol]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_volume_g_tp</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.heat_capacity_solid"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.heat_capacity_solid">[docs]</a>    <span class="k">def</span> <span class="nf">heat_capacity_solid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the pure solid heat capacity at a given temperature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Pure solid heat capacity in Joule per mol per Kelvin [J/mol/K]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_heat_capacity_s_t</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.heat_capacity_liquid"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.heat_capacity_liquid">[docs]</a>    <span class="k">def</span> <span class="nf">heat_capacity_liquid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the pure liquid heat capacity at a given temperature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Pure liquid heat capacity in Joule per mol per Kelvin [J/mol/K]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_heat_capacity_l_t</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.heat_capacity_gas"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.heat_capacity_gas">[docs]</a>    <span class="k">def</span> <span class="nf">heat_capacity_gas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the pure gas heat capacity at a given temperature.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Pure gas heat capacity in Joule per mol per Kelvin [J/mol/K]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_heat_capacity_g_t</span><span class="p">(</span><span class="n">temperature</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.thermal_conductivity_liquid"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.thermal_conductivity_liquid">[docs]</a>    <span class="k">def</span> <span class="nf">thermal_conductivity_liquid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the liquid thermal conductivity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+<span class="sd">        pressure : float</span>
+<span class="sd">            Pressure in Pascal [Pa]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Liquid thermal conductivity in Watts per meter per Kelvin [W/m/K]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thermal_conductivity_l_tp</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.thermal_conductivity_gas"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.thermal_conductivity_gas">[docs]</a>    <span class="k">def</span> <span class="nf">thermal_conductivity_gas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the gas thermal conductivity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+<span class="sd">        pressure : float</span>
+<span class="sd">            Pressure in Pascal [Pa]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Gas thermal conductivity in Watts per meter per Kelvin [W/m/K]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_thermal_conductivity_g_tp</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.viscosity_liquid"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.viscosity_liquid">[docs]</a>    <span class="k">def</span> <span class="nf">viscosity_liquid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the pure liquid viscosity.</span>
+
+<span class="sd">         Pure liquid viscosity as a function of temperature and pressure</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+<span class="sd">        pressure : float</span>
+<span class="sd">            Pressure in Pascal [Pa]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Pure liquid viscosity in [Pa*s]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viscosity_l_tp</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.viscosity_gas"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.viscosity_gas">[docs]</a>    <span class="k">def</span> <span class="nf">viscosity_gas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the pure gas viscosity.</span>
+
+<span class="sd">         Pure gas viscosity as a function of temperature and pressure</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature : float</span>
+<span class="sd">            Temperature in Kelvin degrees [K]</span>
+<span class="sd">        pressure : float</span>
+<span class="sd">            Pressure in Pascal [Pa]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Pure gas viscosity in [Pa*s]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_viscosity_g_tp</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">pressure</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Substance.heat_capacity_solid_dt_integral"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.heat_capacity_solid_dt_integral">[docs]</a>    <span class="k">def</span> <span class="nf">heat_capacity_solid_dt_integral</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">temperature1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature2</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the integral of solid heat capacity between two temperatures.</span>
+
+<span class="sd">        Calculate the definite integral of solid heat capacity between</span>
+<span class="sd">        temperature1 and temperature2</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature1 : float</span>
+<span class="sd">            Temperature 1 in Kelvin degrees [K]</span>
+<span class="sd">        temperature2 : float</span>
+<span class="sd">            Temperature 2 in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Definite integral of solid heat capacity between temperature1</span>
+<span class="sd">            and temperature2 in Joule per mol per Kelvin [J/mol/K]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">integral</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">quad</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">heat_capacity_solid</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">temperature1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">temperature2</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">integral</span></div>
+
+<div class="viewcode-block" id="Substance.heat_capacity_liquid_dt_integral"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.heat_capacity_liquid_dt_integral">[docs]</a>    <span class="k">def</span> <span class="nf">heat_capacity_liquid_dt_integral</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">temperature1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature2</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the integral of liq. heat capacity between two temperatures.</span>
+
+<span class="sd">        Calculate the definite integral of liquid heat capacity between</span>
+<span class="sd">        temperature1 and temperature2</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature1 : float</span>
+<span class="sd">            Temperature 1 in Kelvin degrees [K]</span>
+<span class="sd">        temperature2 : float</span>
+<span class="sd">            Temperature 2 in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Definite integral of liquid heat capacity between temperature1</span>
+<span class="sd">            and temperature2 in Joule per mol per Kelvin [J/mol/K]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">integral</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">quad</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">heat_capacity_liquid</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">temperature1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">temperature2</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">integral</span></div>
+
+<div class="viewcode-block" id="Substance.heat_capacity_gas_dt_integral"><a class="viewcode-back" href="../../reactord.html#reactord.Substance.heat_capacity_gas_dt_integral">[docs]</a>    <span class="k">def</span> <span class="nf">heat_capacity_gas_dt_integral</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">temperature1</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">temperature2</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the integral of gas heat capacity between two temperatures.</span>
+
+<span class="sd">        Calculate the definite integral of gas heat capacity between</span>
+<span class="sd">        temperature1 and temperature2</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        temperature1 : float</span>
+<span class="sd">            Temperature 1 in Kelvin degrees [K]</span>
+<span class="sd">        temperature2 : float</span>
+<span class="sd">            Temperature 2 in Kelvin degrees [K]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Definite integral of gas heat capacity between temperature1</span>
+<span class="sd">            and temperature2 in Joule per mol per Kelvin [J/mol/K]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">integral</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">quad</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">heat_capacity_gas</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">temperature1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">temperature2</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">integral</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Brandolin, Salvador Eduardo - Parodi, Adrian - Rovezzi, Juan Pablo - Santos, Maricel Del Valle - Scilipoti, Jose Antonio - Copyright (c) 2022&#34;.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

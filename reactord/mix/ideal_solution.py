@@ -1,5 +1,5 @@
 """Ideal solution Module."""
-from typing import List
+from typing import Dict, List
 
 import numpy as np
 
@@ -23,7 +23,17 @@ class IdealSolution(AbstractMix):
         list of substance objects
     """
 
-    def __init__(self, substance_list: List[Substance]):
+    _substance_list: List[Substance]
+    _substance_dict: Dict[str, str]
+
+    def __init__(self, **substance_dict):
+
+        substance_list = [
+            value
+            if isinstance(value, Substance)
+            else Substance.from_thermo_database(value)
+            for value in substance_dict.values()
+        ]
         self.substances = substance_list
 
     def concentrations(self, moles, temperature, pressure):
