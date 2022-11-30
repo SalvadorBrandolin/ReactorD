@@ -26,17 +26,17 @@ class Substance:
     ----------
     name : str, optional
        Name of the substance, by default None
-    mw : float, optional
+    molecular_weight : float, optional
         The molecular weight of the substance [g/mol], by default None
     normal_boiling_point : float, optional
         The normal boiling point of the substance [K], by default None
     normal_melting_point : float, optional
         The normal melting point of the substance [K], by default None
-    tc : float, optional
+    critical_temperature : float, optional
         The critical temperature of the substance [K], by default None
-    pc : float, optional
+    critical_pressure : float, optional
         The critical pressure of the substance [Pa], by default None
-    omega : float, optional
+    acentric_factor : float, optional
         The acentric factor of the substance, by default None
     formation_enthalpy : float, optional
         Standard state molar enthalpy of formation [J/mol], by default None
@@ -54,39 +54,39 @@ class Substance:
     sublimation_enthalpy_t : Callable, optional
         A function that receives temperature and returns the sublimation
         enthalpy at temperature [J/mol], by default None
-    volume_s_t : Callable, optional
+    volume_solid_t : Callable, optional
         A function that receives temperature and returns the molar volume of
         the solid at temperature [m^3/mol], by default None
-    volume_l_tp : Callable, optional
+    volume_liquid_tp : Callable, optional
         A function that receives temperature and pressure, and returns the
         molar volume of liquid at temperature and pressure [m^3/mol], by
         default None
-    volume_g_tp : Callable, optional
+    volume_gas_tp : Callable, optional
         A function that receives temperature and pressure, and returns the
         molar volume of gas at temperature and pressure [m^3/mol], by default
         None
-    heat_capacity_s_t : Callable, optional
+    heat_capacity_solid_t : Callable, optional
         A function that receives temperature and pressure, and returns the heat
         capacity of solid at temperature and pressure [J/mol/K], by default
         None
-    heat_capacity_l_t : Callable, optional
+    heat_capacity_liquid_t : Callable, optional
         A function that receives temperature and returns the heat capacity of
         liquid at temperature [J/mol/K], by default None
-    heat_capacity_g_t : Callable, optional
+    heat_capacity_gas_t : Callable, optional
         A function that receives temperature and returns the heat capacity of
         gas at temperature [J/mol/K], by default None
-    thermal_conductivity_l_tp : Callable, optional
+    thermal_conductivity_liquid_tp : Callable, optional
         A function that receives temperature and pressure, and returns the
         thermal conductivity of liquid at temperature and pressure [W/m/K], by
         default None
-    thermal_conductivity_g_tp : Callable, optional
+    thermal_conductivity_gas_tp : Callable, optional
         A function that receives temperature and pressure, and returns the
         thermal conductivity of gas at temperature and pressure [W/m/K], by
         default None
-    viscosity_l_tp : Callable, optional
+    viscosity_liquid_tp : Callable, optional
         A function that receives temperature and pressure, and returns the
         viscosity of liquid at temperature and pressure [Pa*s], by default None
-    viscosity_g_tp : Callable, optional
+    viscosity_gas_tp : Callable, optional
         A function that receives temperature and pressure, and returns the
         viscosity of gas at temperature and pressure [Pa*s], by default None
 
@@ -94,17 +94,17 @@ class Substance:
     ----------
     name : str, optional
        Name of the substance, by default None
-    mw : float, optional
+    molecular_weight : float, optional
         The molecular weight of the substance [g/mol], by default None
     normal_boiling_point : float, optional
         The normal boiling point of the substance [K], by default None
     normal_melting_point : float, optional
         The normal melting point of the substance [K], by default None
-    tc : float, optional
+    critical_temperature : float, optional
         The critical temperature of the substance [K], by default None
-    pc : float, optional
+    critical_pressure : float, optional
         The critical pressure of the substance [Pa], by default None
-    omega : float, optional
+    acentric_factor : float, optional
         The acentric factor of the substance, by default None
     formation_enthalpy : float, optional
         Standard state molar enthalpy of formation [J/mol], by default None
@@ -121,38 +121,38 @@ class Substance:
     def __init__(
         self,
         name: str = None,
-        mw: float = None,
+        molecular_weight: float = None,
         normal_boiling_point: float = None,
         normal_melting_point: float = None,
-        tc: float = None,
-        pc: float = None,
-        omega: float = None,
+        critical_temperature: float = None,
+        critical_pressure: float = None,
+        acentric_factor: float = None,
         formation_enthalpy: float = None,
         formation_enthalpy_ig: float = None,
         formation_gibbs: float = None,
         formation_gibbs_ig: float = None,
         vaporization_enthalpy_t: Callable = None,
         sublimation_enthalpy_t: Callable = None,
-        volume_s_t: Callable = None,
-        volume_l_tp: Callable = None,
-        volume_g_tp: Callable = None,
-        heat_capacity_s_t: Callable = None,
-        heat_capacity_l_t: Callable = None,
-        heat_capacity_g_t: Callable = None,
-        thermal_conductivity_l_tp: Callable = None,
-        thermal_conductivity_g_tp: Callable = None,
-        viscosity_l_tp: Callable = None,
-        viscosity_g_tp: Callable = None,
+        volume_solid_t: Callable = None,
+        volume_liquid_tp: Callable = None,
+        volume_gas_tp: Callable = None,
+        heat_capacity_solid_t: Callable = None,
+        heat_capacity_liquid_t: Callable = None,
+        heat_capacity_gas_t: Callable = None,
+        thermal_conductivity_liquid_tp: Callable = None,
+        thermal_conductivity_gas_tp: Callable = None,
+        viscosity_liquid_tp: Callable = None,
+        viscosity_gas_tp: Callable = None,
     ) -> None:
 
         # Pure compound properties:
         self.name = name
-        self.mw = mw
+        self.molecular_weight = molecular_weight
         self.normal_boiling_point = normal_boiling_point
         self.normal_melting_point = normal_melting_point
-        self.tc = tc
-        self.pc = pc
-        self.omega = omega
+        self.critical_temperature = critical_temperature
+        self.critical_pressure = critical_pressure
+        self.acentric_factor = acentric_factor
         self.formation_enthalpy = formation_enthalpy
         self.formation_enthalpy_ig = formation_enthalpy_ig
         self.formation_gibbs = formation_gibbs
@@ -160,17 +160,17 @@ class Substance:
         # Temperature-dependent properties calculation functions:
         self._vaporization_enthalpy_t = vaporization_enthalpy_t
         self._sublimation_enthalpy_t = sublimation_enthalpy_t
-        self._volume_s_t = volume_s_t
-        self._volume_l_tp = volume_l_tp
-        self._volume_g_tp = volume_g_tp
-        self._heat_capacity_s_t = heat_capacity_s_t
-        self._heat_capacity_l_t = heat_capacity_l_t
-        self._heat_capacity_g_t = heat_capacity_g_t
+        self._volume_solid_t = volume_solid_t
+        self._volume_liquid_tp = volume_liquid_tp
+        self._volume_gas_tp = volume_gas_tp
+        self._heat_capacity_solid_t = heat_capacity_solid_t
+        self._heat_capacity_liquid_t = heat_capacity_liquid_t
+        self._heat_capacity_gas_t = heat_capacity_gas_t
         # self._thermal_conductivity_s_tp = thermal_conductivity_s_tp
-        self._thermal_conductivity_l_tp = thermal_conductivity_l_tp
-        self._thermal_conductivity_g_tp = thermal_conductivity_g_tp
-        self._viscosity_l_tp = viscosity_l_tp
-        self._viscosity_g_tp = viscosity_g_tp
+        self._thermal_conductivity_liquid_tp = thermal_conductivity_liquid_tp
+        self._thermal_conductivity_gas_tp = thermal_conductivity_gas_tp
+        self._viscosity_liquid_tp = viscosity_liquid_tp
+        self._viscosity_gas_tp = viscosity_gas_tp
 
     @classmethod
     def from_thermo_database(cls, identification: str):
@@ -199,28 +199,28 @@ class Substance:
 
         substance_object = cls(
             name=chemobj.name,
-            mw=chemobj.MW,
+            molecular_weight=chemobj.MW,
             normal_boiling_point=chemobj.Tb,
             normal_melting_point=chemobj.Tm,
-            tc=chemobj.Tc,
-            pc=chemobj.Pc,
-            omega=chemobj.omega,
+            critical_temperature=chemobj.Tc,
+            critical_pressure=chemobj.Pc,
+            acentric_factor=chemobj.omega,
             formation_enthalpy=chemobj.Hfm,
             formation_enthalpy_ig=chemobj.Hfgm,
             formation_gibbs=chemobj.Gfm,
             formation_gibbs_ig=chemobj.Gfgm,
             vaporization_enthalpy_t=chemobj.EnthalpyVaporization,
             sublimation_enthalpy_t=chemobj.EnthalpySublimation,
-            volume_s_t=chemobj.VolumeSolid,
-            volume_l_tp=chemobj.VolumeLiquid,
-            volume_g_tp=chemobj.VolumeGas,
-            heat_capacity_s_t=chemobj.HeatCapacitySolid,
-            heat_capacity_l_t=chemobj.HeatCapacityLiquid,
-            heat_capacity_g_t=chemobj.HeatCapacityGas,
-            thermal_conductivity_l_tp=chemobj.ThermalConductivityLiquid,
-            thermal_conductivity_g_tp=chemobj.ThermalConductivityGas,
-            viscosity_l_tp=chemobj.ViscosityLiquid,
-            viscosity_g_tp=chemobj.ViscosityGas,
+            volume_solid_t=chemobj.VolumeSolid,
+            volume_liquid_tp=chemobj.VolumeLiquid,
+            volume_gas_tp=chemobj.VolumeGas,
+            heat_capacity_solid_t=chemobj.HeatCapacitySolid,
+            heat_capacity_liquid_t=chemobj.HeatCapacityLiquid,
+            heat_capacity_gas_t=chemobj.HeatCapacityGas,
+            thermal_conductivity_liquid_tp=chemobj.ThermalConductivityLiquid,
+            thermal_conductivity_gas_tp=chemobj.ThermalConductivityGas,
+            viscosity_liquid_tp=chemobj.ViscosityLiquid,
+            viscosity_gas_tp=chemobj.ViscosityGas,
         )
         return substance_object
 
@@ -289,7 +289,7 @@ class Substance:
         float
             Solid molar volume in cubic meters per mol [m^3/mol]
         """
-        return self._volume_s_t(temperature)
+        return self._volume_solid_t(temperature)
 
     def volume_liquid(self, temperature: float, pressure: float) -> float:
         """Return the liquid molar volume at a given temperature and pressure.
@@ -306,7 +306,7 @@ class Substance:
         float
             Liquid molar volume in cubic meters per mol [m^3/mol]
         """
-        return self._volume_l_tp(temperature, pressure)
+        return self._volume_liquid_tp(temperature, pressure)
 
     def volume_gas(self, temperature: float, pressure: float) -> float:
         """Return the gas molar volume at a given temperature and pressure.
@@ -323,7 +323,7 @@ class Substance:
         float
             Liquid molar volume in cubic meters per mol [m^3/mol]
         """
-        return self._volume_g_tp(temperature, pressure)
+        return self._volume_gas_tp(temperature, pressure)
 
     def heat_capacity_solid(self, temperature: float) -> float:
         """Return the pure solid heat capacity at a given temperature.
@@ -338,7 +338,7 @@ class Substance:
         float
             Pure solid heat capacity in Joule per mol per Kelvin [J/mol/K]
         """
-        return self._heat_capacity_s_t(temperature)
+        return self._heat_capacity_solid_t(temperature)
 
     def heat_capacity_liquid(self, temperature: float) -> float:
         """Return the pure liquid heat capacity at a given temperature.
@@ -353,7 +353,7 @@ class Substance:
         float
             Pure liquid heat capacity in Joule per mol per Kelvin [J/mol/K]
         """
-        return self._heat_capacity_l_t(temperature)
+        return self._heat_capacity_liquid_t(temperature)
 
     def heat_capacity_gas(self, temperature: float) -> float:
         """Return the pure gas heat capacity at a given temperature.
@@ -368,7 +368,7 @@ class Substance:
         float
             Pure gas heat capacity in Joule per mol per Kelvin [J/mol/K]
         """
-        return self._heat_capacity_g_t(temperature)
+        return self._heat_capacity_gas_t(temperature)
 
     def thermal_conductivity_liquid(
         self, temperature: float, pressure: float
@@ -387,7 +387,7 @@ class Substance:
         float
             Liquid thermal conductivity in Watts per meter per Kelvin [W/m/K]
         """
-        return self._thermal_conductivity_l_tp(temperature, pressure)
+        return self._thermal_conductivity_liquid_tp(temperature, pressure)
 
     def thermal_conductivity_gas(
         self, temperature: float, pressure: float
@@ -406,7 +406,7 @@ class Substance:
         float
             Gas thermal conductivity in Watts per meter per Kelvin [W/m/K]
         """
-        return self._thermal_conductivity_g_tp(temperature, pressure)
+        return self._thermal_conductivity_gas_tp(temperature, pressure)
 
     def viscosity_liquid(self, temperature: float, pressure: float) -> float:
         """Return the pure liquid viscosity.
@@ -425,7 +425,7 @@ class Substance:
         float
             Pure liquid viscosity in [Pa*s]
         """
-        return self._viscosity_l_tp(temperature, pressure)
+        return self._viscosity_liquid_tp(temperature, pressure)
 
     def viscosity_gas(self, temperature: float, pressure: float) -> float:
         """Return the pure gas viscosity.
@@ -444,7 +444,7 @@ class Substance:
         float
             Pure gas viscosity in [Pa*s]
         """
-        return self._viscosity_g_tp(temperature, pressure)
+        return self._viscosity_gas_tp(temperature, pressure)
 
     def heat_capacity_solid_dt_integral(
         self, temperature1: float, temperature2: float
