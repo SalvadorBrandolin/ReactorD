@@ -36,7 +36,9 @@ class IdealSolution(AbstractMix):
         ]
         self.substances = substance_list
 
-    def concentrations(self, moles, temperature, pressure):
+    def concentrations(
+        self, moles: List[float], temperature: float, pressure: float
+    ) -> List[float]:
         """Calculate concentrations of the mixture.
 
         Parameters

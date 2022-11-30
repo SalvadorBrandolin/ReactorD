@@ -15,10 +15,10 @@ def test_name(name):
 
 
 @pytest.mark.parametrize("name", compounds)
-def test_mw(name):
+def test_molecular_weight(name):
     substance = rd.Substance.from_thermo_database(name)
     chemical_obj = Chemical(name)
-    assert substance.mw == chemical_obj.MW
+    assert substance.molecular_weight == chemical_obj.MW
 
 
 @pytest.mark.parametrize("name", compounds)
@@ -36,24 +36,24 @@ def test_normal_melting_point(name):
 
 
 @pytest.mark.parametrize("name", compounds)
-def test_tc(name):
+def test_critical_temperature(name):
     substance = rd.Substance.from_thermo_database(name)
     chemical_obj = Chemical(name)
-    assert substance.tc == chemical_obj.Tc
+    assert substance.critical_temperature == chemical_obj.Tc
 
 
 @pytest.mark.parametrize("name", compounds)
-def test_pc(name):
+def test_critical_pressure(name):
     substance = rd.Substance.from_thermo_database(name)
     chemical_obj = Chemical(name)
-    assert substance.pc == chemical_obj.Pc
+    assert substance.critical_pressure == chemical_obj.Pc
 
 
 @pytest.mark.parametrize("name", compounds)
-def test_omega(name):
+def test_acentric_factor(name):
     substance = rd.Substance.from_thermo_database(name)
     chemical_obj = Chemical(name)
-    assert substance.omega == chemical_obj.omega
+    assert substance.acentric_factor == chemical_obj.omega
 
 
 @pytest.mark.parametrize("name", compounds)
