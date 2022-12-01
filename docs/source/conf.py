@@ -18,8 +18,6 @@ REACTORD_PATH = CURRENT_PATH.parent.parent
 
 sys.path.insert(0, str(REACTORD_PATH))
 
-import reactord
-
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
@@ -30,7 +28,10 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
-    "sphinx.ext.autosummary", #"nbsphinx","sphinxcontrib.bibtex","sphinx_copybutton",
+    "sphinx.ext.autosummary",
+    "nbsphinx",
+    #"sphinxcontrib.bibtex",
+    "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]
