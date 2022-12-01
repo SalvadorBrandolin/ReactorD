@@ -41,7 +41,7 @@ def test_one_substance_mix():
     # ---------------------------------------------------------------
 
     for z in compositions:
-        assert mixture.mol_fracations(z) == 1.0
+        assert mixture.mol_fractions(z) == 1.0
 
         for t in temperature:
             assert mixture.volume(z, t, pressure) == (
@@ -110,9 +110,7 @@ def test_three_substance_mix():
         raw_mol_fraction = moles / sum(moles)
 
         # Test of mol_fractions method
-        assert (
-            mixture.mol_fracations(moles) == raw_mol_fraction
-        ).all()  # OKAY
+        assert (mixture.mol_fractions(moles) == raw_mol_fraction).all()  # OKAY
 
         # Test of volume method
         vol_mix = mixture.volume(moles, t, pressure)

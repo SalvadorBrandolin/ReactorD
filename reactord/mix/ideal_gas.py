@@ -1,5 +1,5 @@
 """Ideal gas Module."""
-from typing import Dict, List
+from typing import List
 
 import numpy as np
 
@@ -24,7 +24,6 @@ class IdealGas(AbstractMix):
     """
 
     _substance_list: List[Substance]
-    _substance_dict: Dict[str, str]
 
     def __init__(self, **substance_dict):
 
@@ -36,7 +35,9 @@ class IdealGas(AbstractMix):
         ]
         self.substances = substance_list
 
-    def concentrations(self, moles, temperature, pressure):
+    def concentrations(
+        self, moles: List[float], temperature: float, pressure: float
+    ) -> List[float]:
         """Calculate concentrations of the mixture.
 
         Parameters
@@ -53,13 +54,15 @@ class IdealGas(AbstractMix):
         ndarray or list [float]
             Concentration of each substance
         """
-        zi = self.mol_fracations(moles)
+        zi = self.mol_fractions(moles)
 
         r = 8.31446261815324  # m3⋅Pa/K/mol
-        density = pressure / (r * temperature)
+        density = np.divide(pressure, (r * temperature))
         return np.multiply(zi, density)
 
-    def volume(self, moles, temperature, pressure):
+    def volume(
+        self, moles: List[float], temperature: float, pressure: float
+    ) -> float:
         """Calculate the volume of the mixture.
 
         Parameters
@@ -82,7 +85,9 @@ class IdealGas(AbstractMix):
         volume = total_moles * r * temperature / pressure
         return volume
 
-    def mix_heat_capacity(self, moles, temperature, *args):
+    def mix_heat_capacity(
+        self, moles: List[float], temperature: float, *args
+    ) -> float:
         """Calculate heat capacity of th mixture.
 
         Parameters
@@ -97,7 +102,7 @@ class IdealGas(AbstractMix):
         float
             Heat capacity of the mixture
         """
-        zi = self.mol_fracations(moles)
+        zi = self.mol_fractions(moles)
         pure_cp = np.array(
             [
                 substance.heat_capacity_gas(temperature)

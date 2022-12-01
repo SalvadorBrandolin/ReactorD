@@ -52,9 +52,9 @@ def test_one_substance_mix():
     # ----------------------------------------------------------------------
 
     for n in compositions:
-        assert mix1.mol_fracations(n) == 1.0
-        assert mix2.mol_fracations(n) == 1.0
-        assert mix3.mol_fracations(n) == 1.0
+        assert mix1.mol_fractions(n) == 1.0
+        assert mix2.mol_fractions(n) == 1.0
+        assert mix3.mol_fractions(n) == 1.0
 
         for t, p in zip(temperature, pressure):
             assert mix1.concentrations(n, t, p) == p / (r * t)

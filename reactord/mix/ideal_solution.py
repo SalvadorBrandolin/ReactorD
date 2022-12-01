@@ -1,5 +1,5 @@
 """Ideal solution Module."""
-from typing import Dict, List
+from typing import List
 
 import numpy as np
 
@@ -24,7 +24,6 @@ class IdealSolution(AbstractMix):
     """
 
     _substance_list: List[Substance]
-    _substance_dict: Dict[str, str]
 
     def __init__(self, **substance_dict):
 
@@ -55,7 +54,7 @@ class IdealSolution(AbstractMix):
         ndarray or list [float]
             Concentration of each substance
         """
-        zi = self.mol_fracations(moles)
+        zi = self.mol_fractions(moles)
         molar_volumes = np.array(
             [
                 substance.volume_liquid(temperature, pressure)
@@ -64,10 +63,12 @@ class IdealSolution(AbstractMix):
         )
 
         total_molar_vol = np.dot(zi, molar_volumes)
-        concentrations = np.divide(zi, total_molar_vol)
+        concentrations = np.divide(zi.T, total_molar_vol)
         return concentrations
 
-    def volume(self, moles, temperature, pressure):
+    def volume(
+        self, moles: List[float], temperature: float, pressure: float
+    ) -> float:
         """Calculate the volume of the mixture.
 
         Parameters
@@ -84,7 +85,7 @@ class IdealSolution(AbstractMix):
         float
             Volume of the mixture
         """
-        zi = self.mol_fracations(moles)
+        zi = self.mol_fractions(moles)
         pure_volumes = np.array(
             [
                 substance.volume_liquid(temperature, pressure)
@@ -93,7 +94,7 @@ class IdealSolution(AbstractMix):
         )
         return np.dot(pure_volumes, zi)
 
-    def mix_heat_capacity(self, moles, temperature, pressure):
+    def mix_heat_capacity(self, moles: List[float], temperature: float, *args):
         """Calculate heat capacity of th mixture.
 
         Parameters
@@ -108,7 +109,7 @@ class IdealSolution(AbstractMix):
         float
             Heat capacity of the mixture
         """
-        zi = self.mol_fracations(moles)
+        zi = self.mol_fractions(moles)
         pure_cp = np.array(
             [
                 substance.heat_capacity_liquid(temperature)
