@@ -60,9 +60,9 @@ project = "ReactorD"
 
 copyright = (
     "Brandolin, Salvador Eduardo - "
+    "Santos, Maricel Del Valle - "
     "Parodi, Adrian - "
     "Rovezzi, Juan Pablo - "
-    "Santos, Maricel Del Valle - "
     'Scilipoti, Jose Antonio - Copyright (c) 2022"'
 )
 
