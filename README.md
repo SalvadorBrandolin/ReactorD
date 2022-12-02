@@ -2,7 +2,6 @@
 
 ![logo](https://raw.githubusercontent.com/SalvadorBrandolin/ReactorD/readthedocs/logo.png)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SalvadorBrandolin/ReactorD/HEAD)
-
 <a href="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml">
 <img src="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml/badge.svg">
 </a> 
@@ -18,35 +17,28 @@ ReactorD (Reactor Design) is a python package whose proposal is to simulate and 
 According to requirements, the operation settings can change as follows; 
 
 -Energy Balance
- -Isothermic
- -Non-isothermic
- -Adiabatic 
+    -Isothermic
+    -Non-isothermic
+    -Adiabatic 
  
--Mas Balance
- -Homogeneous 
- -Heterogeneous 
- -Continuous 
- -Discontinuous 
+-Mass Balance
+    -Homogeneous 
+    -Heterogeneous 
+    -Continuous 
+    -Discontinuous 
  
 -Pressure Balance
- -Isobaric
- -Non - isobaric
+    -Isobaric
+    -Non-isobaric
 
 ## Available in version 0.0.1a
 - Stationary PFR Isothermic - Isobaric Operation 
 
 
 ## Motivation
-While nowadays there are a lot of tools for calculation of thermodynamic
-properties of fluids, most of them either are hard to mantain and don't have an
-integrated testing system or are embeded to other softwares (as spredsheat
-software) limiting the things that can be done to that enviroment.
 
-PyForFluids aims to be a tool:
 
-- With high performance, since most of it's calculations are done in Fortran
-- Easy to scale due to it's modular design using the power of Python objects.
-- Continuosly tested (at every `push`)to spot any problems as soon as possible.
+
 
 ## Instalation
 For installing _ReactorD_ you just need to:
@@ -54,10 +46,6 @@ For installing _ReactorD_ you just need to:
 ```sh
 pip install reactord
 ```
-
-Make sure to check the requirements first!
-
-### Requirements
 
 ## Authors
 Brandolín, Salvador Eduardo 
