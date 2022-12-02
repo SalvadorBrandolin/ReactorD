@@ -1,10 +1,10 @@
 # ReactorD
 
 ![logo](https://raw.githubusercontent.com/SalvadorBrandolin/ReactorD/readthedocs/logo.png)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SalvadorBrandolin/ReactorD/HEAD)
 
-
-<a href="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/CI.yml">
-<img src="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/CI.yml/badge.svg">
+<a href="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml">
+<img src="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml/badge.svg">
 </a> 
 <a href='https://reactord.readthedocs.io/en/latest/?badge=latest'>
 <img src='https://readthedocs.org/projects/reactord/badge/?version=latest'
@@ -14,46 +14,27 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 <img src='https://img.shields.io/pypi/v/reactord'>
 </a>
 
-PyForFluids (Python-Fortran-Fluids) is a Python package focused in the
-calculation of Fluid properties based on Ecuations of State (EoS). It provides
-a simple interface to work from Python but also exploits the high performance
-Fortran code for the more heavy calculations.
+ReactorD (Reactor Design) is a python package whose proposal is to simulate and design reactors for multiple-reaction systems.Two models of reactors are solved: plug flow (PFR) or stirred tank (STR) in stationary or non-stationary conditions. 
+According to requirements, the operation settings can change as follows; 
 
-It’s designed with modularity in mind, in a way that new thermodyinamic models
-are easy to add, they even can be written either in Python or Fortran.
+-Energy Balance
+ -Isothermic
+ -Non-isothermic
+ -Adiabatic 
+ 
+-Mas Balance
+ -Homogeneous 
+ -Heterogeneous 
+ -Continuous 
+ -Discontinuous 
+ 
+-Pressure Balance
+ -Isobaric
+ -Non - isobaric
 
-- Multifluid equations:
-	- GERG-2008 [Paper link](https://pubs.acs.org/doi/10.1021/je300655b)
+## Available in version 0.0.1a
+- Stationary PFR Isothermic - Isobaric Operation 
 
-- Cubic EoS:
-	- PengRobinson
-	- SoaveRedlichKwong
-	- Mixing Rules:
-		- Quadratic (Classic Van der Waals)
-		- Constant $k_{ij}$ and $l_{ij}$
-
-## Available properties
-- Reduced Temperature and Density
-- Ideal Helmholtz Energy (Ao)
-- Residual Helmholtz Energy (Ar)
-- Compresibility Factor (Z)
-- Isochoric Heat (Cv)
-- Isobaric Heat (Cp)
-- Speed of sound (w)
-- Isothermal throttling coefficent (δ)
-- Pressure derivatives:
-	- Temperature
-	- Density
-	- Volume
-- Pressure (P)
-- Entropy (S)
-- Gibbs Free Energy (G)
-- Enthalpy (H)
-- Joule-Thompson coefficent
-- Isoentropic exponent
-- Virial Terms:
-	- B
-	- C
 
 ## Motivation
 While nowadays there are a lot of tools for calculation of thermodynamic
@@ -77,15 +58,6 @@ pip install reactord
 Make sure to check the requirements first!
 
 ### Requirements
-
-
-
-##### Windows
-We recommended using the Windows Subsystem for Linux 
-[WSL](https://www.windowscentral.com/install-windows-subsystem-linux-windows-10)
-
-If WSL ain't being used, the native Windows wheels will be download instead,
-so no need to worry!
 
 ## Authors
 Brandolín, Salvador Eduardo 
