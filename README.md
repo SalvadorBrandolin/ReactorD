@@ -13,27 +13,24 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 <img src='https://img.shields.io/pypi/v/reactord'>
 </a>
 
-ReactorD (Reactor Design) is a python package whose proposal is to simulate and design reactors for multiple-reaction systems. The intention is to solve the following reactor types in stationary or not-stationary conditions:
-
-    - Plug flow (PFR) 
-    - Stirred tank (STR) 
+ReactorD (Reactor Design) is a python package whose proposal is to simulate and design reactors for multiple-reaction systems. The intention is to solve the following reactor types in stationary or not-stationary conditions: Plug flow (PFR) and Stirred tank (STR) 
 
 According to requirements, the operation settings can change as follows; 
 
 - Mass Balance:
-	-Homogeneous
-    -Heterogeneous
-    -Continuous
-    -Discontinuous
+	- Homogeneous
+    - Heterogeneous
+    - Continuous
+    - Discontinuous
     
 - Energy Balance:
-	-Isothermic
-    -Non-isothermic
-    -Adiabatic
+	- Isothermic
+    - Non-isothermic
+    - Adiabatic
 
 - Energy Pressure:
-	-Isobaric
-    -Non-isobaric
+	- Isobaric
+    - Non-isobaric
 
 
 ## Available in version 0.0.1a
