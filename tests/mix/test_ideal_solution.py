@@ -7,8 +7,8 @@ def test_one_substance_mix():
     hexane = rd.Substance.from_thermo_database("hexane")
     lauric_acid = rd.Substance.from_thermo_database("lauric acid")
 
-    mixture = rd.mix.IdealSolution([hexane])
-    mixture2 = rd.mix.IdealSolution([lauric_acid])
+    mixture = rd.mix.IdealSolution(A=hexane)
+    mixture2 = rd.mix.IdealSolution(B=lauric_acid)
 
     compositions = np.array([[1], [10], [100], [1000], [10000]])
     temperature = np.array([300, 400, 500, 600])
@@ -62,7 +62,7 @@ def test_three_substance_mix():
     toluene = rd.Substance.from_thermo_database("toluene")
     butanol = rd.Substance.from_thermo_database("butanol")
 
-    mixture = rd.mix.IdealSolution([hexane, toluene, butanol])
+    mixture = rd.mix.IdealSolution(A=hexane, B=toluene, C=butanol)
 
     compositions = np.array(
         [

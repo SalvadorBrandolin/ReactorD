@@ -10,9 +10,9 @@ def test_one_substance_mix():
 
     hydrogen = rd.Substance.from_thermo_database("hydrogen")
 
-    mix1 = rd.mix.IdealGas([methane])
-    mix2 = rd.mix.IdealGas([oxygen])
-    mix3 = rd.mix.IdealGas([hydrogen])
+    mix1 = rd.mix.IdealGas(A=methane)
+    mix2 = rd.mix.IdealGas(B=oxygen)
+    mix3 = rd.mix.IdealGas(C=hydrogen)
 
     r = 8.31446261815324  # m3⋅Pa/K/mol
 
@@ -88,7 +88,7 @@ def test_three_substances_mix():
     ethane = rd.Substance.from_thermo_database("ethane")
     chlorine = rd.Substance.from_thermo_database("chlorine")
 
-    mixture = rd.mix.IdealGas([co2, ethane, chlorine])
+    mixture = rd.mix.IdealGas(A=co2, B=ethane, C=chlorine)
 
     r = 8.31446261815324  # m3⋅Pa/K/mol
 

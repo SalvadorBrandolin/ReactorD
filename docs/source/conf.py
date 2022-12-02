@@ -24,8 +24,14 @@ sys.path.insert(0, str(REACTORD_PATH))
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
+    "sphinx.ext.autosummary",
+    "nbsphinx",
+    #"sphinxcontrib.bibtex",
+    "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]

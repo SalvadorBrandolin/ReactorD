@@ -15,7 +15,7 @@ def test_abstract_error_raises():
         a = rd.Substance()
         b = rd.Substance()
 
-        mixture = rd.mix.IdealSolution([a, b])
+        mixture = rd.mix.IdealSolution(A=a, B=b)
 
         reactor = rd.ReactorBase(
             mix=mixture,
@@ -348,8 +348,8 @@ def test_asignation_kinetics_arguments():
     c = rd.Substance(name="SubstanceC")
     d = rd.Substance(name="SubstanceD")
 
-    mixture1 = rd.mix.IdealSolution([a, b])
-    mixture2 = rd.mix.IdealSolution([c, d])
+    mixture1 = rd.mix.IdealSolution(A=a, B=b)
+    mixture2 = rd.mix.IdealSolution(C=c, D=d)
 
     reactor = SpecificReactor(
         mix=mixture1,

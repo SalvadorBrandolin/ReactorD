@@ -7,11 +7,7 @@ import reactord as rd
 
 def test_simple_evaluation1():
 
-    substance_a = rd.Substance.from_thermo_database("water")
-    substance_b = rd.Substance.from_thermo_database("ethanol")
-    substance_c = rd.Substance.from_thermo_database("acetone")
-
-    mix = rd.mix.IdealSolution([substance_a, substance_b, substance_c])
+    mix = rd.mix.IdealSolution(A="water", B="ethanol", C="acetone")
 
     def law1(concentrations, temperature):
         return 10
@@ -50,12 +46,12 @@ def test_simple_evaluation1():
 
 def test_user_reaction_enthalpies():
 
-    ethanol = rd.Substance.from_thermo_database("ethanol")
+    """ethanol = rd.Substance.from_thermo_database("ethanol")
     acetic = rd.Substance.from_thermo_database("acetic acid")
     water = rd.Substance.from_thermo_database("water")
     acetate = rd.Substance.from_thermo_database("ethyl acetate")
 
-    list_of_components = [acetic, ethanol, acetate, water]
+    list_of_components = [acetic, ethanol, acetate, water]"""
 
     stoichiometry_single_reaction = np.array([-1, -1, 1, 1])
 
@@ -65,8 +61,12 @@ def test_user_reaction_enthalpies():
     def reaction_rate2(concentration, temperature):
         return 15
 
-    mix1 = rd.mix.IdealGas(list_of_components)
-    mix2 = rd.mix.IdealSolution(list_of_components)
+    mix1 = rd.mix.IdealGas(
+        A="acetic acid", B="ethanol", C="ethyl acetate", D="water"
+    )
+    mix2 = rd.mix.IdealSolution(
+        A="acetic acid", B="ethanol", C="ethyl acetate", D="water"
+    )
 
     kinetic1 = rd.Kinetics(
         mix1,
@@ -125,7 +125,7 @@ def test_user_reaction_enthalpies():
 
     # Individual formation enthalpies are retrieved and the list
     # is converted to a numpy array
-    for component in list_of_components:
+    for component in mix1.substances:
         raw_formation_enthalpies.append(component.formation_enthalpy_ig)
     raw_formation_enthalpies = np.array(raw_formation_enthalpies)
 
