@@ -3,6 +3,7 @@
 ![logo](https://raw.githubusercontent.com/SalvadorBrandolin/ReactorD/main/logo.png)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SalvadorBrandolin/ReactorD/HEAD)
 <a href="https://codeclimate.com/github/SalvadorBrandolin/ReactorD/maintainability"><img src="https://api.codeclimate.com/v1/badges/a864fbe28176d9a5d410/maintainability" /></a>
+[![Coverage Status](https://coveralls.io/repos/github/SalvadorBrandolin/ReactorD/badge.svg?branch=main)](https://coveralls.io/github/SalvadorBrandolin/ReactorD?branch=main)
 <a href="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml">
 <img src="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml/badge.svg">
 </a> 
