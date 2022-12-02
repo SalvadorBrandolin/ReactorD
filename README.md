@@ -2,6 +2,7 @@
 
 ![logo](https://raw.githubusercontent.com/SalvadorBrandolin/ReactorD/readthedocs/logo.png)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SalvadorBrandolin/ReactorD/HEAD)
+<a href="https://codeclimate.com/github/SalvadorBrandolin/ReactorD/maintainability"><img src="https://api.codeclimate.com/v1/badges/a864fbe28176d9a5d410/maintainability" /></a>
 <a href="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml">
 <img src="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml/badge.svg">
 </a> 
@@ -28,12 +29,12 @@ According to requirements, the operation settings can change as follows;
     - Non-isothermic
     - Adiabatic
 
-- Energy Pressure:
+- Pressure Balance:
 	- Isobaric
     - Non-isobaric
 
 
-## Available in version 0.0.1a
+## Available in version 0.0.1a1
 - Stationary PFR Isothermic - Isobaric Operation 
 
 

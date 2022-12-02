@@ -8,6 +8,7 @@ exclude tox.ini
 exclude pyproject.toml
 exclude .readthedocs.yml
 exclude requirements_dev.txt
+exclude logo.png
 recursive-exclude examples *
 recursive-exclude reactord *.mod *.log *.pyc
 recursive-exclude tests *
