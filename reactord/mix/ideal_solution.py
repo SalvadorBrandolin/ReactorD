@@ -62,8 +62,8 @@ class IdealSolution(AbstractMix):
             ]
         )
 
-        total_molar_vol = np.dot(zi, molar_volumes)
-        concentrations = np.divide(zi.T, total_molar_vol)
+        total_molar_vol = np.dot(zi.T, molar_volumes.T)
+        concentrations = np.divide(zi, total_molar_vol)
         return concentrations
 
     def volume(

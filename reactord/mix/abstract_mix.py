@@ -19,8 +19,9 @@ class AbstractMix(metaclass=ABCMeta):
     def mol_fractions(self, moles: List[float]):
         """Calculate the molar fractions of the mixture.
 
-        Multiple mixture compositions can be specified as the method argument
-        as the moles' matrix rows.
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        row represent each substance and each colum represent each mixture 
+        composition.
 
         Parameters
         ----------
