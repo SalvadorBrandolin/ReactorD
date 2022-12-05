@@ -1,5 +1,5 @@
-reactord
-========
+ReactorD API
+============
 
 .. toctree::
    :maxdepth: 4
