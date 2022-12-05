@@ -1,8 +1,9 @@
 """Kinetics module."""
+from typing import List
+
 import numpy as np
 
 from .mix.abstract_mix import AbstractMix
-from .utils import vectorize
 
 
 class Kinetics:
@@ -46,7 +47,6 @@ class Kinetics:
         self.mix = mix
         self.kinetic_argument = kinetic_argument.lower()
         self.kwargs = kwargs
-
         # ==============================================================
         # DATA VALIDATION
         # ==============================================================
@@ -131,9 +131,8 @@ class Kinetics:
     # PUBLIC METHODS
     # ==================================================================
 
-    @vectorize(signature="(n),(),()->(n),(m)", excluded={0})
     def kinetic_eval(
-        self, moles: list, temperature: float, pressure: float
+        self, moles: List[float], temperature: float, pressure: float
     ) -> np.ndarray:
         """Evaluate kinetic.
 
@@ -160,12 +159,11 @@ class Kinetics:
         )
 
         # Rates for each individual reaction:
-        reaction_rates = np.array(
-            [
-                reaction(composition, temperature)
-                for reaction in self.list_of_reactions
-            ]
-        )
+        reaction_rates = [
+            reaction(composition, temperature)
+            for reaction in self.list_of_reactions
+        ]
+
         # Rates for each compound:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates
@@ -182,7 +180,6 @@ class Kinetics:
             "assignation."
         )
 
-    @vectorize(signature="(),()->(m)", excluded={0})
     def reaction_enthalpies(self, temperature, pressure):
         """Eval reacion enthalpies.
 
