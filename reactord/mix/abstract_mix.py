@@ -16,13 +16,18 @@ class AbstractMix(metaclass=ABCMeta):
     # Mixtures common methods
     # ==================================================================
 
-    def mol_fracations(self, moles: List[float]):
+    def mol_fractions(self, moles: List[float]):
         """Calculate the molar fractions of the mixture.
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        row represent each substance and each colum represent each mixture
+        composition.
 
         Parameters
         ----------
         moles: ndarray or list [float]
-            moles of each substance
+            moles of each substance specified in the same order as the
+            mix substances order.
 
         Returns
         -------
@@ -55,7 +60,7 @@ class AbstractMix(metaclass=ABCMeta):
             array that contains the partial pressures of mixture's
             substances
         """
-        zi = self.mol_fracations(moles)
+        zi = self.mol_fractions(moles)
         partial_pressures = np.multiply(zi, pressure)
         return partial_pressures
 

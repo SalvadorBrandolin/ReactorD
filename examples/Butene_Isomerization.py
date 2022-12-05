@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 # import the reactord package
 import reactord as rd
 
@@ -15,12 +16,12 @@ A.name = "A"
 B.name = "B"
 
 # The mixture object is created:
-mixture = rd.mix.IdealSolution(A = A, B= B)
+
+mixture = rd.mix.IdealSolution(A=A, B=B)
 
 # A function for the reaction rate is defined:
 def rate(concentrations, temperature):
-    return 0.00001*concentrations[0]
-
+    return 0.00001 * concentrations[0]
 
 
 fa_in = 5 / 3600  # mol/s
@@ -52,7 +53,7 @@ var_dependientes = solution.y
 fig1, ax1 = plt.subplots(1)
 ax1.plot(largo_reactor, var_dependientes[0], "-r", label="Flux_A", linewidth=3)
 ax1.plot(largo_reactor, var_dependientes[1], "-g", label="Flux_B", linewidth=3)
-#ax1.set(xlabel="Reactor volume (m^3)", ylabel="molar fluxes (mol/s)")
+# ax1.set(xlabel="Reactor volume (m^3)", ylabel="molar fluxes (mol/s)")
 ax1.set_xlabel("Reactor volume (m^3)", fontsize=10)
 ax1.set_ylabel("molar fluxes (mol/s)", fontsize=10)
 
