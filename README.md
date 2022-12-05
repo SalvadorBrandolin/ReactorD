@@ -13,7 +13,8 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 <a href='https://pypi.org/project/reactord/'>
 <img src='https://img.shields.io/pypi/v/reactord'>
 </a>
-
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
+[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://badge.fury.io/py/uttrs)
 ReactorD (Reactor Design) is a python package whose proposal is to simulate and design reactors for multiple-reaction systems. The intention is to solve the following reactor types in stationary or not-stationary conditions: Plug flow (PFR) and Stirred tank (STR) 
 
 According to requirements, the operation settings can change as follows; 
@@ -39,7 +40,10 @@ According to requirements, the operation settings can change as follows;
 
 
 ## Motivation
+Chemical reaction engineering has as its main objective the study and optimization of reactive processes, usually, with a chemical reactor as the protagonist equipment. To design a chemical reactor, it is necessary to consider several physical and chemical phenomena simultaneously, such as the inlet and outlet molar flow of chemical substances, mass transfer, heat transfer, and reaction kinetics. All these contributions to the system's complexity, commonly lead to coupled non-linear algebraic problems, coupled differential equations, or either both coupled algebraic-differential equations that must be solved by numeric algorithms. ReactorD provides an interphase to configure the necessary information for the simulation of the chemical reactors. Also, ReactorD implements the mathematical representations of mass and energy balances of specific reactors for a numerical resolution.
 
+## Requirements
+You need Python 3.7+ to run ReactorD.
 
 ## Instalation
 For installing _ReactorD_ you just need to:
