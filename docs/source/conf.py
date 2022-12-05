@@ -30,7 +30,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autosummary",
     "nbsphinx",
-    #"sphinxcontrib.bibtex",
+    # "sphinxcontrib.bibtex",
     "sphinx_copybutton",
 ]
 

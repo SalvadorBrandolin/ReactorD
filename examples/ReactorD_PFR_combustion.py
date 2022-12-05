@@ -14,7 +14,7 @@ D = rd.Substance.from_thermo_database("co2")
 
 # Then we create the mixture:
 
-mixture = rd.mix.IdealGas(A=A,B=B,C=C,D=D)
+mixture = rd.mix.IdealGas(A=A, B=B, C=C, D=D)
 
 # and the stoichiometry matrix:
 stoichiometry = np.array([[-1, -2, 2, 1]])
@@ -48,6 +48,4 @@ PFR = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
 )
 
 # Simulation:
-solution = (
-    PFR.simulate()
-)
+solution = PFR.simulate()
