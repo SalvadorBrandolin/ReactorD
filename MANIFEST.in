@@ -11,6 +11,6 @@ exclude requirements_dev.txt
 exclude logo.png
 recursive-exclude examples *
 recursive-exclude dist *
-recursive-exclude reactord *.mod *.log *.pyc
+recursive-exclude reactord *.mod *.log *.pyc *.png
 recursive-exclude tests *
 recursive-exclude docs *
