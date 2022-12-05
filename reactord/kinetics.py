@@ -43,11 +43,14 @@ class Kinetics:
         **kwargs,
     ) -> None:
 
-        self.list_of_reactions = list_of_reactions
+        self.list_of_reactions = []
+        for reaction in list_of_reactions:
+            self.list_of_reactions.append(
+                np.vectorize(reaction, signature='(n),()->()')
+            )
         self.mix = mix
         self.kinetic_argument = kinetic_argument.lower()
         self.kwargs = kwargs
-
         # ==============================================================
         # DATA VALIDATION
         # ==============================================================
