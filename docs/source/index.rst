@@ -10,7 +10,6 @@
     :align: center
     :scale: 100 %
 
-ReactorD
 ===========
 
 |image1| |image2| |image3| |image4| |image5|
@@ -40,13 +39,6 @@ Release
 Ver. |release|
 
 ----
-
-Contents
---------
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Tutorials
 
 .. toctree::
    :maxdepth: 1
