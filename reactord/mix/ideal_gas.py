@@ -37,25 +37,25 @@ class IdealGas(AbstractMix):
         self.substances = substance_list
 
     def concentrations(self, moles, temperature, pressure):
-        """Calculate concentrations of the mixture.
+        """Calculate the concentrations of the mixture.
 
         Parameters
         ----------
         moles : ndarray or list [float]
             Moles of each substance
         temperature : float
-            System temperature
+            System temperature [K]
         pressure : float
-            System pressure
+            System pressure [Pa]
 
         Returns
         -------
         ndarray or list [float]
-            Concentration of each substance
+            Concentration of each substance [mol/m³]
         """
         zi = self.mol_fracations(moles)
 
-        r = 8.31446261815324  # m3⋅Pa/K/mol
+        r = 8.31446261815324  # m³⋅Pa/K/mol
         density = pressure / (r * temperature)
         return np.multiply(zi, density)
 
@@ -67,14 +67,14 @@ class IdealGas(AbstractMix):
         moles : ndarray or list[float]
             Moles of each substance
         temperature : float
-            System temperature
+            System temperature [K]
         pressure : float
-            System pressure
+            System pressure [Pa]
 
         Returns
         -------
         float
-            Volume of the mixture
+            Volume of the mixture [m³]
         """
         total_moles = np.sum(moles)
 
@@ -83,40 +83,39 @@ class IdealGas(AbstractMix):
         return volume
 
     def mix_heat_capacity(self, moles, temperature, *args):
-        """Calculate heat capacity of th mixture.
+        """Calculate the heat capacity of the mixture.
 
         Parameters
         ----------
         moles : ndarray or list [float]
             Moles of each substance
         temperature : float
-            System temperature
+            System temperature [K]
 
         Returns
         -------
         float
-            Heat capacity of the mixture
+            Heat capacity of the mixture [J/K]
         """
-        zi = self.mol_fracations(moles)
         pure_cp = np.array(
             [
                 substance.heat_capacity_gas(temperature)
                 for substance in self.substances
             ]
         )
-        mix_cp = np.dot(zi, pure_cp)
+        mix_cp = np.dot(moles, pure_cp)
         return mix_cp
 
     def _formation_enthalpies_set(self):
         """Return the ideal gas formation enthalpies in a ordered ndarray.
 
-        Method that read the ideal gas formation enthalpies of mix
-        and returns them in a ordered ndarray.
+        Method that read the ideal gas formation enthalpies of the mix
+        class and returns them in a ordered ndarray.
 
         Returns
         -------
         ndarray [float]
-            Ideal gas formation enthalpies of each substance
+            Ideal gas formation enthalpies of each substance [J/mol/K]
         """
         enthalpies = np.array([])
 
@@ -126,23 +125,30 @@ class IdealGas(AbstractMix):
         return enthalpies
 
     def formation_enthalpies_correction(self, temperature: float, *args):
-        """Calculate the enthalpy of formation at the specified temperature.
+        """Calculate the correction term for the formation enthalpy.
 
-        Method that corrects the enthalpy of formation of pure
-        substances of 298.15 K 100000 Pa at the specified temperature
-        using Kirchhoff's equation.
+        Method that calculates the correction term for the formation
+        enthalpies of the pure substances from 298.15 K and 101325 Pa to
+        the given temperature and pressure using Kirchhoff's equation.
 
         Parameters
         ----------
         temperature : float
-            Correction temperature for the formation enthalpies. [K]
+            Temperature at which formation enthalpies are to be calculated. [K]
+        pressure : float
+            Pressure at which formation enthalpies are to be calculated. [Pa]
+
+        Returns
+        -------
+        correction_enthalpies : ndarray [float]
+            Formation enthalpies of each substance (J/mol/K)
         """
-        enthalpies = np.array([])
+        correction_enthalpies = np.array([])
 
         for substance in self.substances:
-            enthalpies = np.append(
-                enthalpies,
+            correction_enthalpies = np.append(
+                correction_enthalpies,
                 substance.heat_capacity_gas_dt_integral(298.15, temperature),
             )
 
-        return enthalpies
+        return correction_enthalpies

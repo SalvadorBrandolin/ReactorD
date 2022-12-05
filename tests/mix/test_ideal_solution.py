@@ -14,9 +14,7 @@ def test_one_substance_mix():
     temperature = np.array([300, 400, 500, 600])
     pressure = 101325
 
-    # ------------ Tests Adrian Abajo -------------------------------
-    #
-    # ---------------------------------------------------------------
+    # Lauric acid normal boiling point
     nbp_lauric_acid = lauric_acid.normal_melting_point
 
     for t in temperature:
@@ -36,9 +34,6 @@ def test_one_substance_mix():
         assert mixture2.formation_enthalpies_correction(t) == (
             cpdt_solid + dh_fus + cpdt_liquid
         )
-    # ------------ Tests Adrian Arriba-------------------------------
-    #
-    # ---------------------------------------------------------------
 
     for z in compositions:
         assert mixture.mol_fracations(z) == 1.0
@@ -53,7 +48,7 @@ def test_one_substance_mix():
             )
 
             assert mixture.mix_heat_capacity(z, t, pressure) == (
-                hexane.heat_capacity_liquid(t)
+                hexane.heat_capacity_liquid(t) * z
             )
 
 
@@ -126,7 +121,7 @@ def test_three_substance_mix():
         ).all()  # OKAY
 
         # Test of mix_heat_capacity method
-        raw_mix_heat_capacity = np.dot(raw_heat_capacities, raw_mol_fraction)
+        raw_mix_heat_capacity = np.dot(raw_heat_capacities, moles)
         assert (
             mixture.mix_heat_capacity(moles, t, pressure)
             == raw_mix_heat_capacity

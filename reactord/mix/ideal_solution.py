@@ -46,14 +46,14 @@ class IdealSolution(AbstractMix):
         moles : ndarray or list[float]
             Moles of each substance
         temperature : float
-            System temperature
+            System temperature [T]
         pressure : float
-            System pressure
+            System pressure [Pa]
 
         Returns
         -------
         ndarray or list [float]
-            Concentration of each substance
+            Concentration of each substance [mol/m³]
         """
         zi = self.mol_fracations(moles)
         molar_volumes = np.array(
@@ -75,14 +75,14 @@ class IdealSolution(AbstractMix):
         moles : ndarray or list [float]
             Moles of each substance
         temperature : float
-            System temperature
+            System temperature [K]
         pressure : float
-            System pressure
+            System pressure [Pa]
 
         Returns
         -------
         float
-            Volume of the mixture
+            Volume of the mixture [m³]
         """
         zi = self.mol_fracations(moles)
         pure_volumes = np.array(
@@ -94,28 +94,27 @@ class IdealSolution(AbstractMix):
         return np.dot(pure_volumes, zi)
 
     def mix_heat_capacity(self, moles, temperature, pressure):
-        """Calculate heat capacity of th mixture.
-
+        """Calculate the heat capacity of the mixture.
+        
         Parameters
         ----------
         moles : ndarray or list [float]
             Moles of each substance
         temperature : float
-            System temperature
+            System temperature [K]
 
         Returns
         -------
         float
-            Heat capacity of the mixture
+            Heat capacity of the mixture [J/K]
         """
-        zi = self.mol_fracations(moles)
         pure_cp = np.array(
             [
                 substance.heat_capacity_liquid(temperature)
                 for substance in self.substances
             ]
         )
-        mix_cp = np.dot(zi, pure_cp)
+        mix_cp = np.dot(moles, pure_cp)
         return mix_cp
 
     def _formation_enthalpies_set(self):
@@ -137,13 +136,27 @@ class IdealSolution(AbstractMix):
         return enthalpies
 
     def formation_enthalpies_correction(self, temperature: float, *args):
-        """Return corrects the enthalpy of formation of pure substances.
+        """Calculate the correction term for the formation enthalpy.
+        
+        Method that calculates the correction term for the formation
+        enthalpies of the pure substances from 298.15 K and 101325 Pa to
+        the given temperature and pressure using Kirchhoff's equation.
+        If the substance is a solid at a temperature > 298.15 K, this
+        method also takes it into account.
 
-        Method that corrects the enthalpy of formation of pure
-        substances When its melting temperature is greater than 298.
+        Parameters
+        ----------
+        temperature : float
+            Temperature at which formation enthalpies are to be calculated. [K]
+        pressure : float
+            Pressure at which formation enthalpies are to be calculated. [Pa]
 
+        Returns
+        -------
+        correction_enthalpies : ndarray [float]
+            Formation enthalpies correction for each substance (J/mol/K)
         """
-        enthalpies = np.array([])
+        correction_enthalpies = np.array([])
         for substance in self.substances:
             if substance.normal_melting_point > 298.15:
                 dhs = substance.heat_capacity_solid_dt_integral(
@@ -154,12 +167,14 @@ class IdealSolution(AbstractMix):
                     substance.normal_melting_point, temperature
                 )
 
-                enthalpies = np.append(enthalpies, dhs + dhf + dhl)
+                correction_enthalpies = np.append(
+                    correction_enthalpies, dhs + dhf + dhl
+                )
             else:
-                enthalpies = np.append(
-                    enthalpies,
+                correction_enthalpies = np.append(
+                    correction_enthalpies,
                     substance.heat_capacity_liquid_dt_integral(
                         298.15, temperature
                     ),
                 )
-        return enthalpies
+        return correction_enthalpies

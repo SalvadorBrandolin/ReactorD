@@ -26,9 +26,8 @@ class AbstractMix(metaclass=ABCMeta):
 
         Returns
         -------
-        ndarray
-            array that contains the molar fractions of mixture's
-            substances
+        zi : ndarray of shape (moles,)
+        Array of the molar fractions of mixture's substances
         """
         total_moles = np.sum(moles, axis=0)
         zi = np.divide(moles, total_moles)
@@ -38,7 +37,7 @@ class AbstractMix(metaclass=ABCMeta):
     def partial_pressures(
         self, moles: List[float], temperature: float, pressure: float
     ):
-        """Calculate the partial pressures of the mixture.
+        """Calculate the partial pressures of the mixture's components.
 
         Parameters
         ----------
@@ -47,11 +46,11 @@ class AbstractMix(metaclass=ABCMeta):
         temperature: float
             Temperature [K]
         pressure: float
-           Total Pressure [Pa]
+            Total Pressure [Pa]
 
         Returns
         -------
-        ndarray
+        partial_pressures: ndarray of shape(moles,) [Pa]
             array that contains the partial pressures of mixture's
             substances
         """
@@ -71,12 +70,12 @@ class AbstractMix(metaclass=ABCMeta):
         return len(self.substances)
 
     def __str__(self):
-        """Return a text whit information about the components of the mixture.
+        """Return a text with information about the components of the mixture.
 
         Returns
         -------
         str
-            Text whit information about the components of the mixture.
+            Text with information about the components of the mixture.
         """
         string = (
             f"The mixture contains the following"
@@ -94,9 +93,9 @@ class AbstractMix(metaclass=ABCMeta):
     def concentrations(
         self, moles: List[float], temperature: float, pressure: float
     ):
-        """Concentrations of the mixtures substances.
+        """Concentrations of the mixture's substances.
 
-        Concentrations of the mixtures substances at the given moles
+        Concentrations of the mixture's substances given moles
         of each compound, temperature and pressure.
 
         Parameters
@@ -106,13 +105,13 @@ class AbstractMix(metaclass=ABCMeta):
         temperature: float
             Temperature [K]
         pressure: float
-           Total Pressure [Pa]
+            Total Pressure [Pa]
 
         Returns
         -------
-        ndarray [float]
+        ndarray [float] of shape (moles,)
             ndarray that contains the concentrations of the mixture's
-            substances [mol/m^3]
+            substances [mol/m³]
         """
         raise NotImplementedError()
 
@@ -123,16 +122,16 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         moles: ndarray or list [float]
-         moles of each substance
+            moles of each substance
         temperature: float
             Temperature [K]
         pressure: float
-           Total Pressure [Pa]
+            Total Pressure [Pa]
 
         Returns
         -------
         float
-            volume of the mixture [m^3]
+            volume of the mixture [m³]
         """
         raise NotImplementedError()
 
@@ -149,7 +148,13 @@ class AbstractMix(metaclass=ABCMeta):
         temperature: float
             Temperature [K]
         pressure: float
-           Total Pressure [Pa]
+            Total Pressure [Pa]
+
+        Returns
+        -------
+        float
+            heat capacity of the mixture [J/K]
+
         """
         raise NotImplementedError()
 
@@ -164,18 +169,22 @@ class AbstractMix(metaclass=ABCMeta):
         temperature: float,
         pressure: float,
     ):
-        """Calculate the correction therm for the formation enthalpy.
+        """Calculate the correction term for the formation enthalpy.
 
-        Method that calculates the correction therm for the formation
-        enthalpy of the pure substances from 298.15 K and 100000 Pa to
-        temperature and pressure
+        Method that calculates the correction term for the formation
+        enthalpies of the pure substances from 298.15 K and 101325 Pa to
+        the given temperature and pressure
 
         Parameters
         ----------
         temperature : float
-            Correction temperature for the formation enthalpies. [K]
+            Temperature at which formation enthalpies are to be calculated. [K]
         pressure : float
-            Correction pressure for the formation enthalpies. [Pa]
+            Pressure at which formation enthalpies are to be calculated. [Pa]
 
+        Returns
+        -------
+        correction_enthalpies : ndarray [float]
+            Formation enthalpies correction for each substance (J/mol/K)
         """
         raise NotImplementedError()

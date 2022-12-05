@@ -20,8 +20,6 @@ def test_one_substance_mix():
     temperature = np.array([300, 400, 500, 600])
     pressure = np.array([101325, 150000, 200000, 300000])
 
-    # ------------------- Tests Adrian ----------------------------------------
-    # Test of __str__ method: --Tests Adrian--
     assert (
         mix1.__str__()
         == "The mixture contains the following 1 components:\nMethane\n"
@@ -49,7 +47,6 @@ def test_one_substance_mix():
         assert mix3.formation_enthalpies_correction(
             t
         ) == hydrogen.heat_capacity_gas_dt_integral(298.15, t)
-    # ----------------------------------------------------------------------
 
     for n in compositions:
         assert mix1.mol_fracations(n) == 1.0
@@ -66,18 +63,17 @@ def test_one_substance_mix():
             assert mix1.volume(n, t, p) == mix2.volume(n, t, p)
 
             assert mix1.mix_heat_capacity(n, t, p) == (
-                methane.heat_capacity_gas(t)
+                methane.heat_capacity_gas(t) * n
             )
 
             assert mix2.mix_heat_capacity(n, t, p) == (
-                oxygen.heat_capacity_gas(t)
+                oxygen.heat_capacity_gas(t) * n
             )
 
             assert mix3.mix_heat_capacity(n, t, p) == (
-                hydrogen.heat_capacity_gas(t)
+                hydrogen.heat_capacity_gas(t) * n
             )
 
-            # Partial pressures of AbstractMix tested: --Tests Adrian--
             assert mix1.partial_pressures(n, t, p) == p
             assert mix2.partial_pressures(n, t, p) == p
             assert mix3.partial_pressures(n, t, p) == p
@@ -138,9 +134,7 @@ def test_three_substances_mix():
             assert mixture.volume(moles, t, p) == raw_vol  # OKAY
 
             # Test of mix_heat_capacity method
-            raw_mix_heat_capacity = np.dot(
-                raw_heat_capacities, raw_mol_fractions
-            )
+            raw_mix_heat_capacity = np.dot(raw_heat_capacities, moles)
             assert raw_mix_heat_capacity == mixture.mix_heat_capacity(
                 moles, t, p
             )  # OKAY
