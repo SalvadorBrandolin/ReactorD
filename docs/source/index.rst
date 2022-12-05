@@ -18,7 +18,7 @@ ReactorD
 .. |image1| image:: https://api.codeclimate.com/v1/badges/3551471cd4cdf37e226f/maintainability
    :target: https://codeclimate.com/github/SalvadorBrandolin/ReactorD/maintainability
    :alt: Maintanibility
-.. |image2| image:: https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci_linux.yml/badge.svg
+.. |image2| image:: https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml/badge.svg
    :target: https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml
    :alt: Tests
 .. |image3| image:: https://readthedocs.org/projects/reactord/badge/?version=latest
