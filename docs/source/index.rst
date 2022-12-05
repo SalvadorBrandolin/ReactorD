@@ -12,7 +12,7 @@
 
 ===========
 
-|image1| |image2| |image3| |image4| |image5|
+|image1| |image2| |image3| |image4| |image5| |Python 3.7+| |License|
 
 .. |image1| image:: https://api.codeclimate.com/v1/badges/3551471cd4cdf37e226f/maintainability
    :target: https://codeclimate.com/github/SalvadorBrandolin/ReactorD/maintainability
@@ -29,6 +29,10 @@
 .. |image5| image:: https://img.shields.io/pypi/v/reactord
    :target: https://pypi.org/project/reactord/
    :alt: Pypi
+.. |Python 3.7+| image:: https://img.shields.io/badge/python-3.7+-blue.svg
+   :target: https://badge.fury.io/py/uttrs
+.. |License| image:: https://img.shields.io/badge/License-MIT-blue.svg
+   :target: https://tldrlegal.com/license/mit-license
 
 ----
 
@@ -47,6 +51,12 @@ Ver. |release|
    installation.rst
    license.rst
    modules
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   tutorial/index
 
 
 **ReactorD** (Reactor Design) is a python package whose proposal is to simulate and design reactors for 
@@ -77,6 +87,15 @@ Available in version 0.0.1a1
 
 Motivation
 ----------
+Chemical reaction engineering has as its main objective the study and optimization 
+of reactive processes, usually, with a chemical reactor as the protagonist equipment. 
+To design a chemical reactor, it is necessary to consider several physical and chemical 
+phenomena simultaneously, such as the inlet and outlet molar flow of chemical substances, 
+mass transfer, heat transfer, and reaction kinetics. All these contributions to the system's 
+complexity, commonly lead to coupled non-linear algebraic problems, coupled differential equations, 
+or either both coupled algebraic-differential equations that must be solved by numeric algorithms.
+ReactorD provides an interphase to configure the necessary information for the simulation of the chemical reactors. 
+Also, ReactorD implements the mathematical representations of mass and energy balances of specific reactors for a numerical resolution.
 
 Indices and tables
 ==================
