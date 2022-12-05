@@ -126,6 +126,6 @@ def test_three_substance_mix():
         # Test of mix_heat_capacity method
         raw_mix_heat_capacity = np.dot(raw_heat_capacities, raw_mol_fraction)
         assert np.allclose(
-            mixture.mix_heat_capacity(moles, t, pressure), 
-            raw_mix_heat_capacity
+            mixture.mix_heat_capacity(moles, t, pressure),
+            raw_mix_heat_capacity,
         )  # OKAY
