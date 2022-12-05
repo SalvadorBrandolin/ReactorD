@@ -43,11 +43,7 @@ class Kinetics:
         **kwargs,
     ) -> None:
 
-        self.list_of_reactions = []
-        for reaction in list_of_reactions:
-            self.list_of_reactions.append(
-                np.vectorize(reaction, signature='(n),()->()')
-            )
+        self.list_of_reactions = list_of_reactions
         self.mix = mix
         self.kinetic_argument = kinetic_argument.lower()
         self.kwargs = kwargs
@@ -163,12 +159,11 @@ class Kinetics:
         )
 
         # Rates for each individual reaction:
-        reaction_rates = np.array(
-            [
-                reaction(composition, temperature)
-                for reaction in self.list_of_reactions
-            ]
-        )
+        reaction_rates = [
+            reaction(composition, temperature)
+            for reaction in self.list_of_reactions
+        ]
+
         # Rates for each compound:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates

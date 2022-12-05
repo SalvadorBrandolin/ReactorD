@@ -20,7 +20,7 @@ class AbstractMix(metaclass=ABCMeta):
         """Calculate the molar fractions of the mixture.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
-        row represent each substance and each colum represent each mixture 
+        row represent each substance and each colum represent each mixture
         composition.
 
         Parameters
