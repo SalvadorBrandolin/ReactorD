@@ -6,8 +6,12 @@ recursive-include reactord *
 
 exclude tox.ini
 exclude pyproject.toml
+exclude .readthedocs.yml
 exclude requirements_dev.txt
+exclude *.png
 recursive-exclude examples *
-recursive-exclude reactord *.mod *.log *.pyc
+recursive-exclude dist *
+recursive-exclude reactord *.mod *.log *.pyc 
 recursive-exclude tests *
 recursive-exclude docs *
+recursive-exlcude .vscode
