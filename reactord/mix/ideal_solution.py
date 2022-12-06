@@ -95,7 +95,7 @@ class IdealSolution(AbstractMix):
 
     def mix_heat_capacity(self, moles, temperature, pressure):
         """Calculate the heat capacity of the mixture.
-        
+
         Parameters
         ----------
         moles : ndarray or list [float]
@@ -137,7 +137,7 @@ class IdealSolution(AbstractMix):
 
     def formation_enthalpies_correction(self, temperature: float, *args):
         """Calculate the correction term for the formation enthalpy.
-        
+
         Method that calculates the correction term for the formation
         enthalpies of the pure substances from 298.15 K and 101325 Pa to
         the given temperature and pressure using Kirchhoff's equation.
