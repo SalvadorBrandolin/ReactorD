@@ -36,7 +36,7 @@ def test_one_substance_mix():
         )
 
     for z in compositions:
-        assert mixture.mol_fracations(z) == 1.0
+        assert mixture.mol_fractions(z) == 1.0
 
         for t in temperature:
             assert mixture.volume(z, t, pressure) == (
@@ -48,7 +48,7 @@ def test_one_substance_mix():
             )
 
             assert mixture.mix_heat_capacity(z, t, pressure) == (
-                hexane.heat_capacity_liquid(t) * z
+                hexane.heat_capacity_liquid(t)
             )
 
 
@@ -106,7 +106,7 @@ def test_three_substance_mix():
 
         # Test of mol_fractions method
         assert (
-            mixture.mol_fracations(moles) == raw_mol_fraction
+            mixture.mol_fractions(moles) == raw_mol_fraction
         ).all()  # OKAY
 
         # Test of volume method
@@ -121,7 +121,7 @@ def test_three_substance_mix():
         ).all()  # OKAY
 
         # Test of mix_heat_capacity method
-        raw_mix_heat_capacity = np.dot(raw_heat_capacities, moles)
+        raw_mix_heat_capacity = np.dot(raw_heat_capacities, raw_mol_fraction)
         assert (
             mixture.mix_heat_capacity(moles, t, pressure)
             == raw_mix_heat_capacity

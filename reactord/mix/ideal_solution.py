@@ -55,7 +55,7 @@ class IdealSolution(AbstractMix):
         ndarray or list [float]
             Concentration of each substance [mol/m³]
         """
-        zi = self.mol_fracations(moles)
+        mol_fractions = self.mol_fractions(moles)
         molar_volumes = np.array(
             [
                 substance.volume_liquid(temperature, pressure)
@@ -63,8 +63,8 @@ class IdealSolution(AbstractMix):
             ]
         )
 
-        total_molar_vol = np.dot(zi, molar_volumes)
-        concentrations = np.divide(zi, total_molar_vol)
+        total_molar_vol = np.dot(mol_fractions, molar_volumes)
+        concentrations = np.divide(mol_fractions, total_molar_vol)
         return concentrations
 
     def volume(self, moles, temperature, pressure):
@@ -84,14 +84,14 @@ class IdealSolution(AbstractMix):
         float
             Volume of the mixture [m³]
         """
-        zi = self.mol_fracations(moles)
+        mol_fractions = self.mol_fractions(moles)
         pure_volumes = np.array(
             [
                 substance.volume_liquid(temperature, pressure)
                 for substance in self.substances
             ]
         )
-        return np.dot(pure_volumes, zi)
+        return np.dot(pure_volumes, mol_fractions)
 
     def mix_heat_capacity(self, moles, temperature, pressure):
         """Calculate the heat capacity of the mixture.
@@ -108,13 +108,14 @@ class IdealSolution(AbstractMix):
         float
             Heat capacity of the mixture [J/K]
         """
+        mol_fractions = self.mol_fractions(moles)
         pure_cp = np.array(
             [
                 substance.heat_capacity_liquid(temperature)
                 for substance in self.substances
             ]
         )
-        mix_cp = np.dot(moles, pure_cp)
+        mix_cp = np.dot(mol_fractions, pure_cp)
         return mix_cp
 
     def _formation_enthalpies_set(self):

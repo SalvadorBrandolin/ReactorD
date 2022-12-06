@@ -49,9 +49,9 @@ def test_one_substance_mix():
         ) == hydrogen.heat_capacity_gas_dt_integral(298.15, t)
 
     for n in compositions:
-        assert mix1.mol_fracations(n) == 1.0
-        assert mix2.mol_fracations(n) == 1.0
-        assert mix3.mol_fracations(n) == 1.0
+        assert mix1.mol_fractions(n) == 1.0
+        assert mix2.mol_fractions(n) == 1.0
+        assert mix3.mol_fractions(n) == 1.0
 
         for t, p in zip(temperature, pressure):
             assert mix1.concentrations(n, t, p) == p / (r * t)
@@ -63,15 +63,15 @@ def test_one_substance_mix():
             assert mix1.volume(n, t, p) == mix2.volume(n, t, p)
 
             assert mix1.mix_heat_capacity(n, t, p) == (
-                methane.heat_capacity_gas(t) * n
+                methane.heat_capacity_gas(t)
             )
 
             assert mix2.mix_heat_capacity(n, t, p) == (
-                oxygen.heat_capacity_gas(t) * n
+                oxygen.heat_capacity_gas(t)
             )
 
             assert mix3.mix_heat_capacity(n, t, p) == (
-                hydrogen.heat_capacity_gas(t) * n
+                hydrogen.heat_capacity_gas(t)
             )
 
             assert mix1.partial_pressures(n, t, p) == p
@@ -134,7 +134,7 @@ def test_three_substances_mix():
             assert mixture.volume(moles, t, p) == raw_vol  # OKAY
 
             # Test of mix_heat_capacity method
-            raw_mix_heat_capacity = np.dot(raw_heat_capacities, moles)
+            raw_mix_heat_capacity = np.dot(raw_heat_capacities, raw_mol_fractions)
             assert raw_mix_heat_capacity == mixture.mix_heat_capacity(
                 moles, t, p
             )  # OKAY

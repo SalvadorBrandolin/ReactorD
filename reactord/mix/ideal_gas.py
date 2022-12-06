@@ -53,11 +53,11 @@ class IdealGas(AbstractMix):
         ndarray or list [float]
             Concentration of each substance [mol/m³]
         """
-        zi = self.mol_fracations(moles)
+        mol_fractions = self.mol_fractions(moles)
 
         r = 8.31446261815324  # m³⋅Pa/K/mol
         density = pressure / (r * temperature)
-        return np.multiply(zi, density)
+        return np.multiply(mol_fractions, density)
 
     def volume(self, moles, temperature, pressure):
         """Calculate the volume of the mixture.
@@ -97,13 +97,14 @@ class IdealGas(AbstractMix):
         float
             Heat capacity of the mixture [J/K]
         """
+        mol_fractions = self.mol_fractions(moles)
         pure_cp = np.array(
             [
                 substance.heat_capacity_gas(temperature)
                 for substance in self.substances
             ]
         )
-        mix_cp = np.dot(moles, pure_cp)
+        mix_cp = np.dot(mol_fractions, pure_cp)
         return mix_cp
 
     def _formation_enthalpies_set(self):
