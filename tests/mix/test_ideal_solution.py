@@ -105,9 +105,7 @@ def test_three_substance_mix():
         raw_mol_fraction = moles / sum(moles)
 
         # Test of mol_fractions method
-        assert (
-            mixture.mol_fractions(moles) == raw_mol_fraction
-        ).all()  # OKAY
+        assert (mixture.mol_fractions(moles) == raw_mol_fraction).all()  # OKAY
 
         # Test of volume method
         vol_mix = mixture.volume(moles, t, pressure)

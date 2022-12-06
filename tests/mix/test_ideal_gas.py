@@ -134,7 +134,9 @@ def test_three_substances_mix():
             assert mixture.volume(moles, t, p) == raw_vol  # OKAY
 
             # Test of mix_heat_capacity method
-            raw_mix_heat_capacity = np.dot(raw_heat_capacities, raw_mol_fractions)
+            raw_mix_heat_capacity = np.dot(
+                raw_heat_capacities, raw_mol_fractions
+            )
             assert raw_mix_heat_capacity == mixture.mix_heat_capacity(
                 moles, t, p
             )  # OKAY

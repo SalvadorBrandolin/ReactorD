@@ -13,14 +13,15 @@ C = rd.Substance.from_thermo_database("water")
 D = rd.Substance.from_thermo_database("co2")
 
 # Then we create the mixture:
-mixture = rd.mix.IdealGas(A=A,B=B,C=C,D=D)
+mixture = rd.mix.IdealGas(A=A, B=B, C=C, D=D)
 
 # and the stoichiometry matrix:
 stoichiometry = np.array([[-1, -2, 2, 1]])
 
 # A function for the reaction rate is defined:
-def rate1(concentrations,temperature):
-    return 10000*concentrations[0]
+def rate1(concentrations, temperature):
+    return 10000 * concentrations[0]
+
 
 # Kinetics is instantiated and "concentration" are being used to make
 # the calculations
@@ -46,6 +47,4 @@ PFR = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
 )
 
 # Simulation:
-solution = (
-    PFR.simulate()
-)
+solution = PFR.simulate()
