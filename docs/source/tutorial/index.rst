@@ -6,4 +6,4 @@ Contents:
 .. toctree::
    :maxdepth: 1
 
-   Substance
+   substance.ipynb

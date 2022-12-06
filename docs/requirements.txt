@@ -1,7 +1,10 @@
-ipykernel
 Sphinx
 sphinx_rtd_theme
+
 nbsphinx
-#sphinxcontrib.bibtex
 sphinx_copybutton
 
+ipykernel
+ipython
+
+#sphinxcontrib-bibtex
