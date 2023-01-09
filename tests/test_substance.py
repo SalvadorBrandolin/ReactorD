@@ -1,8 +1,7 @@
 import pytest
+from thermo.chemical import Chemical
 
 import reactord as rd
-
-from thermo.chemical import Chemical
 
 compounds = [("water"), ("methane"), ("pentane"), ("toluene")]
 
@@ -208,3 +207,11 @@ def test_viscosity_gas(name):
             assert substance.viscosity_gas(t, p) == (
                 chemical_obj.ViscosityGas(t, p)
             )
+
+
+@pytest.mark.parametrize("name", compounds)
+def test_create_substance_file(name):
+    substance = rd.Substance(name)
+    rd.Substance.create_substance_file(substance, "name_file")
+    file = rd.Substance.load_file("name_file")
+    assert file.name == substance.name

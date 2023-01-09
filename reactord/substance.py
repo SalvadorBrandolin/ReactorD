@@ -2,13 +2,13 @@
 
 Class to define a substance for ReactorD library.
 """
+import pickle
 from typing import Callable
 
-from reactord.utils import vectorize
-
 from scipy.integrate import quad
-
 from thermo.chemical import Chemical
+
+from reactord.utils import vectorize
 
 
 class Substance:
@@ -173,6 +173,45 @@ class Substance:
         self._thermal_conductivity_gas_tp = thermal_conductivity_gas_tp
         self._viscosity_liquid_tp = viscosity_liquid_tp
         self._viscosity_gas_tp = viscosity_gas_tp
+
+    def create_substance_file(self, name_file) -> __file__:
+        """Serialize an object substance
+        This method save an object substance as a file
+
+        Parameters
+        ----------
+        name_file : str
+            name of file to save the substance object
+
+        mode: str
+            file read mode
+
+        Returns
+        -------
+        _file_
+            A binary file with substance predefine object
+        """
+        with open(name_file, "wb") as f:
+            return pickle.dump(self, f)
+
+    @classmethod
+    def load_file(cls, name_file):
+        """_summary_
+
+        Parameters
+        ----------
+        name_file : _type_
+            _description_
+        mode : _type_, optional
+            _description_, by default None
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        with open(name_file, "rb") as f:
+            return pickle.load(f)
 
     @classmethod
     def from_thermo_database(cls, identification: str):
