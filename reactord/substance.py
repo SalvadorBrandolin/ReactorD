@@ -8,6 +8,7 @@ from typing import Callable
 from reactord.utils import vectorize
 
 from scipy.integrate import quad
+
 from thermo.chemical import Chemical
 
 
@@ -198,11 +199,11 @@ class Substance:
 
         Parameters
         ----------
-        name_file : str_
+        name_file : str
 
         Returns
         -------
-        _Substance Object_
+        Substance : Substance
         """
         with open(name_file, "rb") as f:
             return pickle.load(f)

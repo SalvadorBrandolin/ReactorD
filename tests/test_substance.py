@@ -1,7 +1,9 @@
 import pytest
-from thermo.chemical import Chemical
 
 import reactord as rd
+
+from thermo.chemical import Chemical
+
 
 compounds = [("water"), ("methane"), ("pentane"), ("toluene")]
 
