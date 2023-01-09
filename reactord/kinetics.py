@@ -14,22 +14,27 @@ class Kinetics:
     mix : AbstractMix
             Mixture object.
     list_of_reactions : List[Callable]
-        List containing functions to eval the reaction rates, each
-        defined by the user with the form:
+        List of functions that evaluate the reaction rates, each one
+        defined by the user with the following format:
+
         callable(concentration_unit: list[float], temperature: float
-        ) -> float. Where concentration_unit refers to the
-        concentration unit of measure that is argument of the
-        kinetic law.
+        ) -> float.
+
+        Where concentration_unit refers to the units in which the
+        arguments of the kinetic laws are expressed, for instance,
+        concentrations or partial_pressures.
+
     stoichiometry : List[float]
-        Stoichiometry matrix of the reactive system. Each row
-        represents each reaction contained in the list_of_reactions
-        parameter, each column represents each substance in the mix
-        parameter. The stoichiometry matrix entrances are the
-        stoichiometric coefficients of each substance in each
-        reaction.
+        A matrix that represents the stoichiometry of the reactive system.
+        Each row represents one reaction contained in the
+        list_of_reactions parameter and each column represents a
+        substance in the mix parameter. The stoichiometry matrix
+        entrances are the stoichiometric coefficients of each substance
+        in each reaction.
     kinetic_argument : str
-        Kinetic argument used to eval the reaction defined by the
-        user. Options:
+        This argument is used to define how to evaluate the composition
+        of the reactive mixture inside the reactor.
+        Options:
         'concentration': substance concentration. [mol/m^3]
         'partial_pressure': substance partial pressure. [Pa]
     """
@@ -51,7 +56,7 @@ class Kinetics:
         # DATA VALIDATION
         # ==============================================================
 
-        # Mix is an instances of AbstractMix?
+        # Is mix an instance of AbstractMix?
 
         if not (isinstance(self.mix, AbstractMix)):
             raise TypeError(
@@ -59,7 +64,7 @@ class Kinetics:
                 "class. See documentation for defining mix objects."
             )
 
-        # Get the number of component and reactions from stoichiometry
+        # Get the number of components and reactions from stoichiometry
 
         if np.ndim(stoichiometry) == 1:
             self.num_reactions = 1
@@ -67,7 +72,8 @@ class Kinetics:
         else:
             self.num_reactions, self.num_substances = np.shape(stoichiometry)
 
-        # Checks that there is a function to eval each reaction
+        # There must be one function to evaluate the reaction rate per
+        # reaction
 
         if self.num_reactions != len(list_of_reactions):
             raise IndexError(
@@ -75,7 +81,8 @@ class Kinetics:
                 " list_of_reactions' length"
             )
 
-        # Checks mix and stoichiometry has the same number of substances
+        # Check whether mix and stoichiometry have the same number of
+        # substances
 
         if len(mix) != self.num_substances:
             raise IndexError(
@@ -83,7 +90,7 @@ class Kinetics:
                 " number in 'mix' object"
             )
 
-        # Checks if reacion_enthalpies option is correct
+        # Checks whether reaction_enthalpies option in kwargs is correct
 
         if "reaction_enthalpies" in self.kwargs.keys():
 
@@ -98,7 +105,7 @@ class Kinetics:
                 )
 
         # ==============================================================
-        # Set the dimension of stoichiometry matrix explicitly
+        # Set the dimension of the stoichiometry matrix explicitly
         # (needed for single reaction systems)
         # ==============================================================
 
@@ -107,7 +114,7 @@ class Kinetics:
         )
 
         # ==============================================================
-        # SETS THE KINETICS COMPOSITIONAL ARGUMENTS
+        # SET THE KINETICS COMPOSITIONAL ARGUMENTS
         # ==============================================================
 
         if self.kinetic_argument == "concentration":
@@ -134,10 +141,11 @@ class Kinetics:
     def kinetic_eval(
         self, moles: List[float], temperature: float, pressure: float
     ) -> np.ndarray:
-        """Evaluate kinetic.
+        """Evaluate reaction kinetics.
 
-        Method that evaluates the reaction rate for each reaction at
-        concentration, temperature and pressure given.
+        Method that evaluates the reaction rates for each reaction and
+        each component in the mixture at given concentrations, temperature
+        and pressure.
 
         Parameters
         ----------
@@ -150,19 +158,22 @@ class Kinetics:
 
         Returns
         -------
-        ndarray, ndarray
-
+        rates_i: ndarray of shape (moles,). The rates for each component.
+        reaction_rates: ndarray of shape (list_reactions,). The rate for
+            each reaction.
         """
         # The partial pressures or concentrations are calculated:
         composition = self._composition_calculator(
             moles, temperature, pressure
         )
 
-        # Rates for each individual reaction:
-        reaction_rates = [
-            reaction(composition, temperature)
-            for reaction in self.list_of_reactions
-        ]
+        # Rates for each reaction:
+        reaction_rates = np.array(
+            [
+                reaction(composition, temperature)
+                for reaction in self.list_of_reactions
+            ]
+        )
 
         # Rates for each compound:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
@@ -170,31 +181,30 @@ class Kinetics:
 
     @property
     def std_reaction_enthalpies(self):
-        """Set standar reaction enthalpies."""
+        """Set standard reaction enthalpies."""
         return self._std_reaction_enthalpies
 
     @std_reaction_enthalpies.setter
     def std_reaction_enthalpies(self):
         raise NotImplementedError(
-            "The attribute std_reaction_enthalpies doesn't admits direct"
+            "The attribute std_reaction_enthalpies doesn't admit direct"
             "assignation."
         )
 
     def reaction_enthalpies(self, temperature, pressure):
-        """Eval reacion enthalpies.
+        """Evaluate reaction enthalpies of all the reactions involved.
 
         Parameters
         ----------
         temperature : float
-            temperature to eval enthalpies
+            Temperature [K] at which enthalpies are evaluated.
         pressure : float
-            pressure to eval enthalpies
+            Pressure [Pa] at which enthalpies are evaluated.
 
         Returns
         -------
         array, attribute
-            reaction enthalpies with correction acording to the substance and
-            temperature
+            reaction enthalpies at the specified temperature.
         """
         if "reaction_enthalpies" in self.kwargs.keys():
             return self.kwargs.get("reaction_enthalpies")
@@ -222,15 +232,15 @@ class Kinetics:
             )
 
     def _std_reaction_enthalpies_from_formation(self):
-        """Calculate standar reaction enthalpies.
+        """Calculate standard reaction enthalpies.
 
-        Calculates the standard reaction enthalpy from standard
-        formation enthalpies defined from mix object.
+        Calculates the standard reaction enthalpies using standard
+        formation enthalpies from a mix object.
 
         Returns
         -------
         ndarray
-            Standar reaction enthalpies. [j/mol/K]
+            Standard reaction enthalpies. [j/mol/K]
         """
         formation_enthalpies = self.mix._formation_enthalpies_set()
         return np.dot(self.stoichiometry, formation_enthalpies)

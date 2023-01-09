@@ -5,6 +5,7 @@
 *.pytest_cache*
 *.ipynb_checkpoints*
 *.vscode*
+*settings.json*
 
 /docs/build
 /docs/{envbuild

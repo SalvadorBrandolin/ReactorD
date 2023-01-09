@@ -1,6 +1,6 @@
 # ReactorD
 
-![logo](https://raw.githubusercontent.com/SalvadorBrandolin/ReactorD/main/logo.png)
+![logo](https://raw.githubusercontent.com/SalvadorBrandolin/ReactorD/main/logo.png)  
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/SalvadorBrandolin/ReactorD/HEAD)
 <a href="https://codeclimate.com/github/SalvadorBrandolin/ReactorD/maintainability"><img src="https://api.codeclimate.com/v1/badges/a864fbe28176d9a5d410/maintainability" /></a>
 <a href="https://github.com/SalvadorBrandolin/ReactorD/actions/workflows/ci.yml">
@@ -14,7 +14,7 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 <img src='https://img.shields.io/pypi/v/reactord'>
 </a>
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
-[![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)](https://badge.fury.io/py/uttrs)
+![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)
 
 ReactorD (Reactor Design) is a python package whose proposal is to simulate and design reactors for multiple-reaction systems. The intention is to solve the following reactor types in stationary or not-stationary conditions: Plug flow (PFR) and Stirred tank (STR) 
 
@@ -54,7 +54,7 @@ pip install reactord
 ```
 
 ## Authors
-Brandolín, Salvador Eduardo 
+Brandolín, Salvador Eduardo
 (<a href=salvadorebrandolin@mi.unc.edu.ar>salvadorebrandolin@mi.unc.edu.ar</a>)
 Parodi, Adrián
 (<a href=adrian.parodi@mi.unc.edu.ar>adrian.parodi@mi.unc.edu.ar</a>)

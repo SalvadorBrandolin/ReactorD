@@ -20,7 +20,7 @@ def vectorize(signature: str = None, excluded: set = None) -> Callable:
         '(m,n),(n)->(m)' for vectorized matrix-vector multiplication
     excluded : set, optional
         Set of strings or integers representing the positional or
-        keyword arguments for which the function will not be vectorized.
+        keyword arguments for which the function won't be vectorized.
         These will be passed directly to user_function unmodified.
         By default None
 
