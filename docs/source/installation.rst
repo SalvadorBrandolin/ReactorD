@@ -14,12 +14,9 @@ After setting up and activating the virtualenv, run the following command:
 
 .. code-block:: console
 
-   $ pip install ReactorD
-   ...
+   $ pip install reactord
 
 That should be it all.
-
-
 
 Installing the development version
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -35,7 +32,6 @@ Check out ReactorD main development branch like so:
 .. code-block:: console
 
    $ git clone https://github.com/SalvadorBrandolin/ReactorD.git
-   ...
 
 This will create a directory *ReactorD* in your current directory.
 
@@ -45,4 +41,3 @@ Then you can proceed to install with the commands
 
    $ cd ReactorD
    $ pip install -e .
-   ...

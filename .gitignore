@@ -6,5 +6,7 @@
 *.ipynb_checkpoints*
 *.vscode*
 *name_file*
+*settings.json*
 
 /docs/build
+/docs/{envbuild

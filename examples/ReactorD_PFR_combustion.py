@@ -13,7 +13,6 @@ C = rd.Substance.from_thermo_database("water")
 D = rd.Substance.from_thermo_database("co2")
 
 # Then we create the mixture:
-
 mixture = rd.mix.IdealGas(A=A, B=B, C=C, D=D)
 
 # and the stoichiometry matrix:
