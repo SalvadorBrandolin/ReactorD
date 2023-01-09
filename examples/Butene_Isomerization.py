@@ -16,6 +16,7 @@ A.name = "A"
 B.name = "B"
 
 # The mixture object is created:
+
 mixture = rd.mix.IdealSolution(A=A, B=B)
 
 # A function for the reaction rate is defined:

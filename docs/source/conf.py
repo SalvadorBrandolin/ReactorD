@@ -80,7 +80,7 @@ author = (
     "Scilipoti, Jose Antonio"
 )
 
-release = "0.0.1"
+release = "0.0.1a1"
 
 # -- Options for HTML output ----------------------------------------------
 
