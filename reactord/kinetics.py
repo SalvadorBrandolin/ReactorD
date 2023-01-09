@@ -174,7 +174,7 @@ class Kinetics:
                 for reaction in self.list_of_reactions
             ]
         )
-        
+
         # Rates for each compound:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates

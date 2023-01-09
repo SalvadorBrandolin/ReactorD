@@ -113,7 +113,7 @@ class IdealSolution(AbstractMix):
             Heat capacity of the mixture [J/K]
         """
         mol_fractions = self.mol_fractions(moles)
-        
+
         pure_cp = np.array(
             [
                 substance.heat_capacity_liquid(temperature)

@@ -61,7 +61,7 @@ class AbstractMix(metaclass=ABCMeta):
         """
         mol_fractions = self.mol_fractions(moles)
         partial_pressures = np.multiply(mol_fractions, pressure)
-        
+
         return partial_pressures
 
     def __len__(self):
