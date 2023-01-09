@@ -54,8 +54,8 @@ pip install reactord
 ```
 
 ## Authors
-Brandolín, Salvador Eduardo 
-(<a href=salvadorebrandolin@mi.unc.edu.ar>salvadorbrandolin@mi.unc.edu.ar</a>)
+Brandolín, Salvador Eduardo
+(<a href=salvadorebrandolin@mi.unc.edu.ar>salvadorebrandolin@mi.unc.edu.ar</a>)
 Parodi, Adrián
 (<a href=adrian.parodi@mi.unc.edu.ar>adrian.parodi@mi.unc.edu.ar</a>)
 Rovezzi, Juan Pablo
