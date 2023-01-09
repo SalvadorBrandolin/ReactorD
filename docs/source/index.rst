@@ -56,8 +56,11 @@ Ver. |release|
    :maxdepth: 1
    :caption: Tutorials
 
-   tutorial/index
+   tutorial/index.rst
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Modules
 
 **ReactorD** (Reactor Design) is a python package whose proposal is to simulate and design reactors for 
 multiple-reaction systems. The intention is to solve the following reactor types in stationary or 

@@ -30,12 +30,12 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autosummary",
     "nbsphinx",
-    #"sphinxcontrib.bibtex",
+    # "sphinxcontrib.bibtex",
     "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = []
+exclude_patterns = ['_build', '**.ipynb_checkpoints']
 
 # =============================================================================
 # EXTRA CONF
