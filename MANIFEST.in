@@ -1,4 +1,4 @@
-include LICENSE
+include LICENCE
 include README.md
 include requirements.txt
 
@@ -9,9 +9,10 @@ exclude pyproject.toml
 exclude .readthedocs.yml
 exclude requirements_dev.txt
 exclude *.png
-recursive-exclude examples *
-recursive-exclude dist *
-recursive-exclude reactord *.mod *.log *.pyc 
-recursive-exclude tests *
-recursive-exclude docs *
-recursive-exlcude .vscode
+prune examples
+prune .tox
+recursive-exclude reactord *.pyc 
+prune tests
+prune docs
+prune .vscode
+prune .pytest_cache
