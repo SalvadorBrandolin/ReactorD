@@ -14,7 +14,7 @@ After setting up and activating the virtualenv, run the following command:
 
 .. code-block:: console
 
-   $ pip install ReactorD
+   $ pip install reactord
 
 That should be it all.
 
