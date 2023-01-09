@@ -9,6 +9,7 @@ exclude pyproject.toml
 exclude .readthedocs.yml
 exclude requirements_dev.txt
 exclude *.png
+recursive-exclude name_file
 recursive-exclude examples *
 recursive-exclude dist *
 recursive-exclude reactord *.mod *.log *.pyc 

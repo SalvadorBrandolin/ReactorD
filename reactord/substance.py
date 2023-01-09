@@ -5,10 +5,10 @@ Class to define a substance for ReactorD library.
 import pickle
 from typing import Callable
 
+from reactord.utils import vectorize
+
 from scipy.integrate import quad
 from thermo.chemical import Chemical
-
-from reactord.utils import vectorize
 
 
 class Substance:
@@ -175,16 +175,14 @@ class Substance:
         self._viscosity_gas_tp = viscosity_gas_tp
 
     def create_substance_file(self, name_file) -> __file__:
-        """Serialize an object substance
+        """Serialize an object substance.
+
         This method save an object substance as a file
 
         Parameters
         ----------
         name_file : str
             name of file to save the substance object
-
-        mode: str
-            file read mode
 
         Returns
         -------
@@ -196,19 +194,15 @@ class Substance:
 
     @classmethod
     def load_file(cls, name_file):
-        """_summary_
+        """Read save file of substance object.
 
         Parameters
         ----------
-        name_file : _type_
-            _description_
-        mode : _type_, optional
-            _description_, by default None
+        name_file : str_
 
         Returns
         -------
-        _type_
-            _description_
+        _Substance Object_
         """
         with open(name_file, "rb") as f:
             return pickle.load(f)
