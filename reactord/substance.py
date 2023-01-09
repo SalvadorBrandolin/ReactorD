@@ -17,8 +17,8 @@ class Substance:
     Class to define a substance object. Specific attributes definition will be
     required for the reactors, described in each reactor documentation. For
     example, an adiabatic reactor will require that substances define a heat
-    capacity function, on the other hand, when using isothermic reactors will
-    not be necessary. Substance has the .from_thermo_data_base alternative
+    capacity function, on the other hand, when using isothermic reactors this
+    won't be necessary. Substance has the .from_thermo_data_base alternative
     construction method.
     E.g:
 
@@ -51,43 +51,44 @@ class Substance:
         Ideal-gas molar change of Gibbs energy of formation [J/mol], by default
         None
     vaporization_enthalpy_t : Callable, optional
-        A function that receives temperature and returns the vaporization
-        enthalpy at temperature [J/mol], by default None
+        A function that receives a temperature and returns the vaporization
+        enthalpy at that temperature [J/mol], by default None
     sublimation_enthalpy_t : Callable, optional
-        A function that receives temperature and returns the sublimation
-        enthalpy at temperature [J/mol], by default None
+        A function that receives a temperature and returns the sublimation
+        enthalpy at that temperature [J/mol], by default None
     volume_solid_t : Callable, optional
-        A function that receives temperature and returns the molar volume of
-        the solid at temperature [m^3/mol], by default None
+        A function that receives a temperature and returns the molar volume of
+        the solid at that temperature [m³/mol], by default None
     volume_liquid_tp : Callable, optional
-        A function that receives temperature and pressure, and returns the
-        molar volume of liquid at temperature and pressure [m^3/mol], by
+        A function that receives a temperature and pressure, and returns the
+        molar volume of liquid at that temperature and pressure [m³/mol], by
         default None
     volume_gas_tp : Callable, optional
-        A function that receives temperature and pressure, and returns the
-        molar volume of gas at temperature and pressure [m^3/mol], by default
-        None
+        A function that receives a temperature and pressure, and returns the
+        molar volume of the gas at that temperature and pressure [m^3/mol],
+        by default None
     heat_capacity_solid_t : Callable, optional
-        A function that receives temperature and pressure, and returns the heat
-        capacity of solid at temperature and pressure [J/mol/K], by default
-        None
+        A function that receives a temperature and pressure, and returns the
+        heat capacity of the solid at that temperature and pressure [J/mol/K],
+        by default None
     heat_capacity_liquid_t : Callable, optional
-        A function that receives temperature and returns the heat capacity of
-        liquid at temperature [J/mol/K], by default None
+        A function that receives a temperature and returns the heat capacity of
+        the liquid at that temperature [J/mol/K], by default None
     heat_capacity_gas_t : Callable, optional
-        A function that receives temperature and returns the heat capacity of
-        gas at temperature [J/mol/K], by default None
+        A function that receives a temperature and returns the heat capacity of
+        the gas at that temperature [J/mol/K], by default None
     thermal_conductivity_liquid_tp : Callable, optional
-        A function that receives temperature and pressure, and returns the
-        thermal conductivity of liquid at temperature and pressure [W/m/K], by
-        default None
+        A function that receives a temperature and pressure, and returns the
+        thermal conductivity of the liquid at that temperature and pressure
+        [W/m/K], by default None
     thermal_conductivity_gas_tp : Callable, optional
-        A function that receives temperature and pressure, and returns the
-        thermal conductivity of gas at temperature and pressure [W/m/K], by
-        default None
+        A function that receives a temperature and pressure, and returns the
+        thermal conductivity of the gas at that temperature and pressure
+        [W/m/K], by default None
     viscosity_liquid_tp : Callable, optional
-        A function that receives temperature and pressure, and returns the
-        viscosity of liquid at temperature and pressure [Pa*s], by default None
+        A function that receives a temperature and pressure, and returns the
+        viscosity of thr liquid at that temperature and pressure [Pa*s], by
+        default None
     viscosity_gas_tp : Callable, optional
         A function that receives temperature and pressure, and returns the
         viscosity of gas at temperature and pressure [Pa*s], by default None
@@ -178,14 +179,14 @@ class Substance:
     def from_thermo_database(cls, identification: str):
         """Substance instance from Bell Caleb's thermo library.
 
-        Method that uses Bell Caleb's Thermo library to construct the Substance
-        object.
+        Method that uses Bell Caleb's Thermo library to construct the
+        Substance object.
 
         Cite:
 
-        Caleb Bell and Contributors (2016-2021). Thermo: Chemical properties
-        component of Chemical Engineering Design Library (ChEDL)
-        https://github.com/CalebBell/thermo.
+        Caleb Bell and Contributors (2016-2021). Thermo: Chemical
+        properties        component of Chemical Engineering Design
+        Library (ChEDL) https://github.com/CalebBell/thermo.
 
         Parameters
         ----------
@@ -262,9 +263,9 @@ class Substance:
     def fusion_enthalpy(self, temperature: float) -> float:
         """Return the fusion enthalpy at a given temperature.
 
-        Uses the sublimation and vaporization enthalpy functions for the fusion
-        enthalpy calculations at a given temperature, by calculating the
-        sublimation and vaporization enthalpy difference.
+        Uses the sublimation and vaporization enthalpy functions for the
+        fusion enthalpy calculations at a given temperature, by
+        calculating the sublimation and vaporization enthalpy difference.
 
         Parameters
         ----------
@@ -293,7 +294,7 @@ class Substance:
         Returns
         -------
         float
-            Solid molar volume in cubic meters per mol [m^3/mol]
+            Solid molar volume in cubic meters per mol [m³/mol]
         """
         return self._volume_solid_t(temperature)
 
@@ -311,7 +312,7 @@ class Substance:
         Returns
         -------
         float
-            Liquid molar volume in cubic meters per mol [m^3/mol]
+            Liquid molar volume in cubic meters per mol [m³/mol]
         """
         return self._volume_liquid_tp(temperature, pressure)
 
@@ -329,7 +330,7 @@ class Substance:
         Returns
         -------
         float
-            Liquid molar volume in cubic meters per mol [m^3/mol]
+            Liquid molar volume in cubic meters per mol [m³/mol]
         """
         return self._volume_gas_tp(temperature, pressure)
 
@@ -361,7 +362,8 @@ class Substance:
         Returns
         -------
         float
-            Pure liquid heat capacity in Joule per mol per Kelvin [J/mol/K]
+            Pure liquid heat capacity in Joule per mol per Kelvin
+            [J/mol/K]
         """
         return self._heat_capacity_liquid_t(temperature)
 
@@ -397,7 +399,8 @@ class Substance:
         Returns
         -------
         float
-            Liquid thermal conductivity in Watts per meter per Kelvin [W/m/K]
+            Liquid thermal conductivity in Watts per meter per Kelvin
+            [W/m/K]
         """
         return self._thermal_conductivity_liquid_tp(temperature, pressure)
 
@@ -417,7 +420,8 @@ class Substance:
         Returns
         -------
         float
-            Gas thermal conductivity in Watts per meter per Kelvin [W/m/K]
+            Gas thermal conductivity in Watts per meter per Kelvin
+            [W/m/K]
         """
         return self._thermal_conductivity_gas_tp(temperature, pressure)
 
@@ -425,7 +429,7 @@ class Substance:
     def viscosity_liquid(self, temperature: float, pressure: float) -> float:
         """Return the pure liquid viscosity.
 
-         Pure liquid viscosity as a function of temperature and pressure
+        Pure liquid viscosity at a given temperature and pressure.
 
         Parameters
         ----------
@@ -445,7 +449,7 @@ class Substance:
     def viscosity_gas(self, temperature: float, pressure: float) -> float:
         """Return the pure gas viscosity.
 
-         Pure gas viscosity as a function of temperature and pressure
+         Pure gas viscosity at a given temperature and pressure.
 
         Parameters
         ----------
@@ -467,8 +471,8 @@ class Substance:
     ) -> float:
         """Return the integral of solid heat capacity.
 
-        Calculate the integral of solid heat capacity between temperature1 and
-        temperature2
+        Calculate the integral of solid heat capacity between temperature1
+        and temperature2
 
         Parameters
         ----------

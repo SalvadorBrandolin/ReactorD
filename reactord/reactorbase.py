@@ -76,9 +76,9 @@ class ReactorBase(metaclass=ABCMeta):
     def mix(self) -> AbstractMix:
         """Get mix.
 
-        Method to instance Mixture object. The mixture object is stored only
-        on the Kinetics object to prevent multiple mixture objects on the same
-        reactor.
+        Method to instantiate a Mixture object, which is stored in an
+        instance of Kinetics to prevent having multiple mixture objects
+        in the same reactor.
 
         Returns
         -------
@@ -92,7 +92,7 @@ class ReactorBase(metaclass=ABCMeta):
         """Set New Mix object.
 
         Method to assign a new mixture object to the reactor. The method
-        replaces the mixture inside the kinetic object.
+        replaces the mixture inside the Kinetics object.
 
         Parameters
         ----------
@@ -110,13 +110,13 @@ class ReactorBase(metaclass=ABCMeta):
     def list_of_reactions(self) -> List[Callable]:
         """Get list of reactions.
 
-        List that contains the functions to eval each law kinetic reaction.
+        List that contains the functions to evaluate each kinetic reaction law.
         Method to store list_of_reactions in Kinetics object.
 
         Returns
         -------
         List[Callable]
-            List that contains the functions to eval each reaction.
+            List that contains the functions to evaluate each reaction.
         """
         return self._kinetics.list_of_reactions
 
@@ -125,12 +125,12 @@ class ReactorBase(metaclass=ABCMeta):
         """Set a new list of reactions.
 
         Method to assign a new list of reactions to the reactor. The method
-        replaces the list of reactions inside the kinetic object.
+        replaces the list of reactions inside the Kinetics object.
 
         Parameters
         ----------
         new_list_of_reactions : List[Callable]
-            List that contains the functions to eval each reaction.
+            List that contains the functions to evaluate each reaction.
         """
         self._kinetics.list_of_reactions = new_list_of_reactions
 
@@ -138,8 +138,7 @@ class ReactorBase(metaclass=ABCMeta):
     def stoichiometry(self) -> numpy.ndarray:
         """Get stoichiometry.
 
-        Numpy.ndrray with stoichiometry information. Method to store
-        list_of_reactions in Kinetics object.
+        Numpy.ndrray with stoichiometry information.
 
         Returns
         -------
@@ -164,12 +163,12 @@ class ReactorBase(metaclass=ABCMeta):
 
     @property
     def kinetic_argument(self) -> str:
-        """Argument to eval the kinetics function.
+        """Argument to evaluate the kinetics function.
 
         Returns
         -------
         str
-            Argument to eval the kinetic laws. Alternatives:
+            Argument to evaluate the kinetic laws. Alternatives:
             "concentration", "partial_pressure".
         """
         return self._kinetics.kinetic_argument
@@ -183,7 +182,7 @@ class ReactorBase(metaclass=ABCMeta):
         Parameters
         ----------
         new_kinetics_argument : str
-            Argument to eval the kinetic functions. Alternatives:
+            Argument to evaluate the kinetic functions. Alternatives:
             "concentration", "partial_pressure".
         """
         self._kinetics.kinetic_argument = new_kinetics_argument
@@ -266,7 +265,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     # =========================================================================
     # Abastract methods
-    # Settings for mass, energy and pressure balance.
+    # Settings for mass, energy and pressure balances.
     # =========================================================================
 
     @abstractmethod
@@ -317,7 +316,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _grid_builder(self) -> None:
-        """Build the independent variables a grid.
+        """Build a grid of independent variables.
 
         Method to build the grid of independent variables. Receives lower and
         upper boundaries for each independent variable and also the number of
@@ -349,7 +348,7 @@ class ReactorBase(metaclass=ABCMeta):
         Constructs the border conditions for the differential equations that
         represent the bulk phase behavior. Also, may return initial guesses for
         the specific solvers. The format of the method's output corresponds
-        with the reactor's algebra.
+        to the reactor's algebra.
 
         Raises
         ------
@@ -366,9 +365,9 @@ class ReactorBase(metaclass=ABCMeta):
     def _mass_balance(self) -> None:
         """Eval the reactor's mass balance.
 
-        Method that evals and returns the evaluated reactor's bulk mass
+        Method that evaluates and returns the reactor's bulk-mass
         balances. The format of the method's returns corresponds to the
-        specific solver's needs.
+        solver's specific needs.
 
         Raises
         ------
@@ -379,11 +378,11 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _energy_balance(self) -> None:
-        """Eval reactor's energy balance.
+        """Evaluate reactor's energy balance.
 
-        Method that evals and returns the evaluated reactor's bulk energy
-        balance. The format of the method's returns corresponds to the specific
-        solver's needs.
+        Method that evaluates and returns the reactor's bulk-energy
+        balance. The format of the method's returns corresponds to the solver's
+        specificic needs.
 
         Raises
         ------
@@ -396,9 +395,9 @@ class ReactorBase(metaclass=ABCMeta):
     def _pressure_balance(self) -> None:
         """Eval reactor's pressure balance.
 
-        Method that evals and returns the evaluated reactor's bulk pressure
-        balance. The format of the method's returns corresponds to the specific
-        solver's needs.
+        Method that evaluates and returns the reactor's bulk-pressure
+        balance. The format of the method's returns corresponds to the solver's
+        specificic needs.
 
         Raises
         ------
@@ -424,10 +423,10 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def simulate(self) -> None:
-        """Simulate reactor.
+        """Simulate reactor operation.
 
-        Simulate the reactor given the mass_balance_data, energy_balance_data,
-        pressure_balance_data.
+        Simulate the reactor operation given the mass_balance_data,
+        energy_balance_data and pressure_balance_data.
 
         Raises
         ------
@@ -437,12 +436,12 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     # =========================================================================
-    # Specifics mass balances
+    # Specific mass balances
     # =========================================================================
 
     @abstractmethod
     def _homogeneous_mass_balance(self) -> None:
-        """Eval homogeneous mass balance.
+        """Evaluate homogeneous mass balance.
 
         Raises
         ------
@@ -453,7 +452,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _heterogeneous_mass_balance(self) -> None:
-        """Eval heterogeneous mass balance.
+        """Evaluate heterogeneous mass balance.
 
         Raises
         ------
@@ -463,12 +462,12 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     # =========================================================================
-    # Specifics energy balances
+    # Specific energy balances
     # =========================================================================
 
     @abstractmethod
     def _isothermic_energy_balance(self) -> None:
-        """Eval isothermic energy balance.
+        """Evaluate isothermic energy balance.
 
         Raises
         ------
@@ -479,7 +478,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _homogeneous_adiabatic_energy_balance(self) -> None:
-        """Eval homogeneous adiabatic energy balance.
+        """Evaluate homogeneous adiabatic energy balance.
 
         Raises
         ------
@@ -490,7 +489,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _heterogeneous_adiabatic_energy_balance(self) -> None:
-        """Eval heterogeneous adiabatic energy balance.
+        """Evaluate heterogeneous adiabatic energy balance.
 
         Raises
         ------
@@ -501,7 +500,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _homogeneous_non_isothermic_energy_balance(self) -> None:
-        """Eval homogeneous non-isothermic energy balance.
+        """Evaluate homogeneous non-isothermic energy balance.
 
         Raises
         ------
@@ -512,7 +511,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _heterogeneous_non_isothermic_energy_balance(self) -> None:
-        """Eval heterogeneous non-isothermic energy balance.
+        """Evaluate heterogeneous non-isothermic energy balance.
 
         Raises
         ------
@@ -522,11 +521,11 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     # =========================================================================
-    # Specifics pressure balances
+    # Specific pressure balances
     # =========================================================================
     @abstractmethod
     def _isobaric_pressure_balance(self) -> None:
-        """Eval isobaric pressure balance.
+        """Evaluate isobaric pressure balance.
 
         Raises
         ------
@@ -537,7 +536,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @abstractmethod
     def _non_isobaric_pressure_balance(self) -> None:
-        """Eval non-isobaric pressure balance.
+        """Evaluate non-isobaric pressure balance.
 
         Raises
         ------
@@ -547,7 +546,7 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     # =========================================================================
-    # Specifics solvers
+    # Specific solvers
     # =========================================================================
     @abstractmethod
     def _homogeneous_solver(self) -> None:
