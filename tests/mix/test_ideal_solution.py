@@ -114,13 +114,13 @@ def test_three_substance_mix():
         # Test of concentrations method
         total_molar_vol = np.dot(raw_mol_fraction, volumes)
         raw_concentrations = np.divide(raw_mol_fraction, total_molar_vol)
-        assert (
-            mixture.concentrations(moles, t, pressure) == raw_concentrations
-        ).all()  # OKAY
+        assert np.allclose(
+            mixture.concentrations(moles, t, pressure), raw_concentrations
+        )
 
         # Test of mix_heat_capacity method
         raw_mix_heat_capacity = np.dot(raw_heat_capacities, raw_mol_fraction)
-        assert (
-            mixture.mix_heat_capacity(moles, t, pressure)
-            == raw_mix_heat_capacity
+        assert np.allclose(
+            mixture.mix_heat_capacity(moles, t, pressure),
+            raw_mix_heat_capacity,
         )  # OKAY

@@ -4,6 +4,8 @@ Class to define a substance for ReactorD library.
 """
 from typing import Callable
 
+from reactord.utils import vectorize
+
 from scipy.integrate import quad
 
 from thermo.chemical import Chemical
@@ -225,6 +227,7 @@ class Substance:
         )
         return substance_object
 
+    @vectorize(signature="()->()", excluded={0})
     def vaporization_enthalpy(self, temperature: float) -> float:
         """Return the vaporization enthalpy at a given temperature.
 
@@ -240,6 +243,7 @@ class Substance:
         """
         return self._vaporization_enthalpy_t(temperature)
 
+    @vectorize(signature="()->()", excluded={0})
     def sublimation_enthalpy(self, temperature: float) -> float:
         """Return the sublimation enthalpy at a given temperature.
 
@@ -255,6 +259,7 @@ class Substance:
         """
         return self._sublimation_enthalpy_t(temperature)
 
+    @vectorize(signature="()->()", excluded={0})
     def fusion_enthalpy(self, temperature: float) -> float:
         """Return the fusion enthalpy at a given temperature.
 
@@ -277,6 +282,7 @@ class Substance:
         ) - self._vaporization_enthalpy_t(temperature)
         return fusion_h
 
+    @vectorize(signature="()->()", excluded={0})
     def volume_solid(self, temperature: float) -> float:
         """Return the solid molar volume at a given temperature.
 
@@ -292,6 +298,7 @@ class Substance:
         """
         return self._volume_solid_t(temperature)
 
+    @vectorize(signature="(),()->()", excluded={0})
     def volume_liquid(self, temperature: float, pressure: float) -> float:
         """Return the liquid molar volume at a given temperature and pressure.
 
@@ -309,6 +316,7 @@ class Substance:
         """
         return self._volume_liquid_tp(temperature, pressure)
 
+    @vectorize(signature="(),()->()", excluded={0})
     def volume_gas(self, temperature: float, pressure: float) -> float:
         """Return the gas molar volume at a given temperature and pressure.
 
@@ -326,6 +334,7 @@ class Substance:
         """
         return self._volume_gas_tp(temperature, pressure)
 
+    @vectorize(signature="()->()", excluded={0})
     def heat_capacity_solid(self, temperature: float) -> float:
         """Return the pure solid heat capacity at a given temperature.
 
@@ -341,6 +350,7 @@ class Substance:
         """
         return self._heat_capacity_solid_t(temperature)
 
+    @vectorize(signature="()->()", excluded={0})
     def heat_capacity_liquid(self, temperature: float) -> float:
         """Return the pure liquid heat capacity at a given temperature.
 
@@ -357,6 +367,7 @@ class Substance:
         """
         return self._heat_capacity_liquid_t(temperature)
 
+    @vectorize(signature="()->()", excluded={0})
     def heat_capacity_gas(self, temperature: float) -> float:
         """Return the pure gas heat capacity at a given temperature.
 
@@ -372,6 +383,7 @@ class Substance:
         """
         return self._heat_capacity_gas_t(temperature)
 
+    @vectorize(signature="(),()->()", excluded={0})
     def thermal_conductivity_liquid(
         self, temperature: float, pressure: float
     ) -> float:
@@ -392,6 +404,7 @@ class Substance:
         """
         return self._thermal_conductivity_liquid_tp(temperature, pressure)
 
+    @vectorize(signature="(),()->()", excluded={0})
     def thermal_conductivity_gas(
         self, temperature: float, pressure: float
     ) -> float:
@@ -412,6 +425,7 @@ class Substance:
         """
         return self._thermal_conductivity_gas_tp(temperature, pressure)
 
+    @vectorize(signature="(),()->()", excluded={0})
     def viscosity_liquid(self, temperature: float, pressure: float) -> float:
         """Return the pure liquid viscosity.
 
@@ -431,6 +445,7 @@ class Substance:
         """
         return self._viscosity_liquid_tp(temperature, pressure)
 
+    @vectorize(signature="(),()->()", excluded={0})
     def viscosity_gas(self, temperature: float, pressure: float) -> float:
         """Return the pure gas viscosity.
 
@@ -450,6 +465,7 @@ class Substance:
         """
         return self._viscosity_gas_tp(temperature, pressure)
 
+    @vectorize(signature="(),()->()", excluded={0})
     def heat_capacity_solid_dt_integral(
         self, temperature1: float, temperature2: float
     ) -> float:
@@ -477,6 +493,7 @@ class Substance:
 
         return integral
 
+    @vectorize(signature="(),()->()", excluded={0})
     def heat_capacity_liquid_dt_integral(
         self, temperature1: float, temperature2: float
     ) -> float:
@@ -504,6 +521,7 @@ class Substance:
 
         return integral
 
+    @vectorize(signature="(),()->()", excluded={0})
     def heat_capacity_gas_dt_integral(
         self, temperature1: float, temperature2: float
     ) -> float:

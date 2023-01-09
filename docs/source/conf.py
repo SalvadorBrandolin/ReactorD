@@ -24,8 +24,14 @@ sys.path.insert(0, str(REACTORD_PATH))
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.coverage",
+    "sphinx.ext.mathjax",
     "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
+    "sphinx.ext.autosummary",
+    "nbsphinx",
+    #"sphinxcontrib.bibtex",
+    "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]
@@ -60,9 +66,9 @@ project = "ReactorD"
 
 copyright = (
     "Brandolin, Salvador Eduardo - "
+    "Santos, Maricel Del Valle - "
     "Parodi, Adrian - "
     "Rovezzi, Juan Pablo - "
-    "Santos, Maricel Del Valle - "
     'Scilipoti, Jose Antonio - Copyright (c) 2022"'
 )
 
@@ -74,7 +80,7 @@ author = (
     "Scilipoti, Jose Antonio"
 )
 
-release = "0.0.1"
+release = "0.0.1a1"
 
 # -- Options for HTML output ----------------------------------------------
 
