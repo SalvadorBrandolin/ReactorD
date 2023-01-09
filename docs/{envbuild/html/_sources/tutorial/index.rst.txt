@@ -1,9 +1,0 @@
-Tutorial
---------
-
-Contents:
-
-.. toctree::
-   :maxdepth: 1
-
-   Substance.ipynb
