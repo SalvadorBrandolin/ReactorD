@@ -113,24 +113,6 @@ class IdealGas(AbstractMix):
         mix_cp = np.dot(mol_fractions, pure_cp)
         return mix_cp
 
-    def _formation_enthalpies_set(self):
-        """Return the ideal gas formation enthalpies in a ordered ndarray.
-
-        Method that read the ideal gas formation enthalpies of the mix
-        class and returns them in a ordered ndarray.
-
-        Returns
-        -------
-        ndarray [float]
-            Ideal gas formation enthalpies of each substance [J/mol/K]
-        """
-        enthalpies = np.array([])
-
-        for substance in self.substances:
-            enthalpies = np.append(enthalpies, substance.formation_enthalpy_ig)
-
-        return enthalpies
-
     def formation_enthalpies_correction(self, temperature: float, *args):
         """Calculate the correction term for the formation enthalpy.
 
@@ -159,3 +141,21 @@ class IdealGas(AbstractMix):
             )
 
         return correction_enthalpies
+
+    def _formation_enthalpies_set(self):
+        """Return the ideal gas formation enthalpies in a ordered ndarray.
+
+        Method that read the ideal gas formation enthalpies of the mix
+        class and returns them in a ordered ndarray.
+
+        Returns
+        -------
+        ndarray [float]
+            Ideal gas formation enthalpies of each substance [J/mol/K]
+        """
+        enthalpies = np.array([])
+
+        for substance in self.substances:
+            enthalpies = np.append(enthalpies, substance.formation_enthalpy_ig)
+
+        return enthalpies

@@ -170,7 +170,8 @@ class Substance:
         )
         self._volume_solid_t = np.vectorize(volume_solid_t, signature="()->()")
         self._volume_liquid_tp = np.vectorize(
-            volume_liquid_tp, signature="(),()->()"
+            volume_liquid_tp,
+            signature="(),()->()",
         )
         self._volume_gas_tp = np.vectorize(
             volume_gas_tp, signature="(),()->()"

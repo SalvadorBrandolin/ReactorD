@@ -8,7 +8,26 @@ from reactord.substance import Substance
 
 
 class AbstractMix(metaclass=ABCMeta):
-    """Mixture object abstract class."""
+    """Mixture object abstract class.
+
+    Parameters
+    ----------
+    metaclass : AbstractMix, optional
+        Mixture objects interface
+
+    Raises
+    ------
+    NotImplementedError
+        concentrations abstract method not implemented
+    NotImplementedError
+        volume abstract method not implemented
+    NotImplementedError
+        mix_heat_capacity abstract method not implemented
+    NotImplementedError
+        _formation_enthalpies_set abstract method not implemented
+    NotImplementedError
+        formation_enthalpies_correction abstract method not implemented
+    """
 
     substances: List[Substance] = []
 
@@ -119,7 +138,7 @@ class AbstractMix(metaclass=ABCMeta):
             ndarray that contains the concentrations of the mixture's
             substances [mol/m³]
         """
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
     def volume(self):
@@ -139,7 +158,7 @@ class AbstractMix(metaclass=ABCMeta):
         float
             volume of the mixture [m³]
         """
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
     def mix_heat_capacity(
@@ -162,12 +181,7 @@ class AbstractMix(metaclass=ABCMeta):
             heat capacity of the mixture [J/K]
 
         """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def _formation_enthalpies_set(self):
-        """Calculate the formation enthalpy of the mixture's substances."""
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
     def formation_enthalpies_correction(
@@ -193,4 +207,9 @@ class AbstractMix(metaclass=ABCMeta):
         correction_enthalpies : ndarray [float]
             Formation enthalpies correction for each substance (J/mol/K)
         """
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")
+
+    @abstractmethod
+    def _formation_enthalpies_set(self):
+        """Calculate the formation enthalpy of the mixture's substances."""
+        raise NotImplementedError("Abstract method not implemented")

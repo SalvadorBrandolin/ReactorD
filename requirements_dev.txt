@@ -1,15 +1,29 @@
-check-manifest
+# Style
+black[jupyter]
+flake8-nb
 flake8-black
 flake8-builtins
 flake8-import-order
-ipdb
-numpy>=1.21.5
 pep8-naming
 pydocstyle
-pytest
-pytest-cov
-scipy>=1.9.0
+
+# documentation (also pandoc must be installed)
 sphinx
 sphinx_rtd_theme
-thermo>=0.2.21
+
+# Testing
+check-manifest
+pytest
+pytest-cov
 tox
+
+# General purpose
+ipdb
+ipython
+jupyter
+matplotlib
+
+# ReactorD dependecies
+numpy>=1.21.5
+scipy>=1.9.0
+thermo>=0.2.21
