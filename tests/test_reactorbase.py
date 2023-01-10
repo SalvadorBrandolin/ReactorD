@@ -98,15 +98,6 @@ def test_not_implemented_error():
         def _border_cond_and_initial_guesses(self) -> None:
             return super()._border_cond_and_initial_guesses()
 
-        def _mass_balance(self) -> None:
-            return super()._mass_balance()
-
-        def _energy_balance(self) -> None:
-            return super()._energy_balance()
-
-        def _pressure_balance(self) -> None:
-            return super()._pressure_balance()
-
         def _refrigerant_energy_balance(self) -> None:
             return super()._refrigerant_energy_balance()
 
@@ -180,15 +171,6 @@ def test_not_implemented_error():
 
     with pytest.raises(NotImplementedError):
         reactor._border_cond_and_initial_guesses()
-
-    with pytest.raises(NotImplementedError):
-        reactor._mass_balance()
-
-    with pytest.raises(NotImplementedError):
-        reactor._energy_balance()
-
-    with pytest.raises(NotImplementedError):
-        reactor._pressure_balance()
 
     with pytest.raises(NotImplementedError):
         reactor._refrigerant_energy_balance()

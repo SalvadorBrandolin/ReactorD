@@ -298,6 +298,7 @@ class StationaryPFR(ReactorBase):
         catalyst_particle=None,
     ) -> ReactorBase:
         """Instantiate isothermic nonisobaric StationaryPFR.
+
         Parameters
         ----------
         mix : AbstractMix
@@ -333,7 +334,7 @@ class StationaryPFR(ReactorBase):
         isothermic_temperature : float
             Reactor's temperature. [K]
         pressure_in_out: dict
-            Pressure at initial and outlet length in non isothermic operation
+            Pressure at inlet and outlet length in non isothermic operation
         pressure_loss_equation: str
             Type of equation to calculate the pressure loss
             Options:
@@ -372,7 +373,6 @@ class StationaryPFR(ReactorBase):
             pressure_loss_equation=pressure_loss_equation,
             packed_bed_porosity=packed_bed_porosity,
             fanning_factor=fanning_factor,
-            catalyst_particle=catalyst_particle,
         )
         return isothermic_noisobaric_pfr
 
@@ -581,7 +581,7 @@ class StationaryPFR(ReactorBase):
         elif any(no_isobaric_args):
             # Check non-isobaric operation:
             self._pressure_operation = self.pressure_loss_equation
-            self._pressure_balance_func = self._noisobaric_pressure_balance
+            self._pressure_balance_func = self._non_isobaric_pressure_balance
             self._pressure_in_for_bc = self.pressure_in_out.get("in")
             self._pressure_out_for_bc = self.pressure_in_out.get("out")
             # como levantar error si me falta un dato TODO
@@ -744,146 +744,6 @@ class StationaryPFR(ReactorBase):
     # ==================================================================
     # Common reactor methods
     # ==================================================================
-
-    def _mass_balance(
-        self,
-        length_coordinate: float,
-        molar_fluxes: List[float],
-        temperature: float,
-        pressure: float,
-    ) -> List[float]:
-        """Mass balance evaluation for each substance in mixture.
-
-        latex math: # TODO
-
-        Parameters
-        ----------
-        length_coordinate : float
-            Reactor's length coordinate.
-        molar_fluxes : List[float]
-            Molar fluxes of each substance at the length_coordinate.
-            [mol/s]
-        temperature : float
-            Temperature at the length coordinate. [K]
-        pressure : float
-            Pressure at the length coordinate. [Pa]
-
-        Returns
-        -------
-        List[float]
-            Derivatives of mix substances' molar fluxes respect to
-            reactor's length. [mol/s/m]
-
-        Raises
-        ------
-        ValueError
-            Triying to simulate without mass balance data setting.
-            Configure mass balance data setting with the method
-            set_mass_balance_data.
-        """
-        return self._mass_balance_func(
-            length_coordinate, molar_fluxes, temperature, pressure
-        )
-
-    def _energy_balance(
-        self,
-        length_coordinate: float,
-        molar_fluxes: List[float],
-        temperature: float,
-        refrigerant_temperature: float,
-        pressure,
-    ) -> List[float]:
-        """Energy balance evaluation for the reactor's bulk phase.
-
-        Parameters
-        ----------
-        length_coordinate : float
-            Reactor's length coordinate.
-        molar_fluxes : List[float]
-            Molar flux of each substances at the length_coordinate.
-            [mol/s]
-        temperature : float
-            Temperature at the length coordinate. [K]
-        refrigerant_temperature : float
-            Refrigerant temperature at the length coordinate. [K]
-        pressure : float
-            Pressure at the length coordinate. [Pa]
-
-        Returns
-        -------
-        float
-            Derivative of reactor's temperature respect to reactor's
-            length. [K/m]
-
-        Raises
-        ------
-        ValueError
-            Triying to simulate without energy balance data setting.
-            Configure energy balance data setting with the method
-            set_isothermic_operation, set_adiabatic_operation or
-            set_non_isothermic_operation.
-        """
-        # TODO check the next if before, not on each energy balance call
-        if self._thermal_operation == "":
-            raise ValueError(
-                "use set_isothermic_operation, set_adiabatic_operation or"
-                " set_non_isothermic_operation method first"
-            )
-
-        return self._energy_balance_func(
-            length_coordinate,
-            molar_fluxes,
-            temperature,
-            refrigerant_temperature,
-            pressure,
-        )
-
-    def _pressure_balance(
-        self,
-        length_coordinate: float,
-        molar_fluxes: List[float],
-        temperature: float,
-        pressure: float,
-    ) -> List[float]:
-        """Pressure balance evaluation for each substance in mixture.
-
-        latex math: # TODO
-
-        Parameters
-        ----------
-        length_coordinate : float
-            Reactor's length coordinate.
-        molar_fluxes : list or List[float]
-            Molar flux of each substances at the length_coordinate.
-            [mol/s]
-        temperature : float
-            Temperature at the length coordinate. [K]
-        pressure : float
-            Pressure at the length coordinate. [Pa]
-
-        Returns
-        -------
-        float
-            Derivative of reactor's pressure respect to reactor's
-            length. [mol/s/m]
-
-        Raises
-        ------
-        ValueError
-            Triying to simulate without pressure balance data setting.
-            Configure pressure balance data setting with the method
-            set_isobaric_operation or set_non_isobaric_operation.
-        """
-        if self._pressure_operation == "":
-            raise ValueError(
-                "use set_isobaric_operation or set_non_isobaric_operation"
-                " method first"
-            )
-
-        return self._pressure_balance_func(
-            length_coordinate, molar_fluxes, temperature, pressure
-        )
-
     def _refrigerant_energy_balance(
         self,
         length_coordinate: float,
@@ -1194,11 +1054,11 @@ class StationaryPFR(ReactorBase):
             pressure = variables[-2, :]
             refrigerant_temperature = variables[-1, :]
 
-            mass_derivatives = self._mass_balance(
+            mass_derivatives = self._mass_balance_func(
                 length_coordinate, molar_fluxes, temperature, pressure
             ).T
 
-            temperature_derivatives = self._energy_balance(
+            temperature_derivatives = self._energy_balance_func(
                 length_coordinate,
                 molar_fluxes,
                 temperature,
@@ -1206,7 +1066,7 @@ class StationaryPFR(ReactorBase):
                 pressure,
             ).T
 
-            pressure_derivatives = self._pressure_balance(
+            pressure_derivatives = self._pressure_balance_func(
                 length_coordinate, molar_fluxes, temperature, pressure
             ).T
 
