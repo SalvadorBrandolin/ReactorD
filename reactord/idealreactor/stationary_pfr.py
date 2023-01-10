@@ -239,10 +239,10 @@ class StationaryPFR(ReactorBase):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     def set_adiabatic_isobaric(cls) -> None:
@@ -250,10 +250,10 @@ class StationaryPFR(ReactorBase):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     def set_adiabatic_noisobaric(cls) -> None:
@@ -261,10 +261,10 @@ class StationaryPFR(ReactorBase):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     def set_noisothermic_isobaric(cls) -> None:
@@ -272,10 +272,10 @@ class StationaryPFR(ReactorBase):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     @classmethod
     def set_noisothermic_noisobaric(cls) -> None:
@@ -283,10 +283,10 @@ class StationaryPFR(ReactorBase):
 
         Raises
         ------
-        NotADirectoryError
+        NotImplementedError
             Not implemented yet.
         """
-        raise NotADirectoryError("Not implemented yet")
+        raise NotImplementedError("Not implemented yet")
 
     # ==================================================================
     # Abastract methods

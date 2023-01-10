@@ -34,6 +34,38 @@ class Kinetics:
         Options:
         'concentration': substance concentration. [mol/m^3]
         'partial_pressure': substance partial pressure. [Pa]
+
+    Attributes
+    ----------
+    mix : AbstractMix
+        Mixture object.
+    list_of_reactions : List[Callable]
+        List of functions that evaluate the reaction rates, each one
+        defined by the user with the following format:
+        callable(concentration_unit: list[float], temperature: float
+        ) -> float.
+        Where concentration_unit refers to the units in which the
+        arguments of the kinetic laws are expressed, for instance,
+        concentrations or partial_pressures.
+    stoichiometry : ndarray[float]
+        A matrix that represents the stoichiometry of the reactive system.
+        Each row represents one reaction contained in the
+        list_of_reactions parameter and each column represents a
+        substance in the mix parameter. The stoichiometry matrix
+        entrances are the stoichiometric coefficients of each substance
+        in each reaction.
+    kinetic_argument : str
+        This argument is used to define how to evaluate the composition
+        of the reactive mixture inside the reactor.
+        Options:
+        'concentration': substance concentration. [mol/m^3]
+        'partial_pressure': substance partial pressure. [Pa]
+    user_reaction_enthalpies : ndarray[float]
+        User specified reaction enthalpies.
+    num_reactions : int
+        Number of reactions.
+    num_substances : int
+        Number of substances in mix.
     """
 
     def __init__(
@@ -118,6 +150,23 @@ class Kinetics:
     # ==================================================================
     # PUBLIC METHODS
     # ==================================================================
+    @property
+    def std_reaction_enthalpies(self) -> np.ndarray:
+        """Set standard reaction enthalpies.
+
+        Array containing the standard reaction enthalpies of the Kinetic
+        object. This attribute must be initializated by the
+        std_reaction_enthalpies_init method, by default None.
+        """
+        return self._std_reaction_enthalpies
+
+    @std_reaction_enthalpies.setter
+    def std_reaction_enthalpies(self) -> None:
+        raise NotImplementedError(
+            "The attribute std_reaction_enthalpies doesn't admit direct"
+            "assignation."
+        )
+
     def kinetic_eval(
         self, moles: List[float], temperature: float, pressure: float
     ) -> np.ndarray:
@@ -159,19 +208,7 @@ class Kinetics:
         rates_i = np.matmul(reaction_rates, self.stoichiometry)
         return rates_i, reaction_rates
 
-    @property
-    def std_reaction_enthalpies(self):
-        """Set standard reaction enthalpies."""
-        return self._std_reaction_enthalpies
-
-    @std_reaction_enthalpies.setter
-    def std_reaction_enthalpies(self):
-        raise NotImplementedError(
-            "The attribute std_reaction_enthalpies doesn't admit direct"
-            "assignation."
-        )
-
-    def std_reaction_enthalpies_init(self):
+    def std_reaction_enthalpies_init(self) -> None:
         """Calculate the standard reaction enthalpies.
 
         If reaction enthalpies were not specified in the Kinetic object
@@ -191,7 +228,9 @@ class Kinetics:
                 self._std_reaction_enthalpies_from_formation()
             )
 
-    def reaction_enthalpies(self, temperature, pressure):
+    def reaction_enthalpies(
+        self, temperature: float, pressure: float
+    ) -> np.ndarray:
         """Evaluate reaction enthalpies of all the reactions involved.
 
         Parameters
@@ -203,8 +242,9 @@ class Kinetics:
 
         Returns
         -------
-        array, attribute
-            reaction enthalpies at the specified temperature.
+        ndarray
+            Array containint the reaction enthalpies at the specified
+            temperature. [J/mol]
         """
         if self.user_reaction_enthalpies is not None:
             return self.user_reaction_enthalpies
@@ -222,8 +262,7 @@ class Kinetics:
     # ==================================================================
     # PRIVATE METHODS
     # ==================================================================
-
-    def _std_reaction_enthalpies_from_formation(self):
+    def _std_reaction_enthalpies_from_formation(self) -> None:
         """Calculate standard reaction enthalpies.
 
         Calculates the standard reaction enthalpies using standard
@@ -232,7 +271,7 @@ class Kinetics:
         Returns
         -------
         ndarray
-            Standard reaction enthalpies. [j/mol/K]
+            Array containing the standard reaction enthalpies. [J/mol/K]
         """
         formation_enthalpies = self.mix._formation_enthalpies_set()
         return np.dot(self.stoichiometry, formation_enthalpies)

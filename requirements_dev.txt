@@ -8,7 +8,9 @@ pep8-naming
 pydocstyle
 
 # documentation (also pandoc must be installed)
+nbsphinx
 sphinx
+sphinx_copybutton
 sphinx_rtd_theme
 
 # Testing

@@ -221,7 +221,7 @@ class Substance:
         Substance
             Instantiated Substance object from thermo database.
         """
-        chemobj = Chemical(identification)
+        chemobj = Chemical(identification, autocalc=False)
 
         substance_object = cls(
             name=chemobj.name,

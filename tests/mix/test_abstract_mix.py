@@ -27,8 +27,10 @@ def test_abastract_class_not_implemented_errors():
         ):
             return super().concentrations(moles, temperature, pressure)
 
-        def volume(self):
-            return super().volume()
+        def volume(
+            self, moles: List[float], temperature: float, pressure: float
+        ):
+            return super().volume(moles, temperature, pressure)
 
         def mix_heat_capacity(
             self, moles: List[float], temperature: float, pressure: float
@@ -53,7 +55,7 @@ def test_abastract_class_not_implemented_errors():
         mixture.concentrations([1, 1], 298.15, 101325)
 
     with pytest.raises(NotImplementedError):
-        mixture.volume()
+        mixture.volume([1, 1], 298.15, 101325)
 
     with pytest.raises(NotImplementedError):
         mixture.mix_heat_capacity([1, 1], 298.15, 101325)

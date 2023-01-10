@@ -23,8 +23,6 @@ class IdealGas(AbstractMix):
         list of substance objects
     """
 
-    _substance_list: List[Substance]
-
     def __init__(self, **substance_dict):
 
         substance_list = [
