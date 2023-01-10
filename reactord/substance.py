@@ -207,7 +207,7 @@ class Substance:
         Cite:
 
         Caleb Bell and Contributors (2016-2021). Thermo: Chemical
-        properties        component of Chemical Engineering Design
+        properties component of Chemical Engineering Design
         Library (ChEDL) https://github.com/CalebBell/thermo.
 
         Parameters
