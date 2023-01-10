@@ -8,15 +8,34 @@ from reactord.substance import Substance
 
 
 class AbstractMix(metaclass=ABCMeta):
-    """Mixture object abstract class."""
+    """Mixture object abstract class.
+
+    Parameters
+    ----------
+    metaclass : AbstractMix, optional
+        Mixture objects interface.
+
+    Raises
+    ------
+    NotImplementedError
+        concentrations abstract method not implemented.
+    NotImplementedError
+        volume abstract method not implemented.
+    NotImplementedError
+        mix_heat_capacity abstract method not implemented.
+    NotImplementedError
+        _formation_enthalpies_set abstract method not implemented.
+    NotImplementedError
+        formation_enthalpies_correction abstract method not implemented.
+    """
 
     substances: List[Substance] = []
 
-    # ==================================================================
+    # =========================================================================
     # Mixtures common methods
-    # ==================================================================
+    # =========================================================================
 
-    def mol_fractions(self, moles: List[float]):
+    def mol_fractions(self, moles: List[float]) -> np.ndarray:
         """Calculate the molar fractions of the mixture.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
@@ -26,13 +45,13 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         moles: ndarray or list [float]
-            moles of each substance specified in the same order as the
-            mix substances order.
+            Moles of each substance specified in the same order as the mix
+            substances order.
 
         Returns
         -------
-        mol_fractions : ndarray of shape (moles,)
-        Array of the molar fractions of mixture's substances
+        mol_fractions : ndarray [float]
+            Array of the molar fractions of mixture's substances.
         """
         total_moles = np.sum(moles, axis=0)
         mol_fractions = np.divide(moles, total_moles)
@@ -41,41 +60,42 @@ class AbstractMix(metaclass=ABCMeta):
 
     def partial_pressures(
         self, moles: List[float], temperature: float, pressure: float
-    ):
+    ) -> np.ndarray:
         """Calculate the partial pressures of the mixture's components.
 
         Parameters
         ----------
         moles: ndarray or list [float]
-            moles of each substance
+            Moles of each substance.
         temperature: float
-            Temperature [K]
+            Temperature. [K]
         pressure: float
-            Total Pressure [Pa]
+            Total Pressure. [Pa]
 
         Returns
         -------
-        partial_pressures: ndarray of shape(moles,) [Pa]
-            array that contains the partial pressures of mixture's
-            substances
+        partial_pressures: ndarray [float]
+            Array that contains the partial pressures of mixture's substances.
+            [Pa]
         """
         mol_fractions = self.mol_fractions(moles)
         partial_pressures = np.multiply(mol_fractions, pressure)
 
         return partial_pressures
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of substances in the mixture.
 
         Redifine the magic method __len__
+
         Returns
         -------
         int
-            Number of substances in the mixture
+            Number of substances in the mixture.
         """
         return len(self.substances)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a text with information about the components of the mixture.
 
         Returns
@@ -91,95 +111,105 @@ class AbstractMix(metaclass=ABCMeta):
             string = string + substance.name.capitalize() + "\n"
         return string
 
-    # ==================================================================
+    # =========================================================================
     # Mixtures specifics methods
-    # ==================================================================
-
+    # =========================================================================
     @abstractmethod
     def concentrations(
         self, moles: List[float], temperature: float, pressure: float
-    ):
+    ) -> None:
         """Concentrations of the mixture's substances.
 
-        Concentrations of the mixture's substances given moles
-        of each compound, temperature and pressure.
+        Concentrations of the mixture's substances given moles of each
+        compound, temperature and pressure.
 
         Parameters
         ----------
         moles: ndarray or list [float]
-            moles of each substance
+            Moles of each substance.
         temperature: float
-            Temperature [K]
+            Temperature. [K]
         pressure: float
-            Total Pressure [Pa]
+            Total Pressure. [Pa]
 
         Returns
         -------
-        ndarray [float] of shape (moles,)
+        ndarray [float]
             ndarray that contains the concentrations of the mixture's
-            substances [mol/m³]
+            substances. [mol/m³]
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
         """
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
-    def volume(self):
+    def volume(
+        self, moles: List[float], temperature: float, pressure: float
+    ) -> None:
         """Return the volume of the mixture.
 
         Parameters
         ----------
         moles: ndarray or list [float]
-            moles of each substance
+            Moles of each substance.
         temperature: float
-            Temperature [K]
+            Temperature. [K]
         pressure: float
-            Total Pressure [Pa]
+            Total Pressure. [Pa]
 
         Returns
         -------
         float
-            volume of the mixture [m³]
+            volume of the mixture. [m³]
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
         """
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
     def mix_heat_capacity(
         self, moles: List[float], temperature: float, pressure: float
-    ):
+    ) -> None:
         """Return the heat capacity of the mixture.
 
         Parameters
         ----------
         moles: ndarray or list [float]
-            moles of each substance
+            moles of each substance.
         temperature: float
-            Temperature [K]
+            Temperature. [K]
         pressure: float
-            Total Pressure [Pa]
+            Total Pressure. [Pa]
 
         Returns
         -------
         float
-            heat capacity of the mixture [J/K]
+            heat capacity of the mixture. [J/K]
 
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
         """
-        raise NotImplementedError()
-
-    @abstractmethod
-    def _formation_enthalpies_set(self):
-        """Calculate the formation enthalpy of the mixture's substances."""
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
     def formation_enthalpies_correction(
         self,
         temperature: float,
         pressure: float,
-    ):
+    ) -> None:
         """Calculate the correction term for the formation enthalpy.
 
-        Method that calculates the correction term for the formation
-        enthalpies of the pure substances from 298.15 K and 101325 Pa to
-        the given temperature and pressure
+        Method that calculates the correction term for the formation enthalpies
+        of the pure substances from 298.15 K and 101325 Pa to the given
+        temperature and pressure.
 
         Parameters
         ----------
@@ -191,6 +221,16 @@ class AbstractMix(metaclass=ABCMeta):
         Returns
         -------
         correction_enthalpies : ndarray [float]
-            Formation enthalpies correction for each substance (J/mol/K)
+            Formation enthalpies correction for each substance. [J/mol/K]
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
         """
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")
+
+    @abstractmethod
+    def _formation_enthalpies_set(self) -> None:
+        """Calculate the formation enthalpy of the mixture's substances."""
+        raise NotImplementedError("Abstract method not implemented")
