@@ -79,7 +79,22 @@ class StationaryPFR(ReactorBase):
         kinetic_argument: str,
         reactor_dim_minmax: List[float],
         transversal_area: float,
-        **kwargs,
+        molar_flow_in: dict = None,
+        molar_flow_out: dict = None,
+        catalyst_particle: dict = None,
+        isothermic_temperature: float = None,
+        temperature_in_out: dict = None,
+        refrigerant: AbstractMix = None,
+        refrigerant_molar_flow: float = None,
+        refrigerant_temperature_in: float = None,
+        refrigerant_constant_temperature: bool = None,
+        refrigerant_flow_arrangement: str = None,
+        exchanger_wall_material: Substance = None,
+        correlation_heat_transfer: str = None,
+        isobaric_pressure: float = None,
+        pressure_in_out: dict = None,
+        pressure_loss_equation: str = None,
+        packed_bed_porosity: float = None,
     ) -> None:
 
         self._kinetics = Kinetics(
@@ -98,44 +113,32 @@ class StationaryPFR(ReactorBase):
         # ==============================================================
         # Mass balance data
         # ==============================================================
-        self.molar_flow_in: dict = kwargs.get("molar_flow_in")
-        self.molar_flow_out: dict = kwargs.get("molar_flow_out")
-        self.catalyst_particle = kwargs.get("catalyst_particle")
+        self.molar_flow_in = molar_flow_in
+        self.molar_flow_out = molar_flow_out
+        self.catalyst_particle = catalyst_particle
 
         # ==============================================================
         # Energy balance data
         # ==============================================================
-        self.isothermic_temperature: float = kwargs.get(
-            "isothermic_temperature"
+        self.isothermic_temperature = isothermic_temperature
+        self.temperature_in_out = temperature_in_out
+        self.refrigerant = refrigerant
+        self.refrigerant_molar_flow = refrigerant_molar_flow
+        self.refrigerant_temperature_in = refrigerant_temperature_in
+        self.refrigerant_constant_temperature = (
+            refrigerant_constant_temperature
         )
-        self.temperature_in_out: dict = kwargs.get("temperature_in_out")
-        self.refrigerant: AbstractMix = kwargs.get("refrigerant")
-        self.refrigerant_molar_flow: float = kwargs.get(
-            "refrigerant_molar_flow"
-        )
-        self.refrigerant_temperature_in: float = kwargs.get(
-            "refrigerant_temperature_in"
-        )
-        self.refrigerant_constant_temperature: bool = kwargs.get(
-            "refrigerant_constant_temperature"
-        )
-        self.refrigerant_flow_arrangement: str = kwargs.get(
-            "refrigerant_flow_arrangement"
-        )
-        self.exchanger_wall_material: Substance = kwargs.get(
-            "exchanger_wall_material"
-        )
-        self.correlation_heat_transfer: str = kwargs.get(
-            "correlation_heat_transfer"
-        )
+        self.refrigerant_flow_arrangement = refrigerant_flow_arrangement
+        self.exchanger_wall_material = exchanger_wall_material
+        self.correlation_heat_transfer = correlation_heat_transfer
 
         # ==============================================================
         # Pressure balance data
         # ==============================================================
-        self.isobaric_pressure: float = kwargs.get("isobaric_pressure")
-        self.pressure_in_out: dict = kwargs.get("pressure_in_out")
-        self.pressure_loss_equation: str = kwargs.get("pressure_loss_equation")
-        self.packed_bed_porosity: float = kwargs.get("packed_bed_porosity")
+        self.isobaric_pressure = isobaric_pressure
+        self.pressure_in_out = pressure_in_out
+        self.pressure_loss_equation = pressure_loss_equation
+        self.packed_bed_porosity = packed_bed_porosity
 
         # ==============================================================
         # Configure the reactor
