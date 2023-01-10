@@ -69,6 +69,47 @@ class StationaryPFR(ReactorBase):
         reactor_dim_minmax = [0, 3]. [m]
     transversal_area : float
         Transversal area of the reactor. [m²]
+    molar_flow_in : dict, optional
+        Dictionary containing the known inlet molar flows of the
+        substances, by default {}.  TODO
+    molar_flow_out : dict, optional
+        Dictionary containing the known outlet molar flows of the
+        substances, by default {}. TODO
+    catalyst_particle : _type_, optional
+        CatalystParticle object, by default None TODO
+    isothermic_temperature: float
+        Temperature in isothermic operation [K]
+    temperature_in_out: dict
+        Temperature at initial and outlet length in non isothermic operation
+    refrigerant: AbstractMix
+        Substances present in the refrigerant mix TODO
+    refrigerant_molar_flow : float
+        Refrigerant molar flow TODO
+    refrigerant_temperature_in: float
+        Inlet refrigerant temperature [K]
+    refrigerant_constant_temperature: bool
+        True is the refrigerant temperature do not change
+        False is the refrigerant temperature change  TODO
+    refrigerant_flow_arrangement: str
+        Current or countercurrent
+    exchanger_wall_material: Substance
+        Substance with a conductivity constant defined
+    correlation_heat_transfer: str
+        Model to do the correlation heat transfer
+    isobaric_pressure: float
+        Pressure of isobaric operation
+    pressure_in_out: dict
+        Pressure at initial and outlet length in non isothermic operation
+    pressure_loss_equation: str
+        Type of equation to calculate the pressure loss
+        Options:
+        "packed bed reactors" for any reaction system
+        "gas phase reaction" for reactors without catalyst
+    packed_bed_porosity: float
+        Packed bed porosity float between 0 and 1.
+    fanning_factor: float
+        Friction factor for pipe without catalyst. This number depends on
+        Reynolds and pipe roughness.
     """
 
     def __init__(
@@ -95,6 +136,7 @@ class StationaryPFR(ReactorBase):
         pressure_in_out: dict = None,
         pressure_loss_equation: str = None,
         packed_bed_porosity: float = None,
+        fanning_factor: float = None,
     ) -> None:
 
         self._kinetics = Kinetics(
@@ -139,6 +181,7 @@ class StationaryPFR(ReactorBase):
         self.pressure_in_out = pressure_in_out
         self.pressure_loss_equation = pressure_loss_equation
         self.packed_bed_porosity = packed_bed_porosity
+        self.fanning_factor = fanning_factor
 
         # ==============================================================
         # Configure the reactor
@@ -237,15 +280,101 @@ class StationaryPFR(ReactorBase):
         return isothermic_isobaric_pfr
 
     @classmethod
-    def set_isothermic_noisobaric(cls) -> None:
-        """Not implemented yet.
-
-        Raises
-        ------
-        NotADirectoryError
-            Not implemented yet.
+    def set_isothermic_noisobaric(
+        cls,
+        mix: AbstractMix,
+        list_of_reactions: List[Callable],
+        stoichiometry: List[float],
+        kinetic_argument: str,
+        reactor_dim_minmax: List[float],
+        transversal_area: float,
+        isothermic_temperature: float,
+        pressure_in_out: dict,
+        pressure_loss_equation: str,
+        packed_bed_porosity: float,
+        fanning_factor: float,
+        molar_flow_in: dict = {},
+        molar_flow_out: dict = {},
+        catalyst_particle=None,
+    ) -> ReactorBase:
+        """Instantiate isothermic nonisobaric StationaryPFR.
+        Parameters
+        ----------
+        mix : AbstractMix
+        Mixture object.
+        list_of_reactions : List[Callable]
+            List of functions that evaluate the reaction rates, eac
+            defined by the user with the following format:
+            callable(concentration_unit: list[float], temperature:
+            ) -> float.
+            Where concentration_unit refers to the units in which t
+            arguments of the kinetic laws are expressed, for instan
+            concentrations or partial_pressures.
+        stoichiometry : List[float]
+            A matrix that represents the stoichiometry of the react
+            Each row represents one reaction contained in the
+            list_of_reactions parameter and each column represents
+            substance in the mix parameter. The stoichiometry matri
+            entrances are the stoichiometric coefficients of each s
+            in each reaction.
+        kinetic_argument : str
+            This argument is used to define how to evaluate the com
+            of the reactive mixture inside the reactor.
+            Options:
+            'concentration': substance concentration. [mol/m³]
+            'partial_pressure': substance partial pressure. [Pa]
+        reactor_dim_minmax : List[float]
+            List containing the minimum and maximum [min, max]
+            boundaries of the reactor's length. E.g: a reactor mode
+            in the boundaries 0 m to 3 m has a
+            reactor_dim_minmax = [0, 3]. [m]
+        transversal_area : float
+            Transversal area of the reactor. [m²]
+        isothermic_temperature : float
+            Reactor's temperature. [K]
+        pressure_in_out: dict
+            Pressure at initial and outlet length in non isothermic operation
+        pressure_loss_equation: str
+            Type of equation to calculate the pressure loss
+            Options:
+            "packed bed reactors" for any reaction system
+            "gas phase reaction" for reactors without catalyst
+        packed_bed_porosity: float
+            Packed bed porosity float between 0 and 1.
+        fanning_factor: float
+            Friction factor for pipe without catalyst. This number depends on
+            Reynolds and pipe roughness.
+        molar_flow_in : dict, optional
+            Dictionary containing the known inlet molar flows of th
+            substances, by default {}.  TODO
+        molar_flow_out : dict, optional
+            Dictionary containing the known outlet molar flows of t
+            substances, by default {}. TODO
+        catalyst_particle : _type_, optional
+            CatalystParticle object, by default None TODO
+        Returns
+        -------
+        ReactorBase
+            Instantiated isothermic noisobaric StationaryPFR.
         """
-        raise NotADirectoryError("Not implemented yet")
+        isothermic_noisobaric_pfr = cls(
+            mix=mix,
+            list_of_reactions=list_of_reactions,
+            stoichiometry=stoichiometry,
+            kinetic_argument=kinetic_argument,
+            reactor_dim_minmax=reactor_dim_minmax,
+            transversal_area=transversal_area,
+            molar_flow_in=molar_flow_in,
+            molar_flow_out=molar_flow_out,
+            catalyst_particle=catalyst_particle,
+            isothermic_temperature=isothermic_temperature,
+            pressure_in_out=pressure_in_out,
+            pressure_loss_equation=pressure_loss_equation,
+            packed_bed_porosity=packed_bed_porosity,
+            fanning_factor=fanning_factor,
+            catalyst_particle=catalyst_particle,
+        )
+        return isothermic_noisobaric_pfr
 
     @classmethod
     def set_adiabatic_isobaric(cls) -> None:
@@ -428,6 +557,7 @@ class StationaryPFR(ReactorBase):
             self.pressure_in_out,
             self.pressure_loss_equation,
             self.packed_bed_porosity,
+            self.fanning_factor,
         ]
 
         if self.isobaric_pressure is not None:
@@ -439,6 +569,7 @@ class StationaryPFR(ReactorBase):
                     "    self.pressure_in_out\n"
                     "    self.pressure_loss_equation\n"
                     "    packed_bed_porosity\n"
+                    "    fanning_factor\n"
                     "because pressure operation becomes ambigous."
                 )
             else:
@@ -449,9 +580,11 @@ class StationaryPFR(ReactorBase):
 
         elif any(no_isobaric_args):
             # Check non-isobaric operation:
-            raise NotImplementedError(
-                "Non-isobaric operation not implemented yet"
-            )
+            self._pressure_operation = self.pressure_loss_equation
+            self._pressure_balance_func = self._noisobaric_pressure_balance
+            self._pressure_in_for_bc = self.pressure_in_out.get("in")
+            self._pressure_out_for_bc = self.pressure_in_out.get("out")
+            # como levantar error si me falta un dato TODO
         else:
             raise ValueError("No pressure specification was set.")
 
@@ -738,7 +871,7 @@ class StationaryPFR(ReactorBase):
         ------
         ValueError
             Triying to simulate without pressure balance data setting.
-            Configure pressurebalance data setting with the method
+            Configure pressure balance data setting with the method
             set_isobaric_operation or set_non_isobaric_operation.
         """
         if self._pressure_operation == "":
