@@ -161,7 +161,7 @@ class Kinetics:
         return self._std_reaction_enthalpies
 
     @std_reaction_enthalpies.setter
-    def std_reaction_enthalpies(self) -> None:
+    def std_reaction_enthalpies(self, new_kinetics: List[float]) -> None:
         raise NotImplementedError(
             "The attribute std_reaction_enthalpies doesn't admit direct"
             "assignation."

@@ -124,3 +124,19 @@ def test_three_substance_mix():
             mixture.mix_heat_capacity(moles, t, pressure),
             raw_mix_heat_capacity,
         )  # OKAY
+
+
+def test_formation_enthalpies():
+    substance1 = rd.Substance(formation_enthalpy=1000)
+    substance2 = rd.Substance(formation_enthalpy=2000)
+    substance3 = rd.Substance(formation_enthalpy=3000)
+
+    mix = rd.mix.IdealSolution(a=substance1, b=substance2, c=substance3)
+
+    enthalpies_mix = mix._formation_enthalpies_set()
+
+    assert enthalpies_mix[0] == 1000
+
+    assert enthalpies_mix[1] == 2000
+
+    assert enthalpies_mix[2] == 3000
