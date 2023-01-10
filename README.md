@@ -14,7 +14,7 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 <img src='https://img.shields.io/pypi/v/reactord'>
 </a>
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
-![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)  
+![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![coverage >= 95%](https://img.shields.io/badge/coverage-95%25-green)
 
 ReactorD (Reactor Design) is a python package whose proposal is to simulate and design reactors for multiple-reaction systems. The intention is to solve the following reactor types in stationary or not-stationary conditions: Plug flow (PFR) and Stirred tank (STR) 
