@@ -169,7 +169,7 @@ class IdealSolution(AbstractMix):
                 )
         return correction_enthalpies
 
-    def _formation_enthalpies_set(self) -> None:
+    def _formation_enthalpies_set(self) -> np.ndarray:
         """Return the formation enthalpies in a ordered ndarray.
 
         Method that read the formation enthalpies of mix and returns

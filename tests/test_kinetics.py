@@ -7,7 +7,7 @@ import reactord as rd
 
 def test_simple_evaluation1():
 
-    mix = rd.mix.IdealSolution(A="water", B="ethanol", C="acetone")
+    mix = rd.mix.IdealSolution(a="water", b="ethanol", c="acetone")
 
     def law1(concentrations, temperature):
         return 10
@@ -138,3 +138,157 @@ def test_user_reaction_enthalpies():
     )
 
     assert np.allclose(raw_reaction_enthalpy, formation_enthalpies_method)
+
+
+def test_standard_reaction_enthalpies():
+    def reac1(concentrations, temperature):
+        return 10
+
+    def reac2(concentrations, temperature):
+        return 20
+
+    stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
+
+    a = rd.Substance.from_thermo_database("acetic acid")
+    b = rd.Substance.from_thermo_database("hydrogen peroxide")
+    c = rd.Substance.from_thermo_database("peracetic acid")
+    d = rd.Substance.from_thermo_database("water")
+
+    mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
+
+    kinetic = rd.Kinetics(mix, [reac1, reac2], stoichiometry, "concentration")
+
+    kinetic.std_reaction_enthalpies_init()
+
+    enthalpy1, enthalpy2 = kinetic.std_reaction_enthalpies
+
+    h1 = (
+        c.formation_enthalpy
+        + d.formation_enthalpy
+        - a.formation_enthalpy
+        - b.formation_enthalpy
+    )
+
+    h2 = 2 * d.formation_enthalpy - 2 * b.formation_enthalpy
+
+    assert enthalpy1 == h1
+    assert enthalpy2 == h2
+
+
+def test_user_defined_reaction_enthalpies():
+    def reac1(concentrations, temperature):
+        return 10
+
+    def reac2(concentrations, temperature):
+        return 20
+
+    stoichiometry = np.array([[-1, -1, 1, 1], [0, -1, 0, 1]])
+
+    a = rd.Substance.from_thermo_database("acetic acid")
+    b = rd.Substance.from_thermo_database("hydrogen peroxide")
+    c = rd.Substance.from_thermo_database("peracetic acid")
+    d = rd.Substance.from_thermo_database("water")
+
+    mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
+
+    kinetic = rd.Kinetics(
+        mix,
+        [reac1, reac2],
+        stoichiometry,
+        "concentration",
+        reaction_enthalpies=[1000, 2000],
+    )
+
+    kinetic.std_reaction_enthalpies_init()
+
+    assert kinetic.std_reaction_enthalpies is None
+
+    assert kinetic.reaction_enthalpies(500, 101325) == [1000, 2000]
+
+
+def test_enthalpies_correction():
+    def reac1(concentrations, temperature):
+        return 10
+
+    def reac2(concentrations, temperature):
+        return 20
+
+    stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
+
+    a = rd.Substance.from_thermo_database("acetic acid")
+    b = rd.Substance.from_thermo_database("hydrogen peroxide")
+    c = rd.Substance.from_thermo_database("peracetic acid")
+    d = rd.Substance.from_thermo_database("water")
+
+    mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
+
+    kinetic = rd.Kinetics(mix, [reac1, reac2], stoichiometry, "concentration")
+
+    kinetic.std_reaction_enthalpies_init()
+
+    enthalpy1, enthalpy2 = kinetic.reaction_enthalpies(330, 101325)
+
+    h1 = (
+        c.formation_enthalpy
+        + c.heat_capacity_liquid_dt_integral(298.15, 330)
+        + d.formation_enthalpy
+        + d.heat_capacity_liquid_dt_integral(298.15, 330)
+        - (
+            a.formation_enthalpy
+            + a.heat_capacity_liquid_dt_integral(298.15, 330)
+        )
+        - (
+            b.formation_enthalpy
+            + b.heat_capacity_liquid_dt_integral(298.15, 330)
+        )
+    )
+
+    h2 = 2 * (
+        d.formation_enthalpy + d.heat_capacity_liquid_dt_integral(298.15, 330)
+    ) - 2 * (
+        b.formation_enthalpy + b.heat_capacity_liquid_dt_integral(298.15, 330)
+    )
+
+    assert np.allclose(enthalpy1, h1)
+    assert np.allclose(enthalpy2, h2)
+
+
+def test_making_it_explode():
+    def reac1(concentrations, temperature):
+        return 10
+
+    def reac2(concentrations, temperature):
+        return 20
+
+    stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
+
+    a = rd.Substance.from_thermo_database("acetic acid")
+    b = rd.Substance.from_thermo_database("hydrogen peroxide")
+    c = rd.Substance.from_thermo_database("peracetic acid")
+    d = rd.Substance.from_thermo_database("water")
+
+    mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
+
+    with pytest.raises(TypeError):
+        kinetic = rd.Kinetics(
+            "Muchachos", [reac1, reac2], stoichiometry, "concentration"
+        )
+
+    with pytest.raises(TypeError):
+        kinetic = rd.Kinetics(
+            3.14, [reac1, reac2], stoichiometry, "concentration"
+        )
+
+    mix2 = rd.mix.IdealSolution(a="methane")
+
+    with pytest.raises(IndexError):
+        kinetic = rd.Kinetics(
+            mix2, [reac1, reac2], stoichiometry, "concentration"
+        )
+
+    with pytest.raises(NotImplementedError):
+        kinetic = rd.Kinetics(
+            mix, [reac1, reac2], stoichiometry, "concentration"
+        )
+
+        kinetic.std_reaction_enthalpies = [10, 20, 30, 0]

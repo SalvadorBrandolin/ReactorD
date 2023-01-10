@@ -56,7 +56,7 @@ def test_heritage_methods():
 
 
 def test_not_implemented_error():
-    "Test for not implemented error of reactor's intherphase methods."
+    "Test for not implemented error of reactor's intherface methods."
 
     class SpecificReactor(rd.ReactorBase):
         @classmethod
@@ -231,7 +231,7 @@ def test_not_implemented_error():
 
 
 def test_asignation_kinetics_arguments():
-    "Test for not implemented error of reactor's intherphase methods."
+    "Test for not implemented error of reactor's intherface methods."
 
     def kinetic1(conc, temperature):
         return 100
