@@ -23,7 +23,7 @@ class IdealSolution(AbstractMix):
         list of substance objects
     """
 
-    def __init__(self, **substance_dict):
+    def __init__(self, **substance_dict) -> None:
 
         substance_list = [
             value
@@ -95,8 +95,10 @@ class IdealSolution(AbstractMix):
         )
         return np.dot(pure_volumes, mol_fractions)
 
-    def mix_heat_capacity(self, moles: List[float], temperature: float, *args):
-        """Calculate heat capacity of th mixture.
+    def mix_heat_capacity(
+        self, moles: List[float], temperature: float, *args
+    ) -> float:
+        """Calculate heat capacity of the mixture.
 
         Parameters
         ----------
@@ -121,7 +123,9 @@ class IdealSolution(AbstractMix):
         mix_cp = np.dot(mol_fractions, pure_cp)
         return mix_cp
 
-    def formation_enthalpies_correction(self, temperature: float, *args):
+    def formation_enthalpies_correction(
+        self, temperature: float, *args
+    ) -> None:
         """Calculate the correction term for the formation enthalpy.
 
         Method that calculates the correction term for the formation
@@ -165,7 +169,7 @@ class IdealSolution(AbstractMix):
                 )
         return correction_enthalpies
 
-    def _formation_enthalpies_set(self):
+    def _formation_enthalpies_set(self) -> None:
         """Return the formation enthalpies in a ordered ndarray.
 
         Method that read the formation enthalpies of mix and returns
