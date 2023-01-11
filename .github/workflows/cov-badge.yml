@@ -1,0 +1,36 @@
+name: coverage-badge
+
+on:
+  - pull_request
+    types: [closed]
+  - workflow_dispatch
+
+jobs:
+  coverage-badge:
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest coverage pytest-cov
+      - name: Install ReactorD
+        run: pip install .
+      - name: erase .coverage just in case
+        run: coverage erase
+      - name: generate .coverage report
+        run: coverage run -m pytest tests/
+      - name: transform .coverage into coverage.xml
+        run: coverage xml 
+
+      # Creating the badge
+      - name: uploading to codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: /home/runner/work/ReactorD/ReactorD/coverage.xml
