@@ -15,7 +15,7 @@ def test_not_defining_abastract_methods():
         ...
 
     with pytest.raises(TypeError):
-        mixture = NewMixture()
+        NewMixture()
 
 
 def test_abastract_class_not_implemented_errors():
