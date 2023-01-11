@@ -12,8 +12,10 @@
 
 ===========
 
-|image1| |image2| |image3| |image4| |image5| |Python 3.7+| |License|
+|mybinder| |image1| |image2| |image3| |image4| |image5| |License| |Python 3.7+| |coverage|
 
+.. |mybinder| image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/SalvadorBrandolin/ReactorD/HEAD
 .. |image1| image:: https://api.codeclimate.com/v1/badges/3551471cd4cdf37e226f/maintainability
    :target: https://codeclimate.com/github/SalvadorBrandolin/ReactorD/maintainability
    :alt: Maintanibility
@@ -29,11 +31,11 @@
 .. |image5| image:: https://img.shields.io/pypi/v/reactord
    :target: https://pypi.org/project/reactord/
    :alt: Pypi
-.. |Python 3.7+| image:: https://img.shields.io/badge/python-3.7+-blue.svg
-   :target: https://badge.fury.io/py/uttrs
 .. |License| image:: https://img.shields.io/badge/License-MIT-blue.svg
    :target: https://tldrlegal.com/license/mit-license
-.. image:: https://codecov.io/github/SalvadorBrandolin/ReactorD/branch/main/graph/badge.svg?token=6E0U0F9AYU
+.. |Python 3.7+| image:: https://img.shields.io/badge/python-3.7+-blue.svg
+   :target: https://badge.fury.io/py/uttrs
+.. |coverage| image:: https://codecov.io/github/SalvadorBrandolin/ReactorD/branch/main/graph/badge.svg?token=6E0U0F9AYU
 :target: https://codecov.io/github/SalvadorBrandolin/ReactorD
 
 ----
