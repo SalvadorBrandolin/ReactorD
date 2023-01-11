@@ -35,8 +35,8 @@
    :target: https://tldrlegal.com/license/mit-license
 .. |Python 3.7+| image:: https://img.shields.io/badge/python-3.7+-blue.svg
    :target: https://badge.fury.io/py/uttrs
-.. |coverage| image:: https://codecov.io/github/SalvadorBrandolin/ReactorD/branch/main/graph/badge.svg?token=6E0U0F9AYU
-   :target: https://codecov.io/github/SalvadorBrandolin/ReactorD
+.. |coverage| image:: https://codecov.io/gh/SalvadorBrandolin/ReactorD/branch/main/graph/badge.svg?token=6E0U0F9AYU
+   :target: https://codecov.io/gh/SalvadorBrandolin/ReactorD
 
 ----
 
