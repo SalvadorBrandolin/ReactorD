@@ -103,10 +103,12 @@ class StationaryPFR(ReactorBase):
     pressure_loss_equation: str
         Type of equation to calculate the pressure loss
         Options:
-        "packed bed reactors" for any reaction system
+        "packed bed reactor" for any reaction system
         "gas phase reaction" for reactors without catalyst
     packed_bed_porosity: float
         Packed bed porosity float between 0 and 1.
+    packed_bed_particle_diameter: float
+        Diameter of particle of packed bed. [m]
     fanning_factor: float
         Friction factor for pipe without catalyst. This number depends on
         Reynolds and pipe roughness.
@@ -136,6 +138,7 @@ class StationaryPFR(ReactorBase):
         pressure_in_out: dict = None,
         pressure_loss_equation: str = None,
         packed_bed_porosity: float = None,
+        packed_bed_particle_diameter: float = None,
         fanning_factor: float = None,
     ) -> None:
 
@@ -181,6 +184,7 @@ class StationaryPFR(ReactorBase):
         self.pressure_in_out = pressure_in_out
         self.pressure_loss_equation = pressure_loss_equation
         self.packed_bed_porosity = packed_bed_porosity
+        self.packed_bed_particle_diameter = packed_bed_particle_diameter
         self.fanning_factor = fanning_factor
 
         # ==============================================================
@@ -292,6 +296,7 @@ class StationaryPFR(ReactorBase):
         pressure_in_out: dict,
         pressure_loss_equation: str,
         packed_bed_porosity: float,
+        packed_bed_particle_diameter: float,
         fanning_factor: float,
         molar_flow_in: dict = {},
         molar_flow_out: dict = {},
@@ -338,10 +343,12 @@ class StationaryPFR(ReactorBase):
         pressure_loss_equation: str
             Type of equation to calculate the pressure loss
             Options:
-            "packed bed reactors" for any reaction system
+            "packed bed reactor" for any reaction system
             "gas phase reaction" for reactors without catalyst
         packed_bed_porosity: float
             Packed bed porosity float between 0 and 1.
+        packed_bed_particle_diameter: float
+            Diameter of particle of packed bed. [m]
         fanning_factor: float
             Friction factor for pipe without catalyst. This number depends on
             Reynolds and pipe roughness.
@@ -372,6 +379,7 @@ class StationaryPFR(ReactorBase):
             pressure_in_out=pressure_in_out,
             pressure_loss_equation=pressure_loss_equation,
             packed_bed_porosity=packed_bed_porosity,
+            packed_bed_particle_diameter=packed_bed_particle_diameter,
             fanning_factor=fanning_factor,
         )
         return isothermic_noisobaric_pfr
@@ -557,6 +565,7 @@ class StationaryPFR(ReactorBase):
             self.pressure_in_out,
             self.pressure_loss_equation,
             self.packed_bed_porosity,
+            self.packed_bed_particle_diameter,
             self.fanning_factor,
         ]
 
@@ -569,6 +578,7 @@ class StationaryPFR(ReactorBase):
                     "    self.pressure_in_out\n"
                     "    self.pressure_loss_equation\n"
                     "    packed_bed_porosity\n"
+                    "    packed_bed_particle_diameter\n"
                     "    fanning_factor\n"
                     "because pressure operation becomes ambigous."
                 )
@@ -580,11 +590,35 @@ class StationaryPFR(ReactorBase):
 
         elif any(no_isobaric_args):
             # Check non-isobaric operation:
-            self._pressure_operation = self.pressure_loss_equation
-            self._pressure_balance_func = self._non_isobaric_pressure_balance
-            self._pressure_in_for_bc = self.pressure_in_out.get("in")
-            self._pressure_out_for_bc = self.pressure_in_out.get("out")
-            # como levantar error si me falta un dato TODO
+            if self.pressure_in_out is {}:
+                raise ValueError(
+                    "If non isobaric operation is setting specify on border"
+                    "condition for pressure"
+                )
+            else:
+                self._pressure_in_for_bc = self.pressure_in_out.get("in")
+                self._pressure_out_for_bc = self.pressure_in_out.get("out")
+            if self.pressure_loss_equation == "packed bed reactor":
+                self._pressure_balance_func = (
+                    self._non_isobaric_pressure_balance_packed_bed_reactor
+                )
+                if (
+                    self.packed_bed_porosity is None
+                    or self.packed_bed_particle_diameter is None
+                ):
+                    raise ValueError(
+                        "If non isobaric packed bed reactor is setting,"
+                        "specify a packed bed porosity and particle diameter"
+                    )
+            elif self.pressure_loss_equation == "gas phase reaction":
+                self._pressure_balance_func = (
+                    self._non_isobaric_pressure_balance_gas_phase_reaction
+                )
+                if self.fanning_factor is None:
+                    raise ValueError(
+                        "If non isobaric gas phase reaction is setting,"
+                        "specify a Fanning factor"
+                    )
         else:
             raise ValueError("No pressure specification was set.")
 
@@ -973,7 +1007,27 @@ class StationaryPFR(ReactorBase):
         grid_length = np.size(length_coordinate)
         return np.zeros(grid_length)
 
-    def _non_isobaric_pressure_balance(self) -> List[float]:
+    def _non_isobaric_pressure_balance_packed_bed_reactor(
+        self,
+        length_coordinate: float,
+        molar_fluxes: List[float],
+        temperature: float,
+        pressure: float,
+    ) -> List[float]:
+        """Pressure balance evaluation for packed bed reactor operation.
+
+        Pressure balance is calculated for each substance in mixture.
+
+        TODO
+
+        Raises
+        ------
+        NotImplementedError
+            Not implemented yet.
+        """
+        raise NotImplementedError("Not implemented yet.")
+
+    def _non_isobaric_pressure_balance_gas_phase_reaction(self) -> List[float]:
         """Not implemented yet.
 
         TODO

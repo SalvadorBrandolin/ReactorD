@@ -128,8 +128,11 @@ def test_not_implemented_error():
         def _isobaric_pressure_balance(self) -> None:
             return super()._isobaric_pressure_balance()
 
-        def _non_isobaric_pressure_balance(self) -> None:
-            return super()._non_isobaric_pressure_balance()
+        def _non_isobaric_pressure_balance_packed_bed_reactor(self) -> None:
+            return super()._non_isobaric_pressure_balance_packed_bed_reactor()
+
+        def _non_isobaric_pressure_balance_gas_phase_reaction(self) -> None:
+            return super()._non_isobaric_pressure_balance_gas_phase_reaction()
 
         def _homogeneous_solver(self) -> None:
             return super()._homogeneous_solver()
@@ -203,7 +206,10 @@ def test_not_implemented_error():
         reactor._isobaric_pressure_balance()
 
     with pytest.raises(NotImplementedError):
-        reactor._non_isobaric_pressure_balance()
+        reactor._non_isobaric_pressure_balance_packed_bed_reactor()
+
+    with pytest.raises(NotImplementedError):
+        reactor._non_isobaric_pressure_balance_gas_phase_reaction()
 
     with pytest.raises(NotImplementedError):
         reactor._homogeneous_solver()
@@ -315,8 +321,11 @@ def test_asignation_kinetics_arguments():
         def _isobaric_pressure_balance(self) -> None:
             return super()._isobaric_pressure_balance()
 
-        def _non_isobaric_pressure_balance(self) -> None:
-            return super()._non_isobaric_pressure_balance()
+        def _non_isobaric_pressure_balance_packed_bed_reactor(self) -> None:
+            return super()._non_isobaric_pressure_balance_packed_bed_reactor()
+
+        def _non_isobaric_pressure_balance_gas_phase_reaction(self) -> None:
+            return super()._non_isobaric_pressure_balance_gas_phase_reaction()
 
         def _homogeneous_solver(self) -> None:
             return super()._homogeneous_solver()

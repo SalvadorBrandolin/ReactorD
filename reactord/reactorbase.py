@@ -488,7 +488,18 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def _non_isobaric_pressure_balance(self) -> None:
+    def _non_isobaric_pressure_balance_packed_bed_reactor(self) -> None:
+        """Evaluate non-isobaric pressure balance.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    @abstractmethod
+    def _non_isobaric_pressure_balance_gas_phase_reaction(self) -> None:
         """Evaluate non-isobaric pressure balance.
 
         Raises
