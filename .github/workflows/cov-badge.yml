@@ -23,7 +23,7 @@ jobs:
       - name: erase .coverage just in case
         run: coverage erase
       - name: generate .coverage report
-        run: coverage run -m pytest tests/
+        run: coverage run -m pytest
       - name: transform .coverage into coverage.xml
         run: coverage xml 
 

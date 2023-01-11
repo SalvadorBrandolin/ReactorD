@@ -7,8 +7,7 @@ import reactord as rd
 
 def test_abstract_class_type_error():
     with pytest.raises(TypeError):
-        mixture = rd.mix.AbstractMix()
-        mixture.mol_fractions([1, 1])
+        rd.mix.AbstractMix()
 
 
 def test_not_defining_abastract_methods():
@@ -17,7 +16,6 @@ def test_not_defining_abastract_methods():
 
     with pytest.raises(TypeError):
         mixture = NewMixture()
-        mixture.mol_fractions([1, 1])
 
 
 def test_abastract_class_not_implemented_errors():
