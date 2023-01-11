@@ -24,7 +24,7 @@ jobs:
           coverage erase
           coverage run -m pytest tests/
 
-      # Creating the badge 
+      # Creating the badge
       - name: uploading to codecov
         uses: codecov/codecov-action@v3
         with:
