@@ -9,7 +9,7 @@ from reactord.utils import vectorize
 
 from scipy.integrate import quad
 
-from thermo.chemical import Chemical
+from thermo import ChemicalConstantsPackage
 
 
 class Substance:
@@ -68,7 +68,7 @@ class Substance:
         A function that receives a temperature and pressure, and returns the
         molar volume of the gas at that temperature and pressure [m^3/mol],
         by default None
-    heat_capacity_solid_t : Callable, optional
+    heat_capacity_solid_tp : Callable, optional
         A function that receives a temperature and pressure, and returns the
         heat capacity of the solid at that temperature and pressure [J/mol/K],
         by default None
@@ -140,7 +140,7 @@ class Substance:
         volume_solid_t: Callable = None,
         volume_liquid_tp: Callable = None,
         volume_gas_tp: Callable = None,
-        heat_capacity_solid_t: Callable = None,
+        heat_capacity_solid_tp: Callable = None,
         heat_capacity_liquid_t: Callable = None,
         heat_capacity_gas_t: Callable = None,
         thermal_conductivity_liquid_tp: Callable = None,
@@ -167,7 +167,7 @@ class Substance:
         self._volume_solid_t = volume_solid_t
         self._volume_liquid_tp = volume_liquid_tp
         self._volume_gas_tp = volume_gas_tp
-        self._heat_capacity_solid_t = heat_capacity_solid_t
+        self._heat_capacity_solid_tp = heat_capacity_solid_tp
         self._heat_capacity_liquid_t = heat_capacity_liquid_t
         self._heat_capacity_gas_t = heat_capacity_gas_t
         # self._thermal_conductivity_s_tp = thermal_conductivity_s_tp
@@ -232,32 +232,36 @@ class Substance:
         Substance
             Instantiated Substance object from thermo database.
         """
-        chemobj = Chemical(identification)
+        corr = ChemicalConstantsPackage.correlations_from_IDs([identification])
+
+        # pressure dependent functions
+
+
 
         substance_object = cls(
-            name=chemobj.name,
-            molecular_weight=chemobj.MW,
-            normal_boiling_point=chemobj.Tb,
-            normal_melting_point=chemobj.Tm,
-            critical_temperature=chemobj.Tc,
-            critical_pressure=chemobj.Pc,
-            acentric_factor=chemobj.omega,
-            formation_enthalpy=chemobj.Hfm,
-            formation_enthalpy_ig=chemobj.Hfgm,
-            formation_gibbs=chemobj.Gfm,
-            formation_gibbs_ig=chemobj.Gfgm,
-            vaporization_enthalpy_t=chemobj.EnthalpyVaporization,
-            sublimation_enthalpy_t=chemobj.EnthalpySublimation,
-            volume_solid_t=chemobj.VolumeSolid,
-            volume_liquid_tp=chemobj.VolumeLiquid,
-            volume_gas_tp=chemobj.VolumeGas,
-            heat_capacity_solid_t=chemobj.HeatCapacitySolid,
-            heat_capacity_liquid_t=chemobj.HeatCapacityLiquid,
-            heat_capacity_gas_t=chemobj.HeatCapacityGas,
-            thermal_conductivity_liquid_tp=chemobj.ThermalConductivityLiquid,
-            thermal_conductivity_gas_tp=chemobj.ThermalConductivityGas,
-            viscosity_liquid_tp=chemobj.ViscosityLiquid,
-            viscosity_gas_tp=chemobj.ViscosityGas,
+            name=corr.constants.names[0],
+            molecular_weight=corr.constants.Mws[0],
+            normal_boiling_point=corr.constants.Tbs[0],
+            normal_melting_point=corr.constants.Tms[0],
+            critical_temperature=corr.constants.Tcs[0],
+            critical_pressure=corr.constants.Pcs[0],
+            acentric_factor=corr.constants.omegas[0],
+            formation_enthalpy=corr.constants.Hf_STPs[0],
+            formation_enthalpy_ig=corr.constants.Hfgs[0],
+            formation_gibbs=0, # TODO look Hvap_298s
+            formation_gibbs_ig=corr.constants.Gfgs[0],
+            vaporization_enthalpy_t=corr.EnthalpyVaporization[0].T_dependent_property,
+            sublimation_enthalpy_t=corr.EnthalpySublimation,
+            volume_solid_tp=corr.VolumeSolid,
+            volume_liquid_tp=corr.VolumeLiquid,
+            volume_gas_tp=corr.VolumeGas,
+            heat_capacity_solid_tp=corr.HeatCapacitySolid,
+            heat_capacity_liquid_tp=corr.HeatCapacityLiquid,
+            heat_capacity_gas_tp=corr.HeatCapacityGas,
+            thermal_conductivity_liquid_tp=corr.ThermalConductivityLiquid,
+            thermal_conductivity_gas_tp=corr.ThermalConductivityGas,
+            viscosity_liquid_tp=corr.ViscosityLiquid,
+            viscosity_gas_tp=corr.ViscosityGas,
         )
         return substance_object
 
@@ -382,7 +386,7 @@ class Substance:
         float
             Pure solid heat capacity in Joule per mol per Kelvin [J/mol/K]
         """
-        return self._heat_capacity_solid_t(temperature)
+        return self._heat_capacity_solid_tp(temperature)
 
     @vectorize(signature="()->()", excluded={0})
     def heat_capacity_liquid(self, temperature: float) -> float:
