@@ -25,7 +25,6 @@ jobs:
           coverage run -m pytest tests/
 
       # Creating the badge
-      steps:
       - uses: actions/checkout@v2
         with: 
           fetch-depth: 0
