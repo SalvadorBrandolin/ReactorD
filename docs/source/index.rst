@@ -33,6 +33,8 @@
    :target: https://badge.fury.io/py/uttrs
 .. |License| image:: https://img.shields.io/badge/License-MIT-blue.svg
    :target: https://tldrlegal.com/license/mit-license
+.. image:: https://codecov.io/github/SalvadorBrandolin/ReactorD/branch/main/graph/badge.svg?token=6E0U0F9AYU
+:target: https://codecov.io/github/SalvadorBrandolin/ReactorD
 
 ----
 
