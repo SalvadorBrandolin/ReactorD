@@ -23,7 +23,7 @@ jobs:
       - name: erase .coverage just in case
         run: coverage erase
       - name: generate .coverage report
-        run: coverage run -m pytest
+        run: pytest tests/ --cov=reactord/ --cov-append --cov-report=term-missing
       - name: transform .coverage into coverage.xml
         run: coverage xml 
 
