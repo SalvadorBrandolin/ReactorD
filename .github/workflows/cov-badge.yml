@@ -8,7 +8,7 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -19,7 +19,7 @@ jobs:
           pip install pytest coverage pytest-cov
       - name: run coverage
         run: 
-          coverage erase pytest ../../tests/ --cov=reactord/ --cov-append 
+          coverage erase pytest tests/ --cov=reactord/ --cov-append 
           --cov-report=term-missing coverage report -m
 
       # Creating the badge
