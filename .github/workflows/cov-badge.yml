@@ -25,7 +25,6 @@ jobs:
           coverage run -m pytest tests/
 
       # Creating the badge
-      - uses: actions/checkout@master
       - name: uploading to codecov
         uses: codecov/codecov-action@v3
         with:
