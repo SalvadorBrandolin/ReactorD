@@ -10,21 +10,19 @@ def test_abstract_error_raises():
     with pytest.raises(TypeError):
 
         def kinetic(conc, temperature):
-            return 10
+            pass
 
         a = rd.Substance()
         b = rd.Substance()
 
         mixture = rd.mix.IdealSolution(A=a, B=b)
 
-        reactor = rd.ReactorBase(
+        rd.ReactorBase(
             mix=mixture,
             list_of_reactions=[kinetic],
             stoichiometry=[-1, 1],
             kinetic_argument="concentration",
         )
-
-        reactor._mass_balance_func()
 
 
 def test_heritage_methods():
@@ -33,11 +31,10 @@ def test_heritage_methods():
     # Not implemented all abstract methods
     # ==================================================================
     class SpecificReactor(rd.ReactorBase):
-        ...
+        pass
 
     with pytest.raises(TypeError):
-        reactor = SpecificReactor()
-        reactor._mass_balance_func()
+        SpecificReactor()
 
     # ==================================================================
     # Implemented some abstract methods
@@ -45,14 +42,13 @@ def test_heritage_methods():
 
     class SpecificReactor(rd.ReactorBase):
         def _grid_builder(self) -> None:
-            ...
+            pass
 
         def _border_cond_and_initial_guesses(self) -> None:
-            ...
+            pass
 
     with pytest.raises(TypeError):
-        reactor = SpecificReactor()
-        reactor._mass_balance_func()
+        SpecificReactor()
 
 
 def test_not_implemented_error():
@@ -234,10 +230,10 @@ def test_asignation_kinetics_arguments():
     "Test for not implemented error of reactor's intherface methods."
 
     def kinetic1(conc, temperature):
-        return 100
+        pass
 
     def kinetic2(conc, temperature):
-        return 200
+        pass
 
     class SpecificReactor(rd.ReactorBase):
         def __init__(
@@ -257,90 +253,90 @@ def test_asignation_kinetics_arguments():
 
         @classmethod
         def set_isothermic_isobaric(cls) -> None:
-            return super().set_isothermic_isobaric()
+            pass
 
         @classmethod
         def set_isothermic_noisobaric(cls) -> None:
-            return super().set_isothermic_noisobaric()
+            pass
 
         @classmethod
         def set_adiabatic_isobaric(cls) -> None:
-            return super().set_adiabatic_isobaric()
+            pass
 
         @classmethod
         def set_adiabatic_noisobaric(cls) -> None:
-            return super().set_adiabatic_noisobaric()
+            pass
 
         @classmethod
         def set_noisothermic_isobaric(cls) -> None:
-            return super().set_noisothermic_isobaric()
+            pass
 
         @classmethod
         def set_noisothermic_noisobaric(cls) -> None:
-            return super().set_noisothermic_noisobaric()
+            pass
 
         def _set_catalyst_operation(self):
-            return super()._set_catalyst_operation()
+            pass
 
         def _set_thermal_operation(self):
-            return super()._set_thermal_operation()
+            pass
 
         def _set_pressure_operation(self):
-            return super()._set_pressure_operation()
+            pass
 
         def _grid_builder(self) -> None:
-            return super()._grid_builder()
+            pass
 
         def _border_cond_and_initial_guesses(self) -> None:
-            return super()._border_cond_and_initial_guesses()
+            pass
 
         def _mass_balance(self) -> None:
-            return super()._mass_balance()
+            pass
 
         def _energy_balance(self) -> None:
-            return super()._energy_balance()
+            pass
 
         def _pressure_balance(self) -> None:
-            return super()._pressure_balance()
+            pass
 
         def _refrigerant_energy_balance(self) -> None:
-            return super()._refrigerant_energy_balance()
+            pass
 
         def simulate(self) -> None:
-            return super().simulate()
+            pass
 
         def _homogeneous_mass_balance(self) -> None:
-            return super()._homogeneous_mass_balance()
+            pass
 
         def _heterogeneous_mass_balance(self) -> None:
-            return super()._heterogeneous_mass_balance()
+            pass
 
         def _isothermic_energy_balance(self) -> None:
-            return super()._isothermic_energy_balance()
+            pass
 
         def _homogeneous_adiabatic_energy_balance(self) -> None:
-            return super()._homogeneous_adiabatic_energy_balance()
+            pass
 
         def _heterogeneous_adiabatic_energy_balance(self) -> None:
-            return super()._heterogeneous_adiabatic_energy_balance()
+            pass
 
         def _homogeneous_non_isothermic_energy_balance(self) -> None:
-            return super()._homogeneous_non_isothermic_energy_balance()
+            pass
 
         def _heterogeneous_non_isothermic_energy_balance(self) -> None:
-            return super()._heterogeneous_non_isothermic_energy_balance()
+            pass
 
         def _isobaric_pressure_balance(self) -> None:
-            return super()._isobaric_pressure_balance()
+            pass
 
         def _non_isobaric_pressure_balance(self) -> None:
-            return super()._non_isobaric_pressure_balance()
+            pass
 
         def _homogeneous_solver(self) -> None:
-            return super()._homogeneous_solver()
+            pass
 
         def _heterogeneous_solver(self) -> None:
-            return super()._heterogeneous_solver()
+            pass
 
     a = rd.Substance(name="SubstanceA")
     b = rd.Substance(name="SubstanceB")
