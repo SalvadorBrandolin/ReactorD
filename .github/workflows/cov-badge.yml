@@ -4,7 +4,7 @@ on:
   - push
 
 jobs:
-  run-coverage:
+  coverage-badge:
 
     runs-on: ubuntu-latest
     steps:
@@ -22,11 +22,7 @@ jobs:
           coverage erase pytest tests/ --cov=reactord/ --cov-append 
           --cov-report=term-missing  coverage report -m
 
-  coverage-badge:
-    
-    runs-on: ubuntu-latest
-
-    steps:
+      # Creating the badge
       - uses: actions/checkout@v2
         with: 
           fetch-depth: 0
