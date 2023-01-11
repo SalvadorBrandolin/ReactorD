@@ -9,9 +9,6 @@ def test_abstract_error_raises():
 
     with pytest.raises(TypeError):
 
-        def kinetic(conc, temperature):
-            pass
-
         a = rd.Substance()
         b = rd.Substance()
 
@@ -19,7 +16,7 @@ def test_abstract_error_raises():
 
         rd.ReactorBase(
             mix=mixture,
-            list_of_reactions=[kinetic],
+            list_of_reactions=[],
             stoichiometry=[-1, 1],
             kinetic_argument="concentration",
         )
@@ -27,25 +24,11 @@ def test_abstract_error_raises():
 
 def test_heritage_methods():
 
-    # ==================================================================
+    # =========================================================================
     # Not implemented all abstract methods
-    # ==================================================================
+    # =========================================================================
     class SpecificReactor(rd.ReactorBase):
         pass
-
-    with pytest.raises(TypeError):
-        SpecificReactor()
-
-    # ==================================================================
-    # Implemented some abstract methods
-    # ==================================================================
-
-    class SpecificReactor(rd.ReactorBase):
-        def _grid_builder(self) -> None:
-            pass
-
-        def _border_cond_and_initial_guesses(self) -> None:
-            pass
 
     with pytest.raises(TypeError):
         SpecificReactor()
@@ -235,6 +218,9 @@ def test_asignation_kinetics_arguments():
     def kinetic2(conc, temperature):
         pass
 
+    assert kinetic1([0.25, 0.25, 0.25, 0.25], 298.15) is None
+    assert kinetic2([0.25, 0.25, 0.25, 0.25], 298.15) is None
+
     class SpecificReactor(rd.ReactorBase):
         def __init__(
             self,
@@ -338,6 +324,15 @@ def test_asignation_kinetics_arguments():
         def _heterogeneous_solver(self) -> None:
             pass
 
+            pass
+
+    assert SpecificReactor.set_isothermic_isobaric() is None
+    assert SpecificReactor.set_isothermic_noisobaric() is None
+    assert SpecificReactor.set_adiabatic_isobaric() is None
+    assert SpecificReactor.set_adiabatic_noisobaric() is None
+    assert SpecificReactor.set_noisothermic_isobaric() is None
+    assert SpecificReactor.set_noisothermic_noisobaric() is None
+
     a = rd.Substance(name="SubstanceA")
     b = rd.Substance(name="SubstanceB")
 
@@ -353,6 +348,28 @@ def test_asignation_kinetics_arguments():
         stoichiometry=[-1, 1],
         kinetic_argument="concentration",
     )
+
+    assert reactor._set_catalyst_operation() is None
+    assert reactor._set_thermal_operation() is None
+    assert reactor._set_pressure_operation() is None
+    assert reactor._grid_builder() is None
+    assert reactor._border_cond_and_initial_guesses() is None
+    assert reactor._mass_balance() is None
+    assert reactor._energy_balance() is None
+    assert reactor._pressure_balance() is None
+    assert reactor._refrigerant_energy_balance() is None
+    assert reactor.simulate() is None
+    assert reactor._homogeneous_mass_balance() is None
+    assert reactor._heterogeneous_mass_balance() is None
+    assert reactor._isothermic_energy_balance() is None
+    assert reactor._homogeneous_adiabatic_energy_balance() is None
+    assert reactor._heterogeneous_adiabatic_energy_balance() is None
+    assert reactor._homogeneous_non_isothermic_energy_balance() is None
+    assert reactor._heterogeneous_non_isothermic_energy_balance() is None
+    assert reactor._isobaric_pressure_balance() is None
+    assert reactor._non_isobaric_pressure_balance() is None
+    assert reactor._homogeneous_solver() is None
+    assert reactor._heterogeneous_solver() is None
 
     reaction2 = rd.Kinetics(
         mix=mixture2,

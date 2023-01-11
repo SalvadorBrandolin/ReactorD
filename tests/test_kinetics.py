@@ -61,6 +61,9 @@ def test_user_reaction_enthalpies():
     def reaction_rate2(concentration, temperature):
         return 15
 
+    assert reaction_rate([0.25, 0.25, 0.25, 0.25], 298.15) == 10
+    assert reaction_rate2([0.25, 0.25, 0.25, 0.25], 298.15) == 15
+
     mix1 = rd.mix.IdealGas(
         A="acetic acid", B="ethanol", C="ethyl acetate", D="water"
     )
@@ -147,6 +150,9 @@ def test_standard_reaction_enthalpies():
     def reac2(concentrations, temperature):
         return 20
 
+    assert reac1([0.25, 0.25, 0.25, 0.25], 298.15) == 10
+    assert reac2([0.25, 0.25, 0.25, 0.25], 298.15) == 20
+
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
 
     a = rd.Substance.from_thermo_database("acetic acid")
@@ -182,6 +188,9 @@ def test_user_defined_reaction_enthalpies():
     def reac2(concentrations, temperature):
         return 20
 
+    assert reac1([0.25, 0.25, 0.25, 0.25], 298.15) == 10
+    assert reac2([0.25, 0.25, 0.25, 0.25], 298.15) == 20
+
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -1, 0, 1]])
 
     a = rd.Substance.from_thermo_database("acetic acid")
@@ -212,6 +221,9 @@ def test_enthalpies_correction():
 
     def reac2(concentrations, temperature):
         return 20
+
+    assert reac1([0.25, 0.25, 0.25, 0.25], 298.15) == 10
+    assert reac2([0.25, 0.25, 0.25, 0.25], 298.15) == 20
 
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
 
@@ -259,6 +271,9 @@ def test_making_it_explode():
 
     def reac2(concentrations, temperature):
         return 20
+
+    assert reac1([0.25, 0.25, 0.25, 0.25], 298.15) == 10
+    assert reac2([0.25, 0.25, 0.25, 0.25], 298.15) == 20
 
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
 
