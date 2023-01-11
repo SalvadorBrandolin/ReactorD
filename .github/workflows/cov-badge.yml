@@ -1,8 +1,5 @@
 name: coverage-badge
 
-on:
-  - push
-
 jobs:
   coverage-badge:
 
