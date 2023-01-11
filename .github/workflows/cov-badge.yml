@@ -20,7 +20,7 @@ jobs:
       - name: run coverage
         run: |
           coverage erase
-          coverage run -m pytest ../../tests/
+          coverage run -m pytest tests/
 
       - name: coverage.py badge
         uses: tj-actions/coverage-badge-py@v1.8
