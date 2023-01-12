@@ -160,8 +160,9 @@ def test_volume_gas(name):
     pressure = [101325, 200000, 300000, 400000]
     for t in temperature:
         for p in pressure:
+            method = chemical_obj.VolumeGases[0].method_P
             assert substance.volume_gas(t, p) == (
-                chemical_obj.VolumeGases[0].T_dependent_property(t)
+                chemical_obj.VolumeGases[0].calculate_P(t, p, method)
             )
 
 

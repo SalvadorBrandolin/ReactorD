@@ -45,9 +45,6 @@ class Substance:
         Standard state molar enthalpy of formation [J/mol], by default None
     formation_enthalpy_ig : float, optional
         Ideal-gas molar enthalpy of formation [J/mol], by default None
-    formation_gibbs : float, optional
-       Standard state molar change of Gibbs energy of formation [J/mol], by
-       default None
     formation_gibbs_ig : float, optional
         Ideal-gas molar change of Gibbs energy of formation [J/mol], by default
         None
@@ -114,9 +111,6 @@ class Substance:
         Standard state molar enthalpy of formation [J/mol], by default None
     formation_enthalpy_ig : float, optional
         Ideal-gas molar enthalpy of formation [J/mol], by default None
-    formation_gibbs : float, optional
-       Standard state molar change of Gibbs energy of formation [J/mol], by
-       default None
     formation_gibbs_ig : float, optional
         Ideal-gas molar change of Gibbs energy of formation [J/mol], by default
         None
@@ -133,7 +127,6 @@ class Substance:
         acentric_factor: float = None,
         formation_enthalpy: float = None,
         formation_enthalpy_ig: float = None,
-        formation_gibbs: float = None,
         formation_gibbs_ig: float = None,
         vaporization_enthalpy: Callable = None,
         sublimation_enthalpy: Callable = None,
@@ -159,7 +152,6 @@ class Substance:
         self.acentric_factor = acentric_factor
         self.formation_enthalpy = formation_enthalpy
         self.formation_enthalpy_ig = formation_enthalpy_ig
-        self.formation_gibbs = formation_gibbs
         self.formation_gibbs_ig = formation_gibbs_ig
 
         # Temperature-dependent properties calculation functions:
@@ -277,7 +269,10 @@ class Substance:
             return volume
 
         def volume_gas(temperature: float, pressure: float) -> float:
-            volume = corr.VolumeGases[0].T_dependent_property(temperature)
+            method = corr.VolumeGases[0].method_P
+            volume = corr.VolumeGases[0].calculate_P(
+                temperature, pressure, method
+            )
             return volume
 
         def heat_capacity_solid(temperature: float, pressure: float) -> float:
@@ -336,7 +331,6 @@ class Substance:
             acentric_factor=corr.constants.omegas[0],
             formation_enthalpy=corr.constants.Hf_STPs[0],
             formation_enthalpy_ig=corr.constants.Hfgs[0],
-            formation_gibbs=0,  # TODO look Hvap_298s
             formation_gibbs_ig=corr.constants.Gfgs[0],
             vaporization_enthalpy=vaporization_enthalpy,
             sublimation_enthalpy=sublimation_enthalpy,
