@@ -39,37 +39,7 @@ class AbstractMix(metaclass=ABCMeta):
 
         return mol_fractions
 
-    def mass_fractions(self, moles: List[float]):
-        """Calculate the mass fractions of the mixture.
 
-        Multiple mixture compositions can be specified by a moles matrix. Each
-        row represent each substance and each colum represent each mixture
-        composition.
-
-        Parameters
-        ----------
-        moles: ndarray or list [float]
-            moles of each substance specified in the same order as the
-            mix substances order.
-
-        Returns
-        -------
-        mass_fractions : ndarray of shape (moles,)
-        Array of the mass fractions of mixture's substances
-        """
-        pure_molecular_weights = [
-            substance.molecular_weight for substance in self.substances
-        ]
-
-        mixture_molecular_weight = self.mixture_molecular_weight(moles)
-
-        molar_fractions = self.mol_fractions(moles)
-
-        mass_fractions = (
-            molar_fractions * pure_molecular_weights / mixture_molecular_weight
-        )
-
-        return mass_fractions
 
     def mixture_molecular_weight(self, moles: List[float]):
         """Calculate the molecular weight of the mixture.

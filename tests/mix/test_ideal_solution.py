@@ -1,5 +1,7 @@
 import numpy as np
 
+import pytest
+
 import reactord as rd
 
 
@@ -125,3 +127,19 @@ def test_three_substance_mix():
             mixture.mix_heat_capacity(moles, t, pressure),
             raw_mix_heat_capacity,
         )  # OKAY
+
+
+class NewMixture(rd.mix.IdealSolution):
+   
+    def mixture_viscosity(
+            self,
+            temperature: float,
+            pressure: float,
+            moles: list,
+        ):
+            return super().mixture_viscosity(temperature, pressure, moles)
+    
+mixture = NewMixture()
+
+with pytest.raises(NotImplementedError):
+        mixture.mixture_viscosity(298.15, 101325, [])
