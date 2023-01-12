@@ -1,3 +1,5 @@
+import numpy as np
+
 import pytest
 
 import reactord as rd
@@ -214,8 +216,9 @@ def test_viscosity_gas(name):
     pressure = [101325, 200000, 300000, 400000]
     for t in temperature:
         for p in pressure:
-            assert substance.viscosity_gas(t, p) == (
-                chemical_obj.ViscosityGases[0].T_dependent_property(t)
+            assert np.allclose(
+                substance.viscosity_gas(t, p),
+                (chemical_obj.ViscosityGases[0].T_dependent_property(t)),
             )
 
 

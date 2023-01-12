@@ -251,9 +251,7 @@ class Substance:
         Substance
             Instantiated Substance object from thermo database.
         """
-        corr = ChemicalConstantsPackage.correlations_from_IDs(
-            [identification]
-        )
+        corr = ChemicalConstantsPackage.correlations_from_IDs([identification])
 
         # Temperature functions
         def vaporization_enthalpy(temperature: float) -> float:
@@ -274,9 +272,7 @@ class Substance:
             return volume
 
         def volume_liquid(temperature: float, pressure: float) -> float:
-            volume = corr.VolumeLiquids[0].T_dependent_property(
-                temperature
-            )
+            volume = corr.VolumeLiquids[0].T_dependent_property(temperature)
             return volume
 
         def volume_gas(temperature: float, pressure: float) -> float:
