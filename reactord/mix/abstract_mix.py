@@ -39,6 +39,30 @@ class AbstractMix(metaclass=ABCMeta):
 
         return mol_fractions
 
+    def mass_fractions(self, moles: List[float]):
+        pure_molecular_weights = [
+            substance.molecular_weight for substance in self.substances
+        ]
+
+        mixture_molecular_weight = self.mixture_molecular_weight(moles)
+
+        molar_fractions = self.mol_fractions(moles)
+
+        mass_fractions = (
+            molar_fractions * pure_molecular_weights / mixture_molecular_weight
+        )
+
+        return mass_fractions
+
+    def mixture_molecular_weight(self, moles: List[float]):
+        pure_molecular_weights = [
+            substance.molecular_weight for substance in self.substances
+        ]
+
+        molar_fractions = self.mol_fractions(moles)
+
+        return np.dot(pure_molecular_weights, molar_fractions)
+
     def partial_pressures(
         self, moles: List[float], temperature: float, pressure: float
     ):
@@ -63,6 +87,40 @@ class AbstractMix(metaclass=ABCMeta):
         partial_pressures = np.multiply(mol_fractions, pressure)
 
         return partial_pressures
+
+    def molar_density(
+        self, moles: List[float], temperature: float, pressure: float
+    ):
+        total_moles = np.sum(moles)
+        return total_moles / self.volume(moles, temperature, pressure)
+
+    def mass_density(
+        self, moles: List[float], temperature: float, pressure: float
+    ):
+        """Return density in [kg/m3]
+
+        Parameters
+        ----------
+        moles : List[float]
+            _description_
+        temperature : float
+            _description_
+        pressure : float
+            _description_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+
+        mass_density = (
+            self.molar_density(moles, temperature, pressure)
+            * self.mixture_molecular_weight(moles)
+            / 1000
+        )
+
+        return mass_density
 
     def __len__(self):
         """Return the number of substances in the mixture.
@@ -197,7 +255,10 @@ class AbstractMix(metaclass=ABCMeta):
 
     @abstractmethod
     def mixture_viscosity(
-        self, temperature: float, pressure: float, moles: list
+        self,
+        moles: list,
+        temperature: float,
+        pressure: float,
     ):
         """
         Evaluate the viscosity of the mixture.

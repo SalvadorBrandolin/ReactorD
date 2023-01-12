@@ -170,7 +170,7 @@ class IdealGas(AbstractMix):
         self,
         moles: List[float],
         temperature: float,
-        pressure: float,   
+        pressure: float,
     ) -> float:
         """
         Evaluate the viscosity of the mixture.

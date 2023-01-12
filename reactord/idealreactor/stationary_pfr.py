@@ -295,9 +295,9 @@ class StationaryPFR(ReactorBase):
         isothermic_temperature: float,
         pressure_in_out: dict,
         pressure_loss_equation: str,
-        packed_bed_porosity: float,
-        packed_bed_particle_diameter: float,
-        fanning_factor: float,
+        packed_bed_porosity: float = None,
+        packed_bed_particle_diameter: float = None,
+        fanning_factor: float = None,
         molar_flow_in: dict = {},
         molar_flow_out: dict = {},
         catalyst_particle=None,
@@ -592,7 +592,7 @@ class StationaryPFR(ReactorBase):
             # Check non-isobaric operation:
             if self.pressure_in_out is {}:
                 raise ValueError(
-                    "If non isobaric operation is setting specify on border"
+                    "If noe isobaric operation is setting specify on border"
                     "condition for pressure"
                 )
             else:
@@ -1007,25 +1007,69 @@ class StationaryPFR(ReactorBase):
         grid_length = np.size(length_coordinate)
         return np.zeros(grid_length)
 
+    @vectorize(signature="(),(n),(),()->()", excluded={0})
     def _non_isobaric_pressure_balance_packed_bed_reactor(
         self,
         length_coordinate: float,
         molar_fluxes: List[float],
         temperature: float,
         pressure: float,
-    ) -> List[float]:
+    ) -> np.ndarray:
         """Pressure balance evaluation for packed bed reactor operation.
 
         Pressure balance is calculated for each substance in mixture.
 
-        TODO
+        Parameters
+        ----------
+        length_coordinate : float
+            _description_
+        molar_fluxes : List[float]
+            _description_
+        temperature : float
+            _description_
+        pressure : float
+            _description_
+
+        Returns
+        -------
+        np.ndarray
+            _description_
 
         Raises
         ------
         NotImplementedError
-            Not implemented yet.
+            _description_
         """
-        raise NotImplementedError("Not implemented yet.")
+
+        total_molar_flow = np.sum(molar_fluxes)
+        mix_molecular_weight = self.mix.mixture_molecular_weight(molar_fluxes)
+        total_mass_flow = total_molar_flow * mix_molecular_weight / 1000
+
+        mass_density = self.mix.mass_density(
+            molar_fluxes, temperature, pressure
+        )
+
+        mix_viscosity = self.mix.mixture_viscosity(
+            molar_fluxes, temperature, pressure
+        )
+
+        f = total_mass_flow / self.transversal_area
+        rho = mass_density
+        phi = self.packed_bed_porosity
+        dp = self.packed_bed_particle_diameter
+        mu = mix_viscosity
+
+        dp_dz = (
+            -f
+            / (rho * dp)
+            * (1 - phi)
+            / phi**3
+            * (150 * (1 - phi) * mu / dp + 1.75 * f)
+        )
+
+        # import ipdb
+        # ipdb.set_trace()
+        return dp_dz
 
     def _non_isobaric_pressure_balance_gas_phase_reaction(self) -> List[float]:
         """Not implemented yet.

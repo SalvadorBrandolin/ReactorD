@@ -604,10 +604,36 @@ def test_fogler_p1_15c_ivp_outlet():
     assert np.allclose(reactord_concentrations, fogler_concentrations)
 
 
-# ======================================================================
-# Fundamentals of Chemical Reaction Engineering. Mark E. Davis;
-# Robert J. Davis.
-# Example 3.4.1 - page 78
-# ======================================================================
+def test_fogler_example_4_4():
+    def kinetic(concentrations, temperature):
+        return 0
 
-# TODO
+    mixture = rd.mix.IdealGas(n="nitrogen", o="oxygen")
+
+    reactor = rd.idealreactor.StationaryPFR.set_isothermic_noisobaric(
+        mix=mixture,
+        list_of_reactions=[kinetic],
+        stoichiometry=[0, 0],
+        kinetic_argument="partial_pressure",
+        reactor_dim_minmax=[0, 18.288],
+        transversal_area=0.001313648986,
+        isothermic_temperature=260 + 273.15,
+        pressure_in_out={"in": 10 * 101325},
+        pressure_loss_equation="packed bed reactor",
+        packed_bed_porosity=0.45,
+        packed_bed_particle_diameter=0.00635,
+        molar_flow_in={
+            "nitrogen": 0.3560387507669636,
+            "oxygen": 0.09983673036871321,
+        },
+    )
+
+    resultado = reactor.simulate(
+        grid_size=7, tol=0.000001, max_nodes=7, verbose=0
+    )
+
+    fogler_pressures = [10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65]
+
+    assert np.allclose(
+        resultado.y[-2, :] / 101325, fogler_pressures, rtol=1e-05, atol=0.1
+    )
