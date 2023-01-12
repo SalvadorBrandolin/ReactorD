@@ -48,24 +48,6 @@ Ver. |release|
 
 ----
 
-.. toctree::
-   :maxdepth: 1
-   :caption: Contents
-
-   installation.rst
-   license.rst
-   modules
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Tutorials
-
-   tutorial/index.rst
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Modules
-
 **ReactorD** (Reactor Design) is a python package whose proposal is to simulate and design reactors for 
 multiple-reaction systems. The intention is to solve the following reactor types in stationary or 
 not-stationary conditions: Plug flow (PFR) and Stirred tank (STR) 
@@ -103,6 +85,30 @@ complexity, commonly lead to coupled non-linear algebraic problems, coupled diff
 or either both coupled algebraic-differential equations that must be solved by numeric algorithms.
 ReactorD provides an interphase to configure the necessary information for the simulation of the chemical reactors. 
 Also, ReactorD implements the mathematical representations of mass and energy balances of specific reactors for a numerical resolution.
+
+.. toctree::
+   :maxdepth: 1
+   :caption: License
+
+   license
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   installation
+   tutorial/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents
+
+   modules
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Modules
+
 
 Indices and tables
 ==================
