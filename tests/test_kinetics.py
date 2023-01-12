@@ -156,8 +156,8 @@ def test_standard_reaction_enthalpies():
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
 
     a = rd.Substance.from_thermo_database("acetic acid")
-    b = rd.Substance.from_thermo_database("hydrogen peroxide")
-    c = rd.Substance.from_thermo_database("peracetic acid")
+    b = rd.Substance.from_thermo_database("ethanol")
+    c = rd.Substance.from_thermo_database("ethyl acetate")
     d = rd.Substance.from_thermo_database("water")
 
     mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
@@ -194,8 +194,8 @@ def test_user_defined_reaction_enthalpies():
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -1, 0, 1]])
 
     a = rd.Substance.from_thermo_database("acetic acid")
-    b = rd.Substance.from_thermo_database("hydrogen peroxide")
-    c = rd.Substance.from_thermo_database("peracetic acid")
+    b = rd.Substance.from_thermo_database("ethanol")
+    c = rd.Substance.from_thermo_database("ethyl acetate")
     d = rd.Substance.from_thermo_database("water")
 
     mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
@@ -228,8 +228,8 @@ def test_enthalpies_correction():
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
 
     a = rd.Substance.from_thermo_database("acetic acid")
-    b = rd.Substance.from_thermo_database("hydrogen peroxide")
-    c = rd.Substance.from_thermo_database("peracetic acid")
+    b = rd.Substance.from_thermo_database("ethanol")
+    c = rd.Substance.from_thermo_database("ethyl acetate")
     d = rd.Substance.from_thermo_database("water")
 
     mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
@@ -242,23 +242,25 @@ def test_enthalpies_correction():
 
     h1 = (
         c.formation_enthalpy
-        + c.heat_capacity_liquid_dt_integral(298.15, 330)
+        + c.heat_capacity_liquid_dt_integral(298.15, 330, 101325)
         + d.formation_enthalpy
-        + d.heat_capacity_liquid_dt_integral(298.15, 330)
+        + d.heat_capacity_liquid_dt_integral(298.15, 330, 101325)
         - (
             a.formation_enthalpy
-            + a.heat_capacity_liquid_dt_integral(298.15, 330)
+            + a.heat_capacity_liquid_dt_integral(298.15, 330, 101325)
         )
         - (
             b.formation_enthalpy
-            + b.heat_capacity_liquid_dt_integral(298.15, 330)
+            + b.heat_capacity_liquid_dt_integral(298.15, 330, 101325)
         )
     )
 
     h2 = 2 * (
-        d.formation_enthalpy + d.heat_capacity_liquid_dt_integral(298.15, 330)
+        d.formation_enthalpy
+        + d.heat_capacity_liquid_dt_integral(298.15, 330, 101325)
     ) - 2 * (
-        b.formation_enthalpy + b.heat_capacity_liquid_dt_integral(298.15, 330)
+        b.formation_enthalpy
+        + b.heat_capacity_liquid_dt_integral(298.15, 330, 101325)
     )
 
     assert np.allclose(enthalpy1, h1)
@@ -278,8 +280,8 @@ def test_making_it_explode():
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
 
     a = rd.Substance.from_thermo_database("acetic acid")
-    b = rd.Substance.from_thermo_database("hydrogen peroxide")
-    c = rd.Substance.from_thermo_database("peracetic acid")
+    b = rd.Substance.from_thermo_database("ethanol")
+    c = rd.Substance.from_thermo_database("ethyl acetate")
     d = rd.Substance.from_thermo_database("water")
 
     mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
