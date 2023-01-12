@@ -236,7 +236,6 @@ class Substance:
         )
 
         # Temperature functions
-
         def vaporization_enthalpy(temperature: float) -> float:
             enthalpy = cls.corr.EnthalpyVaporizations[0].T_dependent_property(
                 temperature
@@ -250,7 +249,6 @@ class Substance:
             return enthalpy
 
         # Temperature and pressure dependent functions
-
         def volume_solid(temperature: float, pressure: float) -> float:
             volume = cls.corr.VolumeSolids[0].T_dependent_property(temperature)
             return volume
