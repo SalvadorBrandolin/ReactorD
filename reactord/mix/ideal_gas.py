@@ -88,7 +88,7 @@ class IdealGas(AbstractMix):
         return volume
 
     def mix_heat_capacity(
-        self, moles: List[float], temperature: float, *args
+        self, moles: List[float], temperature: float, pressure: float
     ) -> float:
         """Calculate heat capacity of th mixture.
 
@@ -108,7 +108,7 @@ class IdealGas(AbstractMix):
 
         pure_cp = np.array(
             [
-                substance.heat_capacity_gas(temperature)
+                substance.heat_capacity_gas(temperature, pressure)
                 for substance in self.substances
             ]
         )
@@ -133,7 +133,9 @@ class IdealGas(AbstractMix):
 
         return enthalpies
 
-    def formation_enthalpies_correction(self, temperature: float, *args):
+    def formation_enthalpies_correction(
+        self, temperature: float, pressure: float
+    ):
         """Calculate the correction term for the formation enthalpy.
 
         Method that calculates the correction term for the formation
@@ -157,7 +159,9 @@ class IdealGas(AbstractMix):
         for substance in self.substances:
             correction_enthalpies = np.append(
                 correction_enthalpies,
-                substance.heat_capacity_gas_dt_integral(298.15, temperature),
+                substance.heat_capacity_gas_dt_integral(
+                    298.15, temperature, pressure
+                ),
             )
 
         return correction_enthalpies

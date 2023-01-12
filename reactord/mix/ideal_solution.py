@@ -97,7 +97,9 @@ class IdealSolution(AbstractMix):
         )
         return np.dot(pure_volumes, mol_fractions)
 
-    def mix_heat_capacity(self, moles: List[float], temperature: float, *args):
+    def mix_heat_capacity(
+        self, moles: List[float], temperature: float, pressure: float
+    ):
         """Calculate heat capacity of th mixture.
 
         Parameters
@@ -116,7 +118,7 @@ class IdealSolution(AbstractMix):
 
         pure_cp = np.array(
             [
-                substance.heat_capacity_liquid(temperature)
+                substance.heat_capacity_liquid(temperature, pressure)
                 for substance in self.substances
             ]
         )
@@ -141,7 +143,9 @@ class IdealSolution(AbstractMix):
 
         return enthalpies
 
-    def formation_enthalpies_correction(self, temperature: float, *args):
+    def formation_enthalpies_correction(
+        self, temperature: float, pressure: float
+    ):
         """Calculate the correction term for the formation enthalpy.
 
         Method that calculates the correction term for the formation
@@ -166,11 +170,11 @@ class IdealSolution(AbstractMix):
         for substance in self.substances:
             if substance.normal_melting_point > 298.15:
                 dhs = substance.heat_capacity_solid_dt_integral(
-                    298.15, substance.normal_melting_point
+                    298.15, substance.normal_melting_point, pressure
                 )
                 dhf = substance.fusion_enthalpy(substance.normal_melting_point)
                 dhl = substance.heat_capacity_liquid_dt_integral(
-                    substance.normal_melting_point, temperature
+                    substance.normal_melting_point, temperature, pressure
                 )
 
                 correction_enthalpies = np.append(
@@ -180,7 +184,7 @@ class IdealSolution(AbstractMix):
                 correction_enthalpies = np.append(
                     correction_enthalpies,
                     substance.heat_capacity_liquid_dt_integral(
-                        298.15, temperature
+                        298.15, temperature, pressure
                     ),
                 )
         return correction_enthalpies
