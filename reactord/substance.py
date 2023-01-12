@@ -251,52 +251,52 @@ class Substance:
         Substance
             Instantiated Substance object from thermo database.
         """
-        cls.corr = ChemicalConstantsPackage.correlations_from_IDs(
+        corr = ChemicalConstantsPackage.correlations_from_IDs(
             [identification]
         )
 
         # Temperature functions
         def vaporization_enthalpy(temperature: float) -> float:
-            enthalpy = cls.corr.EnthalpyVaporizations[0].T_dependent_property(
+            enthalpy = corr.EnthalpyVaporizations[0].T_dependent_property(
                 temperature
             )
             return enthalpy
 
         def sublimation_enthalpy(temperature: float) -> float:
-            enthalpy = cls.corr.EnthalpySublimations[0].T_dependent_property(
+            enthalpy = corr.EnthalpySublimations[0].T_dependent_property(
                 temperature
             )
             return enthalpy
 
         # Temperature and pressure dependent functions
         def volume_solid(temperature: float, pressure: float) -> float:
-            volume = cls.corr.VolumeSolids[0].T_dependent_property(temperature)
+            volume = corr.VolumeSolids[0].T_dependent_property(temperature)
             return volume
 
         def volume_liquid(temperature: float, pressure: float) -> float:
-            volume = cls.corr.VolumeLiquids[0].T_dependent_property(
+            volume = corr.VolumeLiquids[0].T_dependent_property(
                 temperature
             )
             return volume
 
         def volume_gas(temperature: float, pressure: float) -> float:
-            volume = cls.corr.VolumeGases[0].T_dependent_property(temperature)
+            volume = corr.VolumeGases[0].T_dependent_property(temperature)
             return volume
 
         def heat_capacity_solid(temperature: float, pressure: float) -> float:
-            heat_cap = cls.corr.HeatCapacitySolids[0].T_dependent_property(
+            heat_cap = corr.HeatCapacitySolids[0].T_dependent_property(
                 temperature
             )
             return heat_cap
 
         def heat_capacity_liquid(temperature: float, pressure: float) -> float:
-            heat_cap = cls.corr.HeatCapacityLiquids[0].T_dependent_property(
+            heat_cap = corr.HeatCapacityLiquids[0].T_dependent_property(
                 temperature
             )
             return heat_cap
 
         def heat_capacity_gas(temperature: float, pressure: float) -> float:
-            heat_cap = cls.corr.HeatCapacityGases[0].T_dependent_property(
+            heat_cap = corr.HeatCapacityGases[0].T_dependent_property(
                 temperature
             )
             return heat_cap
@@ -304,7 +304,7 @@ class Substance:
         def thermal_conductivity_liquid(
             temperature: float, pressure: float
         ) -> float:
-            thermal_cond = cls.corr.ThermalConductivityLiquids[
+            thermal_cond = corr.ThermalConductivityLiquids[
                 0
             ].T_dependent_property(temperature)
             return thermal_cond
@@ -312,35 +312,35 @@ class Substance:
         def thermal_conductivity_gas(
             temperature: float, pressure: float
         ) -> float:
-            thermal_cond = cls.corr.ThermalConductivityGases[
+            thermal_cond = corr.ThermalConductivityGases[
                 0
             ].T_dependent_property(temperature)
             return thermal_cond
 
         def viscosity_liquid(temperature: float, pressure: float) -> float:
-            thermal_cond = cls.corr.ViscosityLiquids[0].T_dependent_property(
+            thermal_cond = corr.ViscosityLiquids[0].T_dependent_property(
                 temperature
             )
             return thermal_cond
 
         def viscosity_gas(temperature: float, pressure: float) -> float:
-            thermal_cond = cls.corr.ViscosityGases[0].T_dependent_property(
+            thermal_cond = corr.ViscosityGases[0].T_dependent_property(
                 temperature
             )
             return thermal_cond
 
         substance_object = cls(
-            name=cls.corr.constants.names[0],
-            molecular_weight=cls.corr.constants.MWs[0],
-            normal_boiling_point=cls.corr.constants.Tbs[0],
-            normal_melting_point=cls.corr.constants.Tms[0],
-            critical_temperature=cls.corr.constants.Tcs[0],
-            critical_pressure=cls.corr.constants.Pcs[0],
-            acentric_factor=cls.corr.constants.omegas[0],
-            formation_enthalpy=cls.corr.constants.Hf_STPs[0],
-            formation_enthalpy_ig=cls.corr.constants.Hfgs[0],
+            name=corr.constants.names[0],
+            molecular_weight=corr.constants.MWs[0],
+            normal_boiling_point=corr.constants.Tbs[0],
+            normal_melting_point=corr.constants.Tms[0],
+            critical_temperature=corr.constants.Tcs[0],
+            critical_pressure=corr.constants.Pcs[0],
+            acentric_factor=corr.constants.omegas[0],
+            formation_enthalpy=corr.constants.Hf_STPs[0],
+            formation_enthalpy_ig=corr.constants.Hfgs[0],
             formation_gibbs=0,  # TODO look Hvap_298s
-            formation_gibbs_ig=cls.corr.constants.Gfgs[0],
+            formation_gibbs_ig=corr.constants.Gfgs[0],
             vaporization_enthalpy=vaporization_enthalpy,
             sublimation_enthalpy=sublimation_enthalpy,
             volume_solid=volume_solid,
