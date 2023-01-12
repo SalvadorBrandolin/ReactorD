@@ -360,53 +360,6 @@ class ReactorBase(metaclass=ABCMeta):
     # ==================================================================
     # Balances
     # ==================================================================
-
-    @abstractmethod
-    def _mass_balance(self) -> None:
-        """Eval the reactor's mass balance.
-
-        Method that evaluates and returns the reactor's bulk-mass
-        balances. The format of the method's returns corresponds to the
-        solver's specific needs.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def _energy_balance(self) -> None:
-        """Evaluate reactor's energy balance.
-
-        Method that evaluates and returns the reactor's bulk-energy
-        balance. The format of the method's returns corresponds to the solver's
-        specificic needs.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
-    def _pressure_balance(self) -> None:
-        """Eval reactor's pressure balance.
-
-        Method that evaluates and returns the reactor's bulk-pressure
-        balance. The format of the method's returns corresponds to the solver's
-        specificic needs.
-
-        Raises
-        ------
-        NotImplementedError
-            Abstract method not implemented.
-        """
-        raise NotImplementedError("Abstract method not implemented.")
-
-    @abstractmethod
     def _refrigerant_energy_balance(self) -> None:
         """Eval regrigerant energy balance.
 
@@ -535,7 +488,18 @@ class ReactorBase(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented.")
 
     @abstractmethod
-    def _non_isobaric_pressure_balance(self) -> None:
+    def _non_isobaric_pressure_balance_packed_bed_reactor(self) -> None:
+        """Evaluate non-isobaric pressure balance.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
+        raise NotImplementedError("Abstract method not implemented.")
+
+    @abstractmethod
+    def _non_isobaric_pressure_balance_gas_phase_reaction(self) -> None:
         """Evaluate non-isobaric pressure balance.
 
         Raises

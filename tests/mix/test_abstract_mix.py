@@ -47,6 +47,14 @@ def test_abastract_class_not_implemented_errors():
                 temperature, pressure
             )
 
+        def mixture_viscosity(
+            self,
+            temperature: float,
+            pressure: float,
+            moles: list,
+        ):
+            return super().mixture_viscosity(temperature, pressure, moles)
+
     mixture = NewMixture()
 
     with pytest.raises(NotImplementedError):
@@ -63,3 +71,6 @@ def test_abastract_class_not_implemented_errors():
 
     with pytest.raises(NotImplementedError):
         mixture.formation_enthalpies_correction(298.15, 101325)
+
+    with pytest.raises(NotImplementedError):
+        mixture.mixture_viscosity(298.15, 101325, [])

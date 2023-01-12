@@ -1,6 +1,8 @@
 """Ideal gas Module."""
 from typing import List
 
+import chemicals
+
 import numpy as np
 
 from reactord.mix.abstract_mix import AbstractMix
@@ -84,7 +86,7 @@ class IdealGas(AbstractMix):
         return volume
 
     def mix_heat_capacity(
-        self, moles: List[float], temperature: float, *args
+        self, moles: List[float], temperature: float, pressure: float
     ) -> float:
         """Calculate heat capacity of th mixture.
 
@@ -104,16 +106,34 @@ class IdealGas(AbstractMix):
 
         pure_cp = np.array(
             [
-                substance.heat_capacity_gas(temperature)
+                substance.heat_capacity_gas(temperature, pressure)
                 for substance in self.substances
             ]
         )
         mix_cp = np.dot(mol_fractions, pure_cp)
         return mix_cp
 
+    def _formation_enthalpies_set(self):
+        """Return the ideal gas formation enthalpies in a ordered ndarray.
+
+        Method that read the ideal gas formation enthalpies of the mix
+        class and returns them in a ordered ndarray.
+
+        Returns
+        -------
+        ndarray [float]
+            Ideal gas formation enthalpies of each substance [J/mol/K]
+        """
+        enthalpies = np.array([])
+
+        for substance in self.substances:
+            enthalpies = np.append(enthalpies, substance.formation_enthalpy_ig)
+
+        return enthalpies
+
     def formation_enthalpies_correction(
-        self, temperature: float, *args
-    ) -> float:
+        self, temperature: float, pressure: float
+    ):
         """Calculate the correction term for the formation enthalpy.
 
         Method that calculates the correction term for the formation
@@ -137,25 +157,44 @@ class IdealGas(AbstractMix):
         for substance in self.substances:
             correction_enthalpies = np.append(
                 correction_enthalpies,
-                substance.heat_capacity_gas_dt_integral(298.15, temperature),
+                substance.heat_capacity_gas_dt_integral(
+                    298.15, temperature, pressure
+                ),
             )
 
         return correction_enthalpies
 
-    def _formation_enthalpies_set(self) -> None:
-        """Return the ideal gas formation enthalpies in a ordered ndarray.
+    def mixture_viscosity(
+        self,
+        moles: List[float],
+        temperature: float,
+        pressure: float,
+    ) -> float:
+        """
+        Evaluate the viscosity of the mixture.
 
-        Method that read the ideal gas formation enthalpies of the mix
-        class and returns them in a ordered ndarray.
-
+        Parameters
+        ----------
+        temperature : float
+            Temperature at which formation enthalpies are to be calculated. [K]
+        pressure : float
+            Pressure at which formation enthalpies are to be calculated. [Pa]
+        moles: list
+        |   List of moles substance in the mixture
         Returns
         -------
-        ndarray [float]
-            Ideal gas formation enthalpies of each substance [J/mol/K]
+         mixture_viscosity: float
+            Viscosity of the mixture
         """
-        enthalpies = np.array([])
-
+        mol_fractions = self.mol_fractions(moles)
+        viscosity_pure = []
+        molecular_weight = []
         for substance in self.substances:
-            enthalpies = np.append(enthalpies, substance.formation_enthalpy_ig)
+            viscosity_pure.append(
+                substance.viscosity_gas(temperature, pressure)
+            )
+            molecular_weight.append(substance.molecular_weight)
 
-        return enthalpies
+        return chemicals.viscosity.Herning_Zipperer(
+            mol_fractions, viscosity_pure, molecular_weight
+        )

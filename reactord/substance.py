@@ -9,7 +9,7 @@ import numpy as np
 
 from scipy.integrate import quad
 
-from thermo.chemical import Chemical
+from thermo import ChemicalConstantsPackage
 
 
 class Substance:
@@ -51,46 +51,46 @@ class Substance:
     formation_gibbs_ig : float, optional
         Ideal-gas molar change of Gibbs energy of formation [J/mol], by default
         None
-    vaporization_enthalpy_t : Callable, optional
+    vaporization_enthalpy : Callable, optional
         A function that receives a temperature and returns the vaporization
         enthalpy at that temperature [J/mol], by default None
-    sublimation_enthalpy_t : Callable, optional
+    sublimation_enthalpy : Callable, optional
         A function that receives a temperature and returns the sublimation
         enthalpy at that temperature [J/mol], by default None
-    volume_solid_t : Callable, optional
+    volume_solid : Callable, optional
         A function that receives a temperature and returns the molar volume of
         the solid at that temperature [m³/mol], by default None
-    volume_liquid_tp : Callable, optional
+    volume_liquid : Callable, optional
         A function that receives a temperature and pressure, and returns the
         molar volume of liquid at that temperature and pressure [m³/mol], by
         default None
-    volume_gas_tp : Callable, optional
+    volume_gas : Callable, optional
         A function that receives a temperature and pressure, and returns the
         molar volume of the gas at that temperature and pressure [m³/mol],
         by default None
-    heat_capacity_solid_t : Callable, optional
+    heat_capacity_solid : Callable, optional
         A function that receives a temperature and pressure, and returns the
         heat capacity of the solid at that temperature and pressure [J/mol/K],
         by default None
-    heat_capacity_liquid_t : Callable, optional
+    heat_capacity_liquid : Callable, optional
         A function that receives a temperature and returns the heat capacity of
         the liquid at that temperature [J/mol/K], by default None
-    heat_capacity_gas_t : Callable, optional
+    heat_capacity_gas : Callable, optional
         A function that receives a temperature and returns the heat capacity of
         the gas at that temperature [J/mol/K], by default None
-    thermal_conductivity_liquid_tp : Callable, optional
+    thermal_conductivity_liquid : Callable, optional
         A function that receives a temperature and pressure, and returns the
         thermal conductivity of the liquid at that temperature and pressure
         [W/m/K], by default None
-    thermal_conductivity_gas_tp : Callable, optional
+    thermal_conductivity_gas : Callable, optional
         A function that receives a temperature and pressure, and returns the
         thermal conductivity of the gas at that temperature and pressure
         [W/m/K], by default None
-    viscosity_liquid_tp : Callable, optional
+    viscosity_liquid : Callable, optional
         A function that receives a temperature and pressure, and returns the
         viscosity of thr liquid at that temperature and pressure [Pa*s], by
         default None
-    viscosity_gas_tp : Callable, optional
+    viscosity_gas : Callable, optional
         A function that receives temperature and pressure, and returns the
         viscosity of gas at temperature and pressure [Pa*s], by default None
 
@@ -135,18 +135,18 @@ class Substance:
         formation_enthalpy_ig: float = None,
         formation_gibbs: float = None,
         formation_gibbs_ig: float = None,
-        vaporization_enthalpy_t: Callable = None,
-        sublimation_enthalpy_t: Callable = None,
-        volume_solid_t: Callable = None,
-        volume_liquid_tp: Callable = None,
-        volume_gas_tp: Callable = None,
-        heat_capacity_solid_t: Callable = None,
-        heat_capacity_liquid_t: Callable = None,
-        heat_capacity_gas_t: Callable = None,
-        thermal_conductivity_liquid_tp: Callable = None,
-        thermal_conductivity_gas_tp: Callable = None,
-        viscosity_liquid_tp: Callable = None,
-        viscosity_gas_tp: Callable = None,
+        vaporization_enthalpy: Callable = None,
+        sublimation_enthalpy: Callable = None,
+        volume_solid: Callable = None,
+        volume_liquid: Callable = None,
+        volume_gas: Callable = None,
+        heat_capacity_solid: Callable = None,
+        heat_capacity_liquid: Callable = None,
+        heat_capacity_gas: Callable = None,
+        thermal_conductivity_liquid: Callable = None,
+        thermal_conductivity_gas: Callable = None,
+        viscosity_liquid: Callable = None,
+        viscosity_gas: Callable = None,
     ) -> None:
 
         # Pure compound properties:
@@ -163,43 +163,40 @@ class Substance:
         self.formation_gibbs_ig = formation_gibbs_ig
 
         # Temperature-dependent properties calculation functions:
-        self._vaporization_enthalpy_t = np.vectorize(
-            vaporization_enthalpy_t, signature="()->()"
+        self._vaporization_enthalpy = np.vectorize(
+            vaporization_enthalpy, signature="()->()"
         )
-        self._sublimation_enthalpy_t = np.vectorize(
-            sublimation_enthalpy_t, signature="()->()"
+        self._sublimation_enthalpy = np.vectorize(
+            sublimation_enthalpy, signature="()->()"
         )
-        self._volume_solid_t = np.vectorize(volume_solid_t, signature="()->()")
-        self._volume_liquid_tp = np.vectorize(
-            volume_liquid_tp,
-            signature="(),()->()",
+        self._volume_solid = np.vectorize(volume_solid, signature="(),()->()")
+        self._volume_liquid = np.vectorize(
+            volume_liquid, signature="(),()->()"
         )
-        self._volume_gas_tp = np.vectorize(
-            volume_gas_tp, signature="(),()->()"
+        self._volume_gas = np.vectorize(volume_gas, signature="(),()->()")
+        self._heat_capacity_solid = np.vectorize(
+            heat_capacity_solid, signature="(),()->()"
         )
-        self._heat_capacity_solid_t = np.vectorize(
-            heat_capacity_solid_t, signature="()->()"
+        self._heat_capacity_liquid = np.vectorize(
+            heat_capacity_liquid, signature="(),()->()"
         )
-        self._heat_capacity_liquid_t = np.vectorize(
-            heat_capacity_liquid_t, signature="()->()"
+        self._heat_capacity_gas = np.vectorize(
+            heat_capacity_gas, signature="(),()->()"
         )
-        self._heat_capacity_gas_t = np.vectorize(
-            heat_capacity_gas_t, signature="()->()"
+        self._thermal_conductivity_liquid = np.vectorize(
+            thermal_conductivity_liquid, signature="(),()->()"
         )
-        self._thermal_conductivity_liquid_tp = np.vectorize(
-            thermal_conductivity_liquid_tp, signature="(),()->()"
+        self._thermal_conductivity_gas = np.vectorize(
+            thermal_conductivity_gas, signature="(),()->()"
         )
-        self._thermal_conductivity_gas_tp = np.vectorize(
-            thermal_conductivity_gas_tp, signature="(),()->()"
+        self._viscosity_liquid = np.vectorize(
+            viscosity_liquid, signature="(),()->()"
         )
-        self._viscosity_liquid_tp = np.vectorize(
-            viscosity_liquid_tp, signature="(),()->()"
-        )
-        self._viscosity_gas_tp = np.vectorize(
-            viscosity_gas_tp, signature="(),()->()"
+        self._viscosity_gas = np.vectorize(
+            viscosity_gas, signature="(),()->()"
         )
 
-    def create_substance_file(self, name_file) -> __file__:
+    def to_pickle(self, name_file) -> __file__:
         """Serialize an object substance.
 
         This method save an object substance as a file
@@ -218,7 +215,7 @@ class Substance:
             return pickle.dump(self, f)
 
     @classmethod
-    def load_file(cls, name_file):
+    def from_pickle(cls, name_file):
         """Read save file of substance object.
 
         Parameters
@@ -255,32 +252,104 @@ class Substance:
         Substance
             Instantiated Substance object from thermo database.
         """
-        chemobj = Chemical(identification, autocalc=False)
+        corr = ChemicalConstantsPackage.correlations_from_IDs([identification])
+
+        # Temperature functions
+        def vaporization_enthalpy(temperature: float) -> float:
+            enthalpy = corr.EnthalpyVaporizations[0].T_dependent_property(
+                temperature
+            )
+            return enthalpy
+
+        def sublimation_enthalpy(temperature: float) -> float:
+            enthalpy = corr.EnthalpySublimations[0].T_dependent_property(
+                temperature
+            )
+            return enthalpy
+
+        # Temperature and pressure dependent functions
+        def volume_solid(temperature: float, pressure: float) -> float:
+            volume = corr.VolumeSolids[0].T_dependent_property(temperature)
+            return volume
+
+        def volume_liquid(temperature: float, pressure: float) -> float:
+            volume = corr.VolumeLiquids[0].T_dependent_property(temperature)
+            return volume
+
+        def volume_gas(temperature: float, pressure: float) -> float:
+            volume = corr.VolumeGases[0].T_dependent_property(temperature)
+            return volume
+
+        def heat_capacity_solid(temperature: float, pressure: float) -> float:
+            heat_cap = corr.HeatCapacitySolids[0].T_dependent_property(
+                temperature
+            )
+            return heat_cap
+
+        def heat_capacity_liquid(temperature: float, pressure: float) -> float:
+            heat_cap = corr.HeatCapacityLiquids[0].T_dependent_property(
+                temperature
+            )
+            return heat_cap
+
+        def heat_capacity_gas(temperature: float, pressure: float) -> float:
+            heat_cap = corr.HeatCapacityGases[0].T_dependent_property(
+                temperature
+            )
+            return heat_cap
+
+        def thermal_conductivity_liquid(
+            temperature: float, pressure: float
+        ) -> float:
+            thermal_cond = corr.ThermalConductivityLiquids[
+                0
+            ].T_dependent_property(temperature)
+            return thermal_cond
+
+        def thermal_conductivity_gas(
+            temperature: float, pressure: float
+        ) -> float:
+            thermal_cond = corr.ThermalConductivityGases[
+                0
+            ].T_dependent_property(temperature)
+            return thermal_cond
+
+        def viscosity_liquid(temperature: float, pressure: float) -> float:
+            thermal_cond = corr.ViscosityLiquids[0].T_dependent_property(
+                temperature
+            )
+            return thermal_cond
+
+        def viscosity_gas(temperature: float, pressure: float) -> float:
+            thermal_cond = corr.ViscosityGases[0].T_dependent_property(
+                temperature
+            )
+            return thermal_cond
 
         substance_object = cls(
-            name=chemobj.name,
-            molecular_weight=chemobj.MW,
-            normal_boiling_point=chemobj.Tb,
-            normal_melting_point=chemobj.Tm,
-            critical_temperature=chemobj.Tc,
-            critical_pressure=chemobj.Pc,
-            acentric_factor=chemobj.omega,
-            formation_enthalpy=chemobj.Hfm,
-            formation_enthalpy_ig=chemobj.Hfgm,
-            formation_gibbs=chemobj.Gfm,
-            formation_gibbs_ig=chemobj.Gfgm,
-            vaporization_enthalpy_t=chemobj.EnthalpyVaporization,
-            sublimation_enthalpy_t=chemobj.EnthalpySublimation,
-            volume_solid_t=chemobj.VolumeSolid,
-            volume_liquid_tp=chemobj.VolumeLiquid,
-            volume_gas_tp=chemobj.VolumeGas,
-            heat_capacity_solid_t=chemobj.HeatCapacitySolid,
-            heat_capacity_liquid_t=chemobj.HeatCapacityLiquid,
-            heat_capacity_gas_t=chemobj.HeatCapacityGas,
-            thermal_conductivity_liquid_tp=chemobj.ThermalConductivityLiquid,
-            thermal_conductivity_gas_tp=chemobj.ThermalConductivityGas,
-            viscosity_liquid_tp=chemobj.ViscosityLiquid,
-            viscosity_gas_tp=chemobj.ViscosityGas,
+            name=corr.constants.names[0],
+            molecular_weight=corr.constants.MWs[0],
+            normal_boiling_point=corr.constants.Tbs[0],
+            normal_melting_point=corr.constants.Tms[0],
+            critical_temperature=corr.constants.Tcs[0],
+            critical_pressure=corr.constants.Pcs[0],
+            acentric_factor=corr.constants.omegas[0],
+            formation_enthalpy=corr.constants.Hf_STPs[0],
+            formation_enthalpy_ig=corr.constants.Hfgs[0],
+            formation_gibbs=0,  # TODO look Hvap_298s
+            formation_gibbs_ig=corr.constants.Gfgs[0],
+            vaporization_enthalpy=vaporization_enthalpy,
+            sublimation_enthalpy=sublimation_enthalpy,
+            volume_solid=volume_solid,
+            volume_liquid=volume_liquid,
+            volume_gas=volume_gas,
+            heat_capacity_solid=heat_capacity_solid,
+            heat_capacity_liquid=heat_capacity_liquid,
+            heat_capacity_gas=heat_capacity_gas,
+            thermal_conductivity_liquid=thermal_conductivity_liquid,
+            thermal_conductivity_gas=thermal_conductivity_gas,
+            viscosity_liquid=viscosity_liquid,
+            viscosity_gas=viscosity_gas,
         )
         return substance_object
 
@@ -297,7 +366,7 @@ class Substance:
         float
             Vaporization enthalpy in Joule per mol [J/mol]
         """
-        return self._vaporization_enthalpy_t(temperature)
+        return self._vaporization_enthalpy(temperature)
 
     def sublimation_enthalpy(self, temperature: float) -> float:
         """Return the sublimation enthalpy at a given temperature.
@@ -312,7 +381,7 @@ class Substance:
         float
             Sublimation enthalpy in Joule per mol [J/mol]
         """
-        return self._sublimation_enthalpy_t(temperature)
+        return self._sublimation_enthalpy(temperature)
 
     def fusion_enthalpy(self, temperature: float) -> float:
         """Return the fusion enthalpy at a given temperature.
@@ -331,12 +400,12 @@ class Substance:
         float
             Fusion enthalpy in Joule per mol [J/mol]
         """
-        fusion_h = self._sublimation_enthalpy_t(
+        fusion_h = self._sublimation_enthalpy(
             temperature
-        ) - self._vaporization_enthalpy_t(temperature)
+        ) - self._vaporization_enthalpy(temperature)
         return fusion_h
 
-    def volume_solid(self, temperature: float) -> float:
+    def volume_solid(self, temperature: float, pressure: float) -> float:
         """Return the solid molar volume at a given temperature.
 
         Parameters
@@ -349,7 +418,7 @@ class Substance:
         float
             Solid molar volume in cubic meters per mol [m³/mol]
         """
-        return self._volume_solid_t(temperature)
+        return self._volume_solid(temperature, pressure)
 
     def volume_liquid(self, temperature: float, pressure: float) -> float:
         """Return the liquid molar volume at a given temperature and pressure.
@@ -366,7 +435,7 @@ class Substance:
         float
             Liquid molar volume in cubic meters per mol [m³/mol]
         """
-        return self._volume_liquid_tp(temperature, pressure)
+        return self._volume_liquid(temperature, pressure)
 
     def volume_gas(self, temperature: float, pressure: float) -> float:
         """Return the gas molar volume at a given temperature and pressure.
@@ -383,9 +452,11 @@ class Substance:
         float
             Liquid molar volume in cubic meters per mol [m³/mol]
         """
-        return self._volume_gas_tp(temperature, pressure)
+        return self._volume_gas(temperature, pressure)
 
-    def heat_capacity_solid(self, temperature: float) -> float:
+    def heat_capacity_solid(
+        self, temperature: float, pressure: float
+    ) -> float:
         """Return the pure solid heat capacity at a given temperature.
 
         Parameters
@@ -398,9 +469,11 @@ class Substance:
         float
             Pure solid heat capacity in Joule per mol per Kelvin [J/mol/K]
         """
-        return self._heat_capacity_solid_t(temperature)
+        return self._heat_capacity_solid(temperature, pressure)
 
-    def heat_capacity_liquid(self, temperature: float) -> float:
+    def heat_capacity_liquid(
+        self, temperature: float, pressure: float
+    ) -> float:
         """Return the pure liquid heat capacity at a given temperature.
 
         Parameters
@@ -414,9 +487,9 @@ class Substance:
             Pure liquid heat capacity in Joule per mol per Kelvin
             [J/mol/K]
         """
-        return self._heat_capacity_liquid_t(temperature)
+        return self._heat_capacity_liquid(temperature, pressure)
 
-    def heat_capacity_gas(self, temperature: float) -> float:
+    def heat_capacity_gas(self, temperature: float, pressure: float) -> float:
         """Return the pure gas heat capacity at a given temperature.
 
         Parameters
@@ -429,7 +502,7 @@ class Substance:
         float
             Pure gas heat capacity in Joule per mol per Kelvin [J/mol/K]
         """
-        return self._heat_capacity_gas_t(temperature)
+        return self._heat_capacity_gas(temperature, pressure)
 
     def thermal_conductivity_liquid(
         self, temperature: float, pressure: float
@@ -449,7 +522,7 @@ class Substance:
             Liquid thermal conductivity in Watts per meter per Kelvin
             [W/m/K]
         """
-        return self._thermal_conductivity_liquid_tp(temperature, pressure)
+        return self._thermal_conductivity_liquid(temperature, pressure)
 
     def thermal_conductivity_gas(
         self, temperature: float, pressure: float
@@ -469,7 +542,7 @@ class Substance:
             Gas thermal conductivity in Watts per meter per Kelvin
             [W/m/K]
         """
-        return self._thermal_conductivity_gas_tp(temperature, pressure)
+        return self._thermal_conductivity_gas(temperature, pressure)
 
     def viscosity_liquid(self, temperature: float, pressure: float) -> float:
         """Return the pure liquid viscosity.
@@ -488,7 +561,7 @@ class Substance:
         float
             Pure liquid viscosity in [Pa*s]
         """
-        return self._viscosity_liquid_tp(temperature, pressure)
+        return self._viscosity_liquid(temperature, pressure)
 
     def viscosity_gas(self, temperature: float, pressure: float) -> float:
         """Return the pure gas viscosity.
@@ -507,10 +580,10 @@ class Substance:
         float
             Pure gas viscosity in [Pa*s]
         """
-        return self._viscosity_gas_tp(temperature, pressure)
+        return self._viscosity_gas(temperature, pressure)
 
     def heat_capacity_solid_dt_integral(
-        self, temperature1: float, temperature2: float
+        self, temperature1: float, temperature2: float, pressure: float
     ) -> float:
         r"""Return the integral of solid heat capacity.
 
@@ -534,13 +607,16 @@ class Substance:
             temperature2 in Joule per mol per Kelvin [J/mol/K]
         """
         integral, err = quad(
-            self.heat_capacity_solid, a=temperature1, b=temperature2
+            self.heat_capacity_solid,
+            a=temperature1,
+            b=temperature2,
+            args=(pressure,),
         )
 
         return integral
 
     def heat_capacity_liquid_dt_integral(
-        self, temperature1: float, temperature2: float
+        self, temperature1: float, temperature2: float, pressure: float
     ) -> float:
         r"""Return the integral of liquid heat capacity.
 
@@ -564,13 +640,16 @@ class Substance:
             and temperature2 in Joule per mol per Kelvin [J/mol/K]
         """
         integral, err = quad(
-            self.heat_capacity_liquid, a=temperature1, b=temperature2
+            self.heat_capacity_liquid,
+            a=temperature1,
+            b=temperature2,
+            args=(pressure,),
         )
 
         return integral
 
     def heat_capacity_gas_dt_integral(
-        self, temperature1: float, temperature2: float
+        self, temperature1: float, temperature2: float, pressure: float
     ) -> float:
         r"""Return the integral of gas heat capacity.
 
@@ -594,7 +673,10 @@ class Substance:
             and temperature2 in Joule per mol per Kelvin [J/mol/K]
         """
         integral, err = quad(
-            self.heat_capacity_gas, a=temperature1, b=temperature2
+            self.heat_capacity_gas,
+            a=temperature1,
+            b=temperature2,
+            args=(pressure,),
         )
 
         return integral

@@ -77,15 +77,6 @@ def test_not_implemented_error():
         def _border_cond_and_initial_guesses(self) -> None:
             return super()._border_cond_and_initial_guesses()
 
-        def _mass_balance(self) -> None:
-            return super()._mass_balance()
-
-        def _energy_balance(self) -> None:
-            return super()._energy_balance()
-
-        def _pressure_balance(self) -> None:
-            return super()._pressure_balance()
-
         def _refrigerant_energy_balance(self) -> None:
             return super()._refrigerant_energy_balance()
 
@@ -116,8 +107,11 @@ def test_not_implemented_error():
         def _isobaric_pressure_balance(self) -> None:
             return super()._isobaric_pressure_balance()
 
-        def _non_isobaric_pressure_balance(self) -> None:
-            return super()._non_isobaric_pressure_balance()
+        def _non_isobaric_pressure_balance_packed_bed_reactor(self) -> None:
+            return super()._non_isobaric_pressure_balance_packed_bed_reactor()
+
+        def _non_isobaric_pressure_balance_gas_phase_reaction(self) -> None:
+            return super()._non_isobaric_pressure_balance_gas_phase_reaction()
 
         def _homogeneous_solver(self) -> None:
             return super()._homogeneous_solver()
@@ -161,15 +155,6 @@ def test_not_implemented_error():
         reactor._border_cond_and_initial_guesses()
 
     with pytest.raises(NotImplementedError):
-        reactor._mass_balance()
-
-    with pytest.raises(NotImplementedError):
-        reactor._energy_balance()
-
-    with pytest.raises(NotImplementedError):
-        reactor._pressure_balance()
-
-    with pytest.raises(NotImplementedError):
         reactor._refrigerant_energy_balance()
 
     with pytest.raises(NotImplementedError):
@@ -200,7 +185,10 @@ def test_not_implemented_error():
         reactor._isobaric_pressure_balance()
 
     with pytest.raises(NotImplementedError):
-        reactor._non_isobaric_pressure_balance()
+        reactor._non_isobaric_pressure_balance_packed_bed_reactor()
+
+    with pytest.raises(NotImplementedError):
+        reactor._non_isobaric_pressure_balance_gas_phase_reaction()
 
     with pytest.raises(NotImplementedError):
         reactor._homogeneous_solver()
@@ -315,15 +303,16 @@ def test_asignation_kinetics_arguments():
         def _isobaric_pressure_balance(self) -> None:
             pass
 
-        def _non_isobaric_pressure_balance(self) -> None:
+        def _non_isobaric_pressure_balance_packed_bed_reactor(self) -> None:
+            pass
+
+        def _non_isobaric_pressure_balance_gas_phase_reaction(self) -> None:
             pass
 
         def _homogeneous_solver(self) -> None:
             pass
 
         def _heterogeneous_solver(self) -> None:
-            pass
-
             pass
 
     assert SpecificReactor.set_isothermic_isobaric() is None
@@ -348,28 +337,6 @@ def test_asignation_kinetics_arguments():
         stoichiometry=[-1, 1],
         kinetic_argument="concentration",
     )
-
-    assert reactor._set_catalyst_operation() is None
-    assert reactor._set_thermal_operation() is None
-    assert reactor._set_pressure_operation() is None
-    assert reactor._grid_builder() is None
-    assert reactor._border_cond_and_initial_guesses() is None
-    assert reactor._mass_balance() is None
-    assert reactor._energy_balance() is None
-    assert reactor._pressure_balance() is None
-    assert reactor._refrigerant_energy_balance() is None
-    assert reactor.simulate() is None
-    assert reactor._homogeneous_mass_balance() is None
-    assert reactor._heterogeneous_mass_balance() is None
-    assert reactor._isothermic_energy_balance() is None
-    assert reactor._homogeneous_adiabatic_energy_balance() is None
-    assert reactor._heterogeneous_adiabatic_energy_balance() is None
-    assert reactor._homogeneous_non_isothermic_energy_balance() is None
-    assert reactor._heterogeneous_non_isothermic_energy_balance() is None
-    assert reactor._isobaric_pressure_balance() is None
-    assert reactor._non_isobaric_pressure_balance() is None
-    assert reactor._homogeneous_solver() is None
-    assert reactor._heterogeneous_solver() is None
 
     reaction2 = rd.Kinetics(
         mix=mixture2,

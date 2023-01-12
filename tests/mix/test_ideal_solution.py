@@ -1,5 +1,7 @@
 import numpy as np
 
+import pytest
+
 import reactord as rd
 
 
@@ -20,18 +22,18 @@ def test_one_substance_mix():
     for t in temperature:
 
         assert mixture.formation_enthalpies_correction(
-            t
-        ) == hexane.heat_capacity_liquid_dt_integral(298.15, t)
+            t, pressure
+        ) == hexane.heat_capacity_liquid_dt_integral(298.15, t, pressure)
 
         cpdt_solid = lauric_acid.heat_capacity_solid_dt_integral(
-            298.15, nbp_lauric_acid
+            298.15, nbp_lauric_acid, pressure
         )
         dh_fus = lauric_acid.fusion_enthalpy(nbp_lauric_acid)
         cpdt_liquid = lauric_acid.heat_capacity_liquid_dt_integral(
-            nbp_lauric_acid, t
+            nbp_lauric_acid, t, pressure
         )
 
-        assert mixture2.formation_enthalpies_correction(t) == (
+        assert mixture2.formation_enthalpies_correction(t, pressure) == (
             cpdt_solid + dh_fus + cpdt_liquid
         )
 
@@ -48,7 +50,7 @@ def test_one_substance_mix():
             )
 
             assert mixture.mix_heat_capacity(z, t, pressure) == (
-                hexane.heat_capacity_liquid(t)
+                hexane.heat_capacity_liquid(t, pressure)
             )
 
 
@@ -74,17 +76,17 @@ def test_three_substance_mix():
     for t in temperature:
         heat_cap_correction = np.array(
             [
-                hexane.heat_capacity_liquid_dt_integral(298.15, t),
-                toluene.heat_capacity_liquid_dt_integral(298.15, t),
-                butanol.heat_capacity_liquid_dt_integral(298.15, t),
+                hexane.heat_capacity_liquid_dt_integral(298.15, t, pressure),
+                toluene.heat_capacity_liquid_dt_integral(298.15, t, pressure),
+                butanol.heat_capacity_liquid_dt_integral(298.15, t, pressure),
             ]
         )
 
         raw_heat_capacities = np.array(
             [
-                hexane.heat_capacity_liquid(t),
-                toluene.heat_capacity_liquid(t),
-                butanol.heat_capacity_liquid(t),
+                hexane.heat_capacity_liquid(t, pressure),
+                toluene.heat_capacity_liquid(t, pressure),
+                butanol.heat_capacity_liquid(t, pressure),
             ]
         )
 
@@ -98,7 +100,8 @@ def test_three_substance_mix():
 
         # Test of formation_enthalpies correction method
         assert (
-            mixture.formation_enthalpies_correction(t) == heat_cap_correction
+            mixture.formation_enthalpies_correction(t, pressure)
+            == heat_cap_correction
         ).all()  # OKAY
 
     for moles in compositions:
