@@ -96,9 +96,9 @@ class IdealSolution(AbstractMix):
         return np.dot(pure_volumes, mol_fractions)
 
     def mix_heat_capacity(
-        self, moles: List[float], temperature: float, *args
-    ) -> float:
-        """Calculate heat capacity of the mixture.
+        self, moles: List[float], temperature: float, pressure: float
+    ):
+        """Calculate heat capacity of th mixture.
 
         Parameters
         ----------
@@ -116,16 +116,34 @@ class IdealSolution(AbstractMix):
 
         pure_cp = np.array(
             [
-                substance.heat_capacity_liquid(temperature)
+                substance.heat_capacity_liquid(temperature, pressure)
                 for substance in self.substances
             ]
         )
         mix_cp = np.dot(mol_fractions, pure_cp)
         return mix_cp
 
+    def _formation_enthalpies_set(self):
+        """Return the formation enthalpies in a ordered ndarray.
+
+        Method that read the formation enthalpies of mix and returns
+        them in a ordered ndarray.
+
+        Returns
+        -------
+        ndarray [float]
+            Formation enthalpies of each substance
+        """
+        enthalpies = np.array([])
+
+        for substance in self.substances:
+            enthalpies = np.append(enthalpies, substance.formation_enthalpy)
+
+        return enthalpies
+
     def formation_enthalpies_correction(
-        self, temperature: float, *args
-    ) -> None:
+        self, temperature: float, pressure: float
+    ):
         """Calculate the correction term for the formation enthalpy.
 
         Method that calculates the correction term for the formation
@@ -150,11 +168,11 @@ class IdealSolution(AbstractMix):
         for substance in self.substances:
             if substance.normal_melting_point > 298.15:
                 dhs = substance.heat_capacity_solid_dt_integral(
-                    298.15, substance.normal_melting_point
+                    298.15, substance.normal_melting_point, pressure
                 )
                 dhf = substance.fusion_enthalpy(substance.normal_melting_point)
                 dhl = substance.heat_capacity_liquid_dt_integral(
-                    substance.normal_melting_point, temperature
+                    substance.normal_melting_point, temperature, pressure
                 )
 
                 correction_enthalpies = np.append(
@@ -164,25 +182,28 @@ class IdealSolution(AbstractMix):
                 correction_enthalpies = np.append(
                     correction_enthalpies,
                     substance.heat_capacity_liquid_dt_integral(
-                        298.15, temperature
+                        298.15, temperature, pressure
                     ),
                 )
         return correction_enthalpies
 
-    def _formation_enthalpies_set(self) -> np.ndarray:
-        """Return the formation enthalpies in a ordered ndarray.
+    def mixture_viscosity(
+        self, temperature: float, pressure: float, moles: list
+    ):
+        """
+        Evaluate viscosity of the mixture.
 
-        Method that read the formation enthalpies of mix and returns
-        them in a ordered ndarray.
-
+        Parameters
+        ----------
+        temperature : float
+            Temperature at which formation enthalpies are to be calculated. [K]
+        pressure : float
+            Pressure at which formation enthalpies are to be calculated. [Pa]
+        moles: list
+        |   List of moles substance in the mixture
         Returns
         -------
-        ndarray [float]
-            Formation enthalpies of each substance
+         mixture_viscosity: float
+            Viscosity of the mixture
         """
-        enthalpies = np.array([])
-
-        for substance in self.substances:
-            enthalpies = np.append(enthalpies, substance.formation_enthalpy)
-
-        return enthalpies
+        raise NotImplementedError()

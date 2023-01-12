@@ -37,16 +37,19 @@ def test_one_substance_mix():
     assert mix2._formation_enthalpies_set() == oxygen.formation_enthalpy_ig
     assert mix3._formation_enthalpies_set() == hydrogen.formation_enthalpy_ig
 
-    for t in temperature:
-        assert mix1.formation_enthalpies_correction(
-            t
-        ) == methane.heat_capacity_gas_dt_integral(298.15, t)
-        assert mix2.formation_enthalpies_correction(
-            t
-        ) == oxygen.heat_capacity_gas_dt_integral(298.15, t)
-        assert mix3.formation_enthalpies_correction(
-            t
-        ) == hydrogen.heat_capacity_gas_dt_integral(298.15, t)
+    for t, p in zip(temperature, pressure):
+        assert (
+            mix1.formation_enthalpies_correction(t, p)
+            == methane.heat_capacity_gas_dt_integral(298.15, t, p)
+        ).all()
+        assert (
+            mix2.formation_enthalpies_correction(t, p)
+            == oxygen.heat_capacity_gas_dt_integral(298.15, t, p)
+        ).all()
+        assert (
+            mix3.formation_enthalpies_correction(t, p)
+            == hydrogen.heat_capacity_gas_dt_integral(298.15, t, p)
+        ).all()
 
     for n in compositions:
         assert mix1.mol_fractions(n) == 1.0
@@ -63,15 +66,15 @@ def test_one_substance_mix():
             assert mix1.volume(n, t, p) == mix2.volume(n, t, p)
 
             assert mix1.mix_heat_capacity(n, t, p) == (
-                methane.heat_capacity_gas(t)
+                methane.heat_capacity_gas(t, p)
             )
 
             assert mix2.mix_heat_capacity(n, t, p) == (
-                oxygen.heat_capacity_gas(t)
+                oxygen.heat_capacity_gas(t, p)
             )
 
             assert mix3.mix_heat_capacity(n, t, p) == (
-                hydrogen.heat_capacity_gas(t)
+                hydrogen.heat_capacity_gas(t, p)
             )
 
             assert mix1.partial_pressures(n, t, p) == p
@@ -104,17 +107,17 @@ def test_three_substances_mix():
     for t, p in zip(temperature, pressure):
         raw_formation_enthalpies_correction = np.array(
             [
-                co2.heat_capacity_gas_dt_integral(298.15, t),
-                ethane.heat_capacity_gas_dt_integral(298.15, t),
-                chlorine.heat_capacity_gas_dt_integral(298.15, t),
+                co2.heat_capacity_gas_dt_integral(298.15, t, p),
+                ethane.heat_capacity_gas_dt_integral(298.15, t, p),
+                chlorine.heat_capacity_gas_dt_integral(298.15, t, p),
             ]
         )
 
         raw_heat_capacities = np.array(
             [
-                co2.heat_capacity_gas(t),
-                ethane.heat_capacity_gas(t),
-                chlorine.heat_capacity_gas(t),
+                co2.heat_capacity_gas(t, p),
+                ethane.heat_capacity_gas(t, p),
+                chlorine.heat_capacity_gas(t, p),
             ]
         )
 
@@ -157,5 +160,5 @@ def test_three_substances_mix():
             # Test of formation_enthalpies_correction method
             assert (
                 raw_formation_enthalpies_correction
-                == mixture.formation_enthalpies_correction(t)
+                == mixture.formation_enthalpies_correction(t, p)
             ).all()  # OKAY
