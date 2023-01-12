@@ -39,15 +39,15 @@ def test_one_substance_mix():
 
     for t, p in zip(temperature, pressure):
         assert (
-            mix1.formation_enthalpies_correction(t, pressure)
+            mix1.formation_enthalpies_correction(t, p)
             == methane.heat_capacity_gas_dt_integral(298.15, t, p)
         ).all()
         assert (
-            mix2.formation_enthalpies_correction(t, pressure)
+            mix2.formation_enthalpies_correction(t, p)
             == oxygen.heat_capacity_gas_dt_integral(298.15, t, p)
         ).all()
         assert (
-            mix3.formation_enthalpies_correction(t, pressure)
+            mix3.formation_enthalpies_correction(t, p)
             == hydrogen.heat_capacity_gas_dt_integral(298.15, t, p)
         ).all()
 
