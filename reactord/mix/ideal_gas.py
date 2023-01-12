@@ -1,6 +1,8 @@
 """Ideal gas Module."""
 from typing import List
 
+import chemicals
+
 import numpy as np
 
 from reactord.mix.abstract_mix import AbstractMix
@@ -159,3 +161,40 @@ class IdealGas(AbstractMix):
             )
 
         return correction_enthalpies
+
+    def mixture_viscosity(
+        self,
+        temperature,
+        pressure,
+        moles,
+    ):
+        """
+        Evaluate the viscosity of the mixture.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature at which formation enthalpies are to be calculated. [K]
+        pressure : float
+            Pressure at which formation enthalpies are to be calculated. [Pa]
+        moles: list
+        |   List of moles substance in the mixture
+        Returns
+        -------
+         mixture_viscosity: float
+            Viscosity of the mixture
+        """
+        mol_fractions = self.mol_fractions(moles)
+        viscosity_pure = []
+        molecular_weight = []
+        for substance in self.substances:
+            print(substance.name)
+            print(substance.viscosity_gas(temperature, pressure))
+            viscosity_pure.append(
+                substance.viscosity_gas(temperature, pressure)
+            )
+            molecular_weight.append(substance.molecular_weight)
+
+        return chemicals.viscosity.Herning_Zipperer(
+            mol_fractions, viscosity_pure, molecular_weight
+        )

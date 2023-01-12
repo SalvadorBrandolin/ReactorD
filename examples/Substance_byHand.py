@@ -6,11 +6,15 @@ import reactord as rd
 
 # The substance objects are instantiated:
 A = rd.Substance("water", 18, 373, 273)
-Ah = rd.Substance.create_substance_file(A, "name_file")
 
-# The substance objects are called
+# The substance object is save in a file
+rd.Substance.create_substance_file(A, "name_file")
 
-Ar = rd.Substance.load_file("name_file")
+# The substance object is called
+read_A = rd.Substance.load_file("name_file")
 
-
-print(Ar.name)
+# Check
+try:
+    type(A) == type(read_A)
+except:
+    print("Pickle fail")

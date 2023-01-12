@@ -194,3 +194,25 @@ class AbstractMix(metaclass=ABCMeta):
             Formation enthalpies correction for each substance (J/mol/K)
         """
         raise NotImplementedError()
+
+    @abstractmethod
+    def mixture_viscosity(
+        self, temperature: float, pressure: float, moles: list
+    ):
+        """
+        Evaluate the viscosity of the mixture.
+
+        Parameters
+        ----------
+        temperature : float
+            Temperature at which formation enthalpies are to be calculated. [K]
+        pressure : float
+            Pressure at which formation enthalpies are to be calculated. [Pa]
+        moles: list
+        |   List of moles substance in the mixture
+        Returns
+        -------
+         mixture_viscosity: float
+            Viscosity of the mixture
+        """
+        raise NotImplementedError()
