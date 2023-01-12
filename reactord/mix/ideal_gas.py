@@ -168,10 +168,10 @@ class IdealGas(AbstractMix):
 
     def mixture_viscosity(
         self,
-        temperature,
-        pressure,
-        moles,
-    ):
+        moles: List[float],
+        temperature: float,
+        pressure: float,   
+    ) -> float:
         """
         Evaluate the viscosity of the mixture.
 
@@ -192,8 +192,6 @@ class IdealGas(AbstractMix):
         viscosity_pure = []
         molecular_weight = []
         for substance in self.substances:
-            print(substance.name)
-            print(substance.viscosity_gas(temperature, pressure))
             viscosity_pure.append(
                 substance.viscosity_gas(temperature, pressure)
             )
