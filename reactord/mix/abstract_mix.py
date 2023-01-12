@@ -39,8 +39,6 @@ class AbstractMix(metaclass=ABCMeta):
 
         return mol_fractions
 
-
-
     def mixture_molecular_weight(self, moles: List[float]):
         """Calculate the molecular weight of the mixture.
 
