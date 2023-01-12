@@ -57,7 +57,6 @@ class Kinetics:
         # ==============================================================
 
         # Is mix an instance of AbstractMix?
-
         if not (isinstance(self.mix, AbstractMix)):
             raise TypeError(
                 "The supplied argument 'mix' must be an instance of mixture "
@@ -65,7 +64,6 @@ class Kinetics:
             )
 
         # Get the number of components and reactions from stoichiometry
-
         if np.ndim(stoichiometry) == 1:
             self.num_reactions = 1
             self.num_substances = np.shape(stoichiometry)[0]
