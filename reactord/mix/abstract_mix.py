@@ -40,6 +40,23 @@ class AbstractMix(metaclass=ABCMeta):
         return mol_fractions
 
     def mass_fractions(self, moles: List[float]):
+        """Calculate the mass fractions of the mixture.
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        row represent each substance and each colum represent each mixture
+        composition.
+
+        Parameters
+        ----------
+        moles: ndarray or list [float]
+            moles of each substance specified in the same order as the
+            mix substances order.
+
+        Returns
+        -------
+        mass_fractions : ndarray of shape (moles,)
+        Array of the mass fractions of mixture's substances
+        """
         pure_molecular_weights = [
             substance.molecular_weight for substance in self.substances
         ]
@@ -55,6 +72,19 @@ class AbstractMix(metaclass=ABCMeta):
         return mass_fractions
 
     def mixture_molecular_weight(self, moles: List[float]):
+        """Calculate the molecular weight of the mixture.
+
+        Parameters
+        ----------
+        moles : List[float]
+            moles of each substance specified in the same order as the
+            mix substances order.
+
+        Returns
+        -------
+        mixture_molecular_weight: ndarray [g/mol]
+            molecular weight of the mixture calculated based on molar fractions
+        """
         pure_molecular_weights = [
             substance.molecular_weight for substance in self.substances
         ]
@@ -91,29 +121,45 @@ class AbstractMix(metaclass=ABCMeta):
     def molar_density(
         self, moles: List[float], temperature: float, pressure: float
     ):
+        """Calculate mixture molar density [mol/m3].
+
+        Parameters
+        ----------
+         moles: ndarray or list [float]
+            moles of each substance
+        temperature: float
+            Temperature [K]
+        pressure: float
+            Total Pressure [Pa]
+
+
+        Returns
+        -------
+        molar_density: float
+        """
         total_moles = np.sum(moles)
         return total_moles / self.volume(moles, temperature, pressure)
 
     def mass_density(
         self, moles: List[float], temperature: float, pressure: float
     ):
-        """Return density in [kg/m3]
+        """Return density in [kg/m3].
+
+        Calculate mixture mass density.
 
         Parameters
         ----------
-        moles : List[float]
-            _description_
-        temperature : float
-            _description_
-        pressure : float
-            _description_
+         moles: ndarray or list [float]
+            moles of each substance
+        temperature: float
+            Temperature [K]
+        pressure: float
+            Total Pressure [Pa]
 
         Returns
         -------
-        _type_
-            _description_
+        mass_density: float
         """
-
         mass_density = (
             self.molar_density(moles, temperature, pressure)
             * self.mixture_molecular_weight(moles)

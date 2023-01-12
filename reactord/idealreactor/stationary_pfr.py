@@ -1040,7 +1040,6 @@ class StationaryPFR(ReactorBase):
         NotImplementedError
             _description_
         """
-
         total_molar_flow = np.sum(molar_fluxes)
         mix_molecular_weight = self.mix.mixture_molecular_weight(molar_fluxes)
         total_mass_flow = total_molar_flow * mix_molecular_weight / 1000
