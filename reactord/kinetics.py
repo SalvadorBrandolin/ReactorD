@@ -259,9 +259,9 @@ class Kinetics:
 
         return reaction_enthalpies_correction + self.std_reaction_enthalpies
 
-    # ==================================================================
+    # =========================================================================
     # PRIVATE METHODS
-    # ==================================================================
+    # =========================================================================
     def _std_reaction_enthalpies_from_formation(self) -> None:
         """Calculate standard reaction enthalpies.
 

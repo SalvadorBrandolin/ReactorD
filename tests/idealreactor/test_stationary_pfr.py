@@ -42,7 +42,7 @@ def test_fogler_p1_15a_ivp():
 
     mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -109,7 +109,7 @@ def test_fogler_p1_15a_bvp():
 
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -179,7 +179,7 @@ def test_fogler_p1_15a_ivp_outlet():
     fa_out = fogler(v_pfr) * f_volumetric
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -239,7 +239,7 @@ def test_fogler_p1_15b():
 
     mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -307,7 +307,7 @@ def test_fogler_p1_15b_bvp():
 
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -376,7 +376,7 @@ def test_fogler_p1_15b_ivp_outlet():
     fa_out = fogler(v_pfr) * f_volumetric
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -437,7 +437,7 @@ def test_fogler_p1_15c_ivp():
 
     mixture = rd.mix.IdealSolution(A=substance_a, B=substance_b)
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -506,7 +506,7 @@ def test_fogler_p1_15c_bvp():
 
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -575,7 +575,7 @@ def test_fogler_p1_15c_ivp_outlet():
     fa_out = fogler(v_pfr) * f_volumetric
     fb_out = (fogler(0) - fogler(v_pfr)) * f_volumetric
 
-    pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[-1, 1],
@@ -605,12 +605,13 @@ def test_fogler_p1_15c_ivp_outlet():
 
 
 def test_fogler_example_4_4():
+    # Pressure border condition information is given at the reactor's inlet.
     def kinetic(concentrations, temperature):
         return 0
 
     mixture = rd.mix.IdealGas(n="nitrogen", o="oxygen")
 
-    reactor = rd.idealreactor.StationaryPFR.set_isothermic_noisobaric(
+    reactor = rd.idealreactor.StationaryPFR.from_isothermic_noisobaric(
         mix=mixture,
         list_of_reactions=[kinetic],
         stoichiometry=[0, 0],
@@ -632,8 +633,132 @@ def test_fogler_example_4_4():
         grid_size=7, tol=0.000001, max_nodes=7, verbose=0
     )
 
-    fogler_pressures = [10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65]
+    fogler_z = np.array([0, 10, 20, 30, 40, 50, 60]) * 0.30480370641
+    fogler_pressures = np.array([10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65])
+    reactord_pressures = result.sol(fogler_z)[-2] / 101325  # Pa to atm
 
     assert np.allclose(
-        result.y[-2, :] / 101325, fogler_pressures, rtol=1e-05, atol=0.1
+        reactord_pressures, fogler_pressures, rtol=1e-05, atol=0.1
     )
+
+
+def test_fogler_example_4_4_border_condition():
+    # Pressure border condition information is given at the reactor's outlet.
+    def kinetic(concentrations, temperature):
+        return 0
+
+    mixture = rd.mix.IdealGas(n="nitrogen", o="oxygen")
+
+    reactor = rd.idealreactor.StationaryPFR.from_isothermic_noisobaric(
+        mix=mixture,
+        list_of_reactions=[kinetic],
+        stoichiometry=[0, 0],
+        kinetic_argument="partial_pressure",
+        reactor_dim_minmax=[0, 18.288],
+        transversal_area=0.001313648986,
+        isothermic_temperature=260 + 273.15,
+        pressure_in_out={"out": 2.65 * 101325},
+        pressure_loss_equation="packed bed reactor",
+        packed_bed_porosity=0.45,
+        packed_bed_particle_diameter=0.00635,
+        molar_flow_in={
+            "nitrogen": 0.3560387507669636,
+            "oxygen": 0.09983673036871321,
+        },
+    )
+
+    result = reactor.simulate(
+        grid_size=100, tol=0.0001, max_nodes=1000, verbose=0
+    )
+
+    fogler_z = np.array([0, 10, 20, 30, 40, 50, 60]) * 0.30480370641
+    fogler_pressures = np.array([10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65])
+    reactord_pressures = result.sol(fogler_z)[-2] / 101325  # Pa to atm
+
+    assert np.allclose(
+        reactord_pressures, fogler_pressures, rtol=1e-05, atol=0.1
+    )
+
+
+def test_fogler_example_8_5():
+    # 4th edition Fogler example 8-5
+    # acetone -> ethenone + methane 
+
+    # Data obtained Graph grabber
+    fogler_z_for_temp = np.array(
+        [
+            0.0111,
+            0.0998,
+            0.2318,
+            0.3896,
+            0.6214,
+            0.9359,
+            1.5254,
+            2.8656,
+            3.9872,
+        ]
+    )
+
+    fogler_temp = np.array(
+        [
+            1005.04,
+            976.14,
+            955.79,
+            941.86,
+            930.88,
+            924.16,
+            916.09,
+            905.28,
+            901.98,
+        ]
+    )
+
+    fogler_z_for_conversion = np.array(
+        [
+            0.0033,
+            0.1291,
+            0.2857,
+            0.5080,
+            0.8567,
+            1.2188,
+            2.0565,
+            2.9422,
+            3.9763,
+        ]
+    )
+
+    fogler_conversion = np.array(
+        [
+            0.0081,
+            0.0954,
+            0.1434,
+            0.1800,
+            0.2153,
+            0.2305,
+            0.2430,
+            0.2549,
+            0.2667,
+        ]
+    )
+
+    def reaction_rate(concentrations, temperature):
+        k = np.exp(34.34 - 34222 / temperature)
+        return k * concentrations[0]
+
+    mix = rd.mix.IdealGas(
+        acetone="acetone", anhydride="ethenone", methane="methane"
+    )
+
+    pfr = rd.idealreactor.StationaryPFR.from_adiabatic_isobaric(
+        mix = mix,
+        list_of_reactions=[reaction_rate],
+        stoichiometry=[-1, 1, 1],
+        kinetic_argument='concentration',
+        reactor_dim_minmax=[0, 5/1000],
+        transversal_area=1,
+        temperature_in_out={'in': 1035},
+        isobaric_pressure=162000,
+        molar_flow_in={'acetone': 0.0376, 'ethenone': 0, 'methane': 0},
+    )
+
+    # pfr.simulate()

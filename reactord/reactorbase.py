@@ -193,7 +193,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_isothermic_isobaric(cls) -> None:
+    def from_isothermic_isobaric(cls) -> None:
         """Abstract method not implemented.
 
         Raises
@@ -205,7 +205,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_isothermic_noisobaric(cls) -> None:
+    def from_isothermic_noisobaric(cls) -> None:
         """Abstract method not implemented.
 
         Raises
@@ -217,7 +217,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_adiabatic_isobaric(cls) -> None:
+    def from_adiabatic_isobaric(cls) -> None:
         """Abstract method not implemented.
 
         Raises
@@ -229,7 +229,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_adiabatic_noisobaric(cls) -> None:
+    def from_adiabatic_noisobaric(cls) -> None:
         """Abstract method not implemented.
 
         Raises
@@ -241,7 +241,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_noisothermic_isobaric(cls) -> None:
+    def from_noisothermic_isobaric(cls) -> None:
         """Abstract method not implemented.
 
         Raises
@@ -253,7 +253,7 @@ class ReactorBase(metaclass=ABCMeta):
 
     @classmethod
     @abstractmethod
-    def set_noisothermic_noisobaric(cls) -> None:
+    def from_noisothermic_noisobaric(cls) -> None:
         """Abstract method not implemented.
 
         Raises

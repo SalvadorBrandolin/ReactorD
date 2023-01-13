@@ -39,28 +39,28 @@ def test_not_implemented_error():
 
     class SpecificReactor(rd.ReactorBase):
         @classmethod
-        def set_isothermic_isobaric(cls) -> None:
-            return super().set_isothermic_isobaric()
+        def from_isothermic_isobaric(cls) -> None:
+            return super().from_isothermic_isobaric()
 
         @classmethod
-        def set_isothermic_noisobaric(cls) -> None:
-            return super().set_isothermic_noisobaric()
+        def from_isothermic_noisobaric(cls) -> None:
+            return super().from_isothermic_noisobaric()
 
         @classmethod
-        def set_adiabatic_isobaric(cls) -> None:
-            return super().set_adiabatic_isobaric()
+        def from_adiabatic_isobaric(cls) -> None:
+            return super().from_adiabatic_isobaric()
 
         @classmethod
-        def set_adiabatic_noisobaric(cls) -> None:
-            return super().set_adiabatic_noisobaric()
+        def from_adiabatic_noisobaric(cls) -> None:
+            return super().from_adiabatic_noisobaric()
 
         @classmethod
-        def set_noisothermic_isobaric(cls) -> None:
-            return super().set_noisothermic_isobaric()
+        def from_noisothermic_isobaric(cls) -> None:
+            return super().from_noisothermic_isobaric()
 
         @classmethod
-        def set_noisothermic_noisobaric(cls) -> None:
-            return super().set_noisothermic_noisobaric()
+        def from_noisothermic_noisobaric(cls) -> None:
+            return super().from_noisothermic_noisobaric()
 
         def _set_catalyst_operation(self):
             return super()._set_catalyst_operation()
@@ -122,22 +122,22 @@ def test_not_implemented_error():
     reactor = SpecificReactor()
 
     with pytest.raises(NotImplementedError):
-        SpecificReactor.set_isothermic_isobaric()
+        SpecificReactor.from_isothermic_isobaric()
 
     with pytest.raises(NotImplementedError):
-        SpecificReactor.set_isothermic_noisobaric()
+        SpecificReactor.from_isothermic_noisobaric()
 
     with pytest.raises(NotImplementedError):
-        SpecificReactor.set_adiabatic_isobaric()
+        SpecificReactor.from_adiabatic_isobaric()
 
     with pytest.raises(NotImplementedError):
-        SpecificReactor.set_adiabatic_noisobaric()
+        SpecificReactor.from_adiabatic_noisobaric()
 
     with pytest.raises(NotImplementedError):
-        SpecificReactor.set_noisothermic_isobaric()
+        SpecificReactor.from_noisothermic_isobaric()
 
     with pytest.raises(NotImplementedError):
-        SpecificReactor.set_noisothermic_noisobaric()
+        SpecificReactor.from_noisothermic_noisobaric()
 
     with pytest.raises(NotImplementedError):
         reactor._set_catalyst_operation()
@@ -226,27 +226,27 @@ def test_asignation_kinetics_arguments():
             )
 
         @classmethod
-        def set_isothermic_isobaric(cls) -> None:
+        def from_isothermic_isobaric(cls) -> None:
             pass
 
         @classmethod
-        def set_isothermic_noisobaric(cls) -> None:
+        def from_isothermic_noisobaric(cls) -> None:
             pass
 
         @classmethod
-        def set_adiabatic_isobaric(cls) -> None:
+        def from_adiabatic_isobaric(cls) -> None:
             pass
 
         @classmethod
-        def set_adiabatic_noisobaric(cls) -> None:
+        def from_adiabatic_noisobaric(cls) -> None:
             pass
 
         @classmethod
-        def set_noisothermic_isobaric(cls) -> None:
+        def from_noisothermic_isobaric(cls) -> None:
             pass
 
         @classmethod
-        def set_noisothermic_noisobaric(cls) -> None:
+        def from_noisothermic_noisobaric(cls) -> None:
             pass
 
         def _set_catalyst_operation(self):
@@ -315,12 +315,12 @@ def test_asignation_kinetics_arguments():
         def _heterogeneous_solver(self) -> None:
             pass
 
-    assert SpecificReactor.set_isothermic_isobaric() is None
-    assert SpecificReactor.set_isothermic_noisobaric() is None
-    assert SpecificReactor.set_adiabatic_isobaric() is None
-    assert SpecificReactor.set_adiabatic_noisobaric() is None
-    assert SpecificReactor.set_noisothermic_isobaric() is None
-    assert SpecificReactor.set_noisothermic_noisobaric() is None
+    assert SpecificReactor.from_isothermic_isobaric() is None
+    assert SpecificReactor.from_isothermic_noisobaric() is None
+    assert SpecificReactor.from_adiabatic_isobaric() is None
+    assert SpecificReactor.from_adiabatic_noisobaric() is None
+    assert SpecificReactor.from_noisothermic_isobaric() is None
+    assert SpecificReactor.from_noisothermic_noisobaric() is None
 
     a = rd.Substance(name="SubstanceA")
     b = rd.Substance(name="SubstanceB")

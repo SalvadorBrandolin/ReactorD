@@ -309,3 +309,84 @@ def test_making_it_explode():
         )
 
         kinetic.std_reaction_enthalpies = [10, 20, 30, 0]
+
+
+def test_reaction_enthalpy_fogler_example_8_2():
+    # Fogler 4th edition
+    # Calculating using thermo data
+    # N2 + 3H2 -> 2NH3
+    def reaction_rate(*args, **kwargs):
+        pass
+
+    mixture = rd.mix.IdealGas(n2="nitrogen", h2="hydrogen", nh3="ammonia")
+
+    kinetic = rd.Kinetics(
+        mix=mixture,
+        list_of_reactions=[reaction_rate],
+        stoichiometry=[-1, -3, 2],
+    )
+
+    kinetic.std_reaction_enthalpies_init()
+
+    assert np.allclose(
+        kinetic.std_reaction_enthalpies / 1000, -92.22, atol=2
+    )  # kJ/mol N2
+
+    assert np.allclose(
+        kinetic.reaction_enthalpies(298.15, None) / 1000, -92.22, atol=2
+    )  # kJ/mol N2
+
+    assert np.allclose(
+        kinetic.reaction_enthalpies(423, None) / 1000, -97.5, atol=2
+    )  # kJ/mol N2
+
+    # ===============================
+    # Calculating using Fogler's data
+    # ===============================
+
+    def cp_h2(temperature, pressure):
+        return 6.992 * 4.186  # cal/mol/K to Joule/mol/K
+
+    def cp_n2(temperature, pressure):
+        return 6.984 * 4.186  # cal/mol/K to Joule/mol/K
+
+    def cp_nh3(temperature, pressure):
+        return 8.92 * 4.186  # cal/mol/K to Joule/mol/K
+
+    n2 = rd.Substance(
+        name="nitrogen",
+        formation_enthalpy_ig=0,
+        heat_capacity_gas=cp_n2,
+    )
+
+    h2 = rd.Substance(
+        name="hydrogen", formation_enthalpy_ig=0, heat_capacity_gas=cp_h2
+    )
+
+    nh3 = rd.Substance(
+        name="ammonia",
+        formation_enthalpy_ig=-11020 * 4.186,  # cal to Joule
+        heat_capacity_gas=cp_nh3,
+    )
+
+    mixture2 = rd.mix.IdealGas(n2=n2, h2=h2, nh3=nh3)
+
+    kinetic2 = rd.Kinetics(
+        mix=mixture2,
+        list_of_reactions=[reaction_rate],
+        stoichiometry=[-1, -3, 2],
+    )
+
+    kinetic2.std_reaction_enthalpies_init()
+
+    assert np.allclose(
+        kinetic2.std_reaction_enthalpies[0] / 1000, -92.22, atol=0.1
+    )  # kJ/mol N2
+
+    assert np.allclose(
+        kinetic2.reaction_enthalpies(298, None) / 1000, -92.22, atol=0.1
+    )  # kJ/mol N2
+
+    assert np.allclose(
+        kinetic2.reaction_enthalpies(423, None) / 1000, -97.5, atol=0.1
+    )  # kJ/mol N2
