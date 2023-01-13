@@ -628,12 +628,12 @@ def test_fogler_example_4_4():
         },
     )
 
-    resultado = reactor.simulate(
+    result = reactor.simulate(
         grid_size=7, tol=0.000001, max_nodes=7, verbose=0
     )
 
     fogler_pressures = [10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65]
 
     assert np.allclose(
-        resultado.y[-2, :] / 101325, fogler_pressures, rtol=1e-05, atol=0.1
+        result.y[-2, :] / 101325, fogler_pressures, rtol=1e-05, atol=0.1
     )
