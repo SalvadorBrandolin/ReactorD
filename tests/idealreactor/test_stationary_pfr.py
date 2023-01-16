@@ -682,83 +682,105 @@ def test_fogler_example_4_4_border_condition():
 
 def test_fogler_example_8_5():
     # 4th edition Fogler example 8-5
-    # acetone -> ethenone + methane 
+    # acetone -> ethenone + methane
 
-    # Data obtained Graph grabber
+    def reaction_rate(concentrations, temperature):
+        k = 3.58 *  np.exp(34222 * (1 / 1035 - 1 / temperature))
+        return k * concentrations[0]
+
+    def acetone_cp(temperature, pressure):
+        return 163
+
+    def ethenone_cp(temperature, pressure):
+        return 83
+
+    def methane_cp(temperature, pressure):
+        return 71
+
+    # Data obtained WebPlotDigitizer 4.6
     fogler_z_for_temp = np.array(
         [
-            0.0111,
-            0.0998,
-            0.2318,
-            0.3896,
-            0.6214,
-            0.9359,
-            1.5254,
-            2.8656,
-            3.9872,
+            0.031,
+            0.148,
+            0.309,
+            0.768,
+            1.502,
+            2.446,
+            3.288,
+            3.949,
         ]
     )
 
     fogler_temp = np.array(
         [
-            1005.04,
-            976.14,
-            955.79,
-            941.86,
-            930.88,
-            924.16,
-            916.09,
-            905.28,
-            901.98,
+            1018.128,
+            983.496,
+            960.397,
+            933.96,
+            921.222,
+            910.653,
+            903.944,
+            902.205,
         ]
     )
 
     fogler_z_for_conversion = np.array(
         [
-            0.0033,
-            0.1291,
-            0.2857,
-            0.5080,
-            0.8567,
-            1.2188,
-            2.0565,
-            2.9422,
-            3.9763,
+            0.057,
+            0.208,
+            0.518,
+            0.989,
+            1.751,
+            2.803,
+            3.587,
+            3.964,
         ]
     )
-
     fogler_conversion = np.array(
         [
-            0.0081,
-            0.0954,
-            0.1434,
-            0.1800,
-            0.2153,
-            0.2305,
-            0.2430,
-            0.2549,
-            0.2667,
+            0.06,
+            0.123,
+            0.184,
+            0.224,
+            0.241,
+            0.255,
+            0.264,
+            0.269,
         ]
     )
 
-    def reaction_rate(concentrations, temperature):
-        k = np.exp(34.34 - 34222 / temperature)
-        return k * concentrations[0]
+    acetone = rd.Substance(name='acetone', heat_capacity_gas=acetone_cp)
+    ethenone = rd.Substance(name='ethenone', heat_capacity_gas=ethenone_cp)
+    methane = rd.Substance(name='methane', heat_capacity_gas=methane_cp)
 
     mix = rd.mix.IdealGas(
-        acetone="acetone", anhydride="ethenone", methane="methane"
+        acetone=acetone, anhydride=ethenone, methane=methane
     )
 
     pfr = rd.idealreactor.StationaryPFR.from_adiabatic_isobaric(
-        mix = mix,
+        mix=mix,
         list_of_reactions=[reaction_rate],
         stoichiometry=[-1, 1, 1],
-        kinetic_argument='concentration',
-        reactor_dim_minmax=[0, 5/1000],
+        kinetic_argument="concentration",
+        reactor_dim_minmax=[0, 5],
         transversal_area=1,
-        temperature_in_out={'in': 1035},
+        temperature_in_out={"in": 1035},
         isobaric_pressure=162000,
-        molar_flow_in={'acetone': 0.0376, 'ethenone': 0, 'methane': 0},
+        molar_flow_in={"acetone": 37.6, "ethenone": 0, "methane": 0},
+        reaction_enthalpies=[80.77*1000]
     )
 
-    # pfr.simulate()
+    result = pfr.simulate()
+
+    print('reactord')
+    print(result.sol(fogler_z_for_temp)[-3])
+    print(result.sol(fogler_z_for_temp)[-2])
+    print('fogler')
+    print(fogler_temp)
+
+    assert np.allclose(
+        result.sol(fogler_z_for_temp)[-3], fogler_temp, atol=4
+    )
+
+    conversion_reactord = (37.6 - result.sol(fogler_z_for_conversion)) / 37.6
+    assert np.allclose(conversion_reactord, fogler_conversion)

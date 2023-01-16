@@ -125,7 +125,7 @@ class Kinetics:
                     " the stoichiometry matrix row number"
                 )
 
-            self.user_reaction_enthalpies = reaction_enthalpies
+            self.user_reaction_enthalpies = np.array(reaction_enthalpies)
 
         # =====================================================================
         # Set the dimension of the stoichiometry matrix explicitly
@@ -249,15 +249,20 @@ class Kinetics:
         if self.user_reaction_enthalpies is not None:
             return self.user_reaction_enthalpies
 
-        formation_correction = self.mix.formation_enthalpies_correction(
-            temperature, pressure
-        )
+        else:
 
-        reaction_enthalpies_correction = np.dot(
-            self.stoichiometry, formation_correction
-        )
+            formation_correction = self.mix.formation_enthalpies_correction(
+                temperature, pressure
+            )
 
-        return reaction_enthalpies_correction + self.std_reaction_enthalpies
+            reaction_enthalpies_correction = np.dot(
+                self.stoichiometry, formation_correction
+            )
+
+            reaction_enthalpies = (
+                reaction_enthalpies_correction + self.std_reaction_enthalpies
+            )
+            return reaction_enthalpies
 
     # =========================================================================
     # PRIVATE METHODS

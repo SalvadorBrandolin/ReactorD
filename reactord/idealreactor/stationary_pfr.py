@@ -138,6 +138,7 @@ class StationaryPFR(ReactorBase):
         packed_bed_porosity: float = None,
         packed_bed_particle_diameter: float = None,
         fanning_factor: float = None,
+        reaction_enthalpies: List[float] = None,
     ) -> None:
 
         self._kinetics = Kinetics(
@@ -145,6 +146,7 @@ class StationaryPFR(ReactorBase):
             mix=mix,
             stoichiometry=stoichiometry,
             kinetic_argument=kinetic_argument,
+            reaction_enthalpies=reaction_enthalpies,
         )
         # =====================================================================
         # Specific reactor arguments
@@ -388,6 +390,7 @@ class StationaryPFR(ReactorBase):
         molar_flow_in: dict = {},
         molar_flow_out: dict = {},
         catalyst_particle: dict = None,
+        reaction_enthalpies: List[float] = None,
     ) -> "StationaryPFR":
         """Instantiate adiabatic isobaric StationaryPFR.
 
@@ -447,6 +450,7 @@ class StationaryPFR(ReactorBase):
             catalyst_particle=catalyst_particle,
             temperature_in_out=temperature_in_out,
             isobaric_pressure=isobaric_pressure,
+            reaction_enthalpies=reaction_enthalpies,
         )
 
         return adiabatic_isobaric_pfr
@@ -1297,7 +1301,6 @@ class StationaryPFR(ReactorBase):
     # =========================================================================
     # Specific solvers
     # =========================================================================
-
     def _homogeneous_solver(
         self, grid_size=1000, tol=0.001, max_nodes=1000, verbose=0
     ) -> List[float]:
