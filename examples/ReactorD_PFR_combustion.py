@@ -1,5 +1,7 @@
 import numpy as np
+
 import reactord as rd
+
 
 # Example: methane combustion reaction
 # CH4 + 2 O2 ----> 2 H2O + CO2
@@ -19,6 +21,8 @@ mixture = rd.mix.IdealGas(A=A, B=B, C=C, D=D)
 stoichiometry = np.array([[-1, -2, 2, 1]])
 
 # A function for the reaction rate is defined:
+
+
 def rate1(concentrations, temperature):
     return 10000 * concentrations[0]
 

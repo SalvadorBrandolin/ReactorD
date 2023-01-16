@@ -7,3 +7,4 @@ Contents:
    :maxdepth: 1
 
    substance.ipynb
+   ideal_gas.ipynb
