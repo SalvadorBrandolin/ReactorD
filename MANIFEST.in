@@ -15,4 +15,5 @@ recursive-exclude dist *
 recursive-exclude reactord *.mod *.log *.pyc 
 recursive-exclude tests *
 recursive-exclude docs *
+recursive-exclude presentation *
 recursive-exlcude .vscode
