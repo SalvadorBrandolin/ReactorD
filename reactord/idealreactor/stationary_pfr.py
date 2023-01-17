@@ -23,32 +23,29 @@ from scipy.integrate import solve_bvp
 class StationaryPFR(ReactorBase):
     """Stationary plug flow reactor class.
 
-    For instantiation is recommended to use the setter class methods:
-    set_isothermic_isobaric
-    set_isothermic_noisobaric
-    set_adiabatic_isobaric
-    set_adiabatic_noisobaric
-    set_noisothermic_isobaric
-    set_noisothermic_noisobaric
+    For instantiation is recommended to use the alternative class constructors:
+    from_isothermic_isobaric
+    from_isothermic_noisobaric
+    from_adiabatic_isobaric
+    from_adiabatic_noisobaric
+    from_noisothermic_isobaric
+    from_noisothermic_noisobaric
 
     For example:
-    pfr = StationaryPFR.set_isothermic_isobaric(...)
+    pfr = StationaryPFR.from_isothermic_isobaric(...)
 
     Parameters
     ----------
     mix : AbstractMix
         Mixture object.
     list_of_reactions : List[Callable]
-        List of functions that evaluate the reaction rates, each one
-        defined by the user with the following format:
-
+        List of functions that evaluate the reaction rates, each one defined by
+        the user with the following format:
         callable(concentration_unit: list[float], temperature: float
         ) -> float.
-
-        Where concentration_unit refers to the units in which the
-        arguments of the kinetic laws are expressed, for instance,
-        concentrations or partial_pressures.
-
+        Where concentration_unit refers to the units in which the arguments of
+        the kinetic laws are expressed, for instance, concentrations or
+        partial_pressures.
     stoichiometry : List[float]
         A matrix that represents the stoichiometry of the reactive system.
         Each row represents one reaction contained in the
@@ -80,7 +77,8 @@ class StationaryPFR(ReactorBase):
     isothermic_temperature: float
         Temperature in isothermic operation [K]
     temperature_in_out: dict
-        Temperature at initial and outlet length in non isothermic operation
+        Temperature at inlet and outlet length in non isothermic or adiabatic
+        operation. Eg: {'in': 500} or {'out': 800}. [K]
     refrigerant: AbstractMix
         Substances present in the refrigerant mix TODO
     refrigerant_molar_flow : float
@@ -99,11 +97,11 @@ class StationaryPFR(ReactorBase):
     isobaric_pressure: float
         Pressure of isobaric operation
     pressure_in_out: dict
-        Pressure at initial and outlet length in non isothermic operation
+        Pressure at inlet and outlet length in non isothermic operation.
+        Eg: {'in': 1013250} or {'out': 101325}. [Pa]
     pressure_loss_equation: str
-        Type of equation to calculate the pressure loss
-        Options:
-        "packed bed reactor" for any reaction system
+        Type of equation to calculate the pressure loss. Options:
+        "packed bed reactor" for Ergun's equation
         "gas phase reaction" for reactors without catalyst
     packed_bed_porosity: float
         Packed bed porosity float between 0 and 1.
@@ -140,6 +138,7 @@ class StationaryPFR(ReactorBase):
         packed_bed_porosity: float = None,
         packed_bed_particle_diameter: float = None,
         fanning_factor: float = None,
+        reaction_enthalpies: List[float] = None,
     ) -> None:
 
         self._kinetics = Kinetics(
@@ -147,24 +146,25 @@ class StationaryPFR(ReactorBase):
             mix=mix,
             stoichiometry=stoichiometry,
             kinetic_argument=kinetic_argument,
+            reaction_enthalpies=reaction_enthalpies,
         )
-        # ==============================================================
+        # =====================================================================
         # Specific reactor arguments
-        # ==============================================================
+        # =====================================================================
         self._name = "StationaryPFR"
         self.reactor_dim_minmax = reactor_dim_minmax
         self.transversal_area = transversal_area
 
-        # ==============================================================
+        # =====================================================================
         # Mass balance data
-        # ==============================================================
+        # =====================================================================
         self.molar_flow_in = molar_flow_in
         self.molar_flow_out = molar_flow_out
         self.catalyst_particle = catalyst_particle
 
-        # ==============================================================
+        # =====================================================================
         # Energy balance data
-        # ==============================================================
+        # =====================================================================
         self.isothermic_temperature = isothermic_temperature
         self.temperature_in_out = temperature_in_out
         self.refrigerant = refrigerant
@@ -177,9 +177,9 @@ class StationaryPFR(ReactorBase):
         self.exchanger_wall_material = exchanger_wall_material
         self.correlation_heat_transfer = correlation_heat_transfer
 
-        # ==============================================================
+        # =====================================================================
         # Pressure balance data
-        # ==============================================================
+        # =====================================================================
         self.isobaric_pressure = isobaric_pressure
         self.pressure_in_out = pressure_in_out
         self.pressure_loss_equation = pressure_loss_equation
@@ -187,19 +187,19 @@ class StationaryPFR(ReactorBase):
         self.packed_bed_particle_diameter = packed_bed_particle_diameter
         self.fanning_factor = fanning_factor
 
-        # ==============================================================
+        # =====================================================================
         # Configure the reactor
-        # ==============================================================
+        # =====================================================================
         self._set_catalyst_operation()
         self._set_thermal_operation()
         self._set_pressure_operation()
 
-    # ==================================================================
+    # =========================================================================
     # Init constructors
-    # ==================================================================
+    # =========================================================================
 
     @classmethod
-    def set_isothermic_isobaric(
+    def from_isothermic_isobaric(
         cls,
         mix: AbstractMix,
         list_of_reactions: List[Callable],
@@ -212,42 +212,36 @@ class StationaryPFR(ReactorBase):
         molar_flow_in: dict = {},
         molar_flow_out: dict = {},
         catalyst_particle=None,
-    ) -> ReactorBase:
+    ) -> "StationaryPFR":
         """Instantiate isothermic isobaric StationaryPFR.
 
         Parameters
         ----------
         mix : AbstractMix
-        Mixture object.
+            Mixture object.
         list_of_reactions : List[Callable]
             List of functions that evaluate the reaction rates, each one
             defined by the user with the following format:
-
             callable(concentration_unit: list[float], temperature: float
             ) -> float.
-
-            Where concentration_unit refers to the units in which the
-            arguments of the kinetic laws are expressed, for instance,
-            concentrations or partial_pressures.
-
+            Where concentration_unit refers to the units in which the arguments
+            of the kinetic laws are expressed, for instance, concentrations or
+            partial_pressures.
         stoichiometry : List[float]
             A matrix that represents the stoichiometry of the reactive system.
-            Each row represents one reaction contained in the
-            list_of_reactions parameter and each column represents a
-            substance in the mix parameter. The stoichiometry matrix
-            entrances are the stoichiometric coefficients of each substance
-            in each reaction.
+            Each row represents one reaction contained in the list_of_reactions
+            parameter and each column represents a substance in the mix
+            parameter. The stoichiometry matrix entrances are the
+            stoichiometric coefficients of each substance in each reaction.
         kinetic_argument : str
             This argument is used to define how to evaluate the composition
-            of the reactive mixture inside the reactor.
-            Options:
+            of the reactive mixture inside the reactor. Options:
             'concentration': substance concentration. [mol/m³]
             'partial_pressure': substance partial pressure. [Pa]
         reactor_dim_minmax : List[float]
-            List containing the minimum and maximum [min, max]
-            boundaries of the reactor's length. E.g: a reactor modeled
-            in the boundaries 0 m to 3 m has a
-            reactor_dim_minmax = [0, 3]. [m]
+            List containing the minimum and maximum [min, max] boundaries of
+            the reactor's length. E.g: a reactor modeled in the boundaries 0 m
+            to 3 m has a reactor_dim_minmax = [0, 3]. [m]
         transversal_area : float
             Transversal area of the reactor. [m²]
         isothermic_temperature : float
@@ -265,7 +259,7 @@ class StationaryPFR(ReactorBase):
 
         Returns
         -------
-        ReactorBase
+        StationaryPFR
             Instantiated isothermic isobaric StationaryPFR.
         """
         isothermic_isobaric_pfr = cls(
@@ -284,7 +278,7 @@ class StationaryPFR(ReactorBase):
         return isothermic_isobaric_pfr
 
     @classmethod
-    def set_isothermic_noisobaric(
+    def from_isothermic_noisobaric(
         cls,
         mix: AbstractMix,
         list_of_reactions: List[Callable],
@@ -301,49 +295,46 @@ class StationaryPFR(ReactorBase):
         molar_flow_in: dict = {},
         molar_flow_out: dict = {},
         catalyst_particle=None,
-    ) -> ReactorBase:
+    ) -> "StationaryPFR":
         """Instantiate isothermic nonisobaric StationaryPFR.
 
         Parameters
         ----------
         mix : AbstractMix
-        Mixture object.
+            Mixture object.
         list_of_reactions : List[Callable]
-            List of functions that evaluate the reaction rates, eac
+            List of functions that evaluate the reaction rates, each one
             defined by the user with the following format:
-            callable(concentration_unit: list[float], temperature:
+            callable(concentration_unit: list[float], temperature: float
             ) -> float.
-            Where concentration_unit refers to the units in which t
-            arguments of the kinetic laws are expressed, for instan
-            concentrations or partial_pressures.
+            Where concentration_unit refers to the units in which the arguments
+            of the kinetic laws are expressed, for instance, concentrations or
+            partial_pressures.
         stoichiometry : List[float]
-            A matrix that represents the stoichiometry of the react
-            Each row represents one reaction contained in the
-            list_of_reactions parameter and each column represents
-            substance in the mix parameter. The stoichiometry matri
-            entrances are the stoichiometric coefficients of each s
-            in each reaction.
+            A matrix that represents the stoichiometry of the reactive system.
+            Each row represents one reaction contained in the list_of_reactions
+            parameter and each column represents a substance in the mix
+            parameter. The stoichiometry matrix entrances are the
+            stoichiometric coefficients of each substance in each reaction.
         kinetic_argument : str
-            This argument is used to define how to evaluate the com
-            of the reactive mixture inside the reactor.
-            Options:
+            This argument is used to define how to evaluate the composition
+            of the reactive mixture inside the reactor. Options:
             'concentration': substance concentration. [mol/m³]
             'partial_pressure': substance partial pressure. [Pa]
         reactor_dim_minmax : List[float]
-            List containing the minimum and maximum [min, max]
-            boundaries of the reactor's length. E.g: a reactor mode
-            in the boundaries 0 m to 3 m has a
-            reactor_dim_minmax = [0, 3]. [m]
+            List containing the minimum and maximum [min, max] boundaries of
+            the reactor's length. E.g: a reactor modeled in the boundaries 0 m
+            to 3 m has a reactor_dim_minmax = [0, 3]. [m]
         transversal_area : float
             Transversal area of the reactor. [m²]
         isothermic_temperature : float
             Reactor's temperature. [K]
         pressure_in_out: dict
-            Pressure at inlet and outlet length in non isothermic operation
+            Pressure at inlet and outlet length in non isothermic operation.
+            Eg: {'in': 1013250} or {'out': 101325}. [Pa]
         pressure_loss_equation: str
-            Type of equation to calculate the pressure loss
-            Options:
-            "packed bed reactor" for any reaction system
+            Type of equation to calculate the pressure loss. Options:
+            "packed bed reactor" for Ergun's equation
             "gas phase reaction" for reactors without catalyst
         packed_bed_porosity: float
             Packed bed porosity float between 0 and 1.
@@ -353,16 +344,17 @@ class StationaryPFR(ReactorBase):
             Friction factor for pipe without catalyst. This number depends on
             Reynolds and pipe roughness.
         molar_flow_in : dict, optional
-            Dictionary containing the known inlet molar flows of th
+            Dictionary containing the known inlet molar flows of the
             substances, by default {}.  TODO
         molar_flow_out : dict, optional
-            Dictionary containing the known outlet molar flows of t
+            Dictionary containing the known outlet molar flows of the
             substances, by default {}. TODO
         catalyst_particle : _type_, optional
             CatalystParticle object, by default None TODO
+
         Returns
         -------
-        ReactorBase
+        StationaryPFR
             Instantiated isothermic noisobaric StationaryPFR.
         """
         isothermic_noisobaric_pfr = cls(
@@ -385,7 +377,186 @@ class StationaryPFR(ReactorBase):
         return isothermic_noisobaric_pfr
 
     @classmethod
-    def set_adiabatic_isobaric(cls) -> None:
+    def from_adiabatic_isobaric(
+        cls,
+        mix: AbstractMix,
+        list_of_reactions: List[Callable],
+        stoichiometry: List[float],
+        kinetic_argument: str,
+        reactor_dim_minmax: List[float],
+        transversal_area: float,
+        temperature_in_out: dict,
+        isobaric_pressure: float,
+        molar_flow_in: dict = {},
+        molar_flow_out: dict = {},
+        catalyst_particle: dict = None,
+        reaction_enthalpies: List[float] = None,
+    ) -> "StationaryPFR":
+        """Instantiate adiabatic isobaric StationaryPFR.
+
+        Parameters
+        ----------
+        mix : AbstractMix
+            Mixture object.
+        list_of_reactions : List[Callable]
+            List of functions that evaluate the reaction rates, each one
+            defined by the user with the following format:
+            callable(concentration_unit: list[float], temperature: float
+            ) -> float.
+            Where concentration_unit refers to the units in which the arguments
+            of the kinetic laws are expressed, for instance, concentrations or
+            partial_pressures.
+        stoichiometry : List[float]
+            A matrix that represents the stoichiometry of the reactive system.
+            Each row represents one reaction contained in the list_of_reactions
+            parameter and each column represents a substance in the mix
+            parameter. The stoichiometry matrix entrances are the
+            stoichiometric coefficients of each substance in each reaction.
+        kinetic_argument : str
+            This argument is used to define how to evaluate the composition
+            of the reactive mixture inside the reactor. Options:
+            'concentration': substance concentration. [mol/m³]
+            'partial_pressure': substance partial pressure. [Pa]
+        reactor_dim_minmax : List[float]
+            List containing the minimum and maximum [min, max] boundaries of
+            the reactor's length. E.g: a reactor modeled in the boundaries 0 m
+            to 3 m has a reactor_dim_minmax = [0, 3]. [m]
+        transversal_area : float
+            Transversal area of the reactor. [m²]
+        temperature_in_out: dict
+            Temperature at inlet and outlet length in non isothermic or
+            adiabatic operation. Eg: {'in': 500} or {'out': 800}. [K]
+        isobaric_pressure: float
+            Pressure of isobaric operation. [Pa]
+        molar_flow_in : dict, optional
+            Dictionary containing the known inlet molar flows of the
+            substances, by default {}.  TODO
+        molar_flow_out : dict, optional
+            Dictionary containing the known outlet molar flows of the
+            substances, by default {}. TODO
+        catalyst_particle : _type_, optional
+            CatalystParticle object, by default None TODO
+        """
+        adiabatic_isobaric_pfr = cls(
+            mix=mix,
+            list_of_reactions=list_of_reactions,
+            stoichiometry=stoichiometry,
+            kinetic_argument=kinetic_argument,
+            reactor_dim_minmax=reactor_dim_minmax,
+            transversal_area=transversal_area,
+            molar_flow_in=molar_flow_in,
+            molar_flow_out=molar_flow_out,
+            catalyst_particle=catalyst_particle,
+            temperature_in_out=temperature_in_out,
+            isobaric_pressure=isobaric_pressure,
+            reaction_enthalpies=reaction_enthalpies,
+        )
+
+        return adiabatic_isobaric_pfr
+
+    @classmethod
+    def from_adiabatic_noisobaric(
+        cls,
+        mix: AbstractMix,
+        list_of_reactions: List[Callable],
+        stoichiometry: List[float],
+        kinetic_argument: str,
+        reactor_dim_minmax: List[float],
+        transversal_area: float,
+        temperature_in_out: dict,
+        pressure_in_out: dict,
+        pressure_loss_equation: str,
+        packed_bed_porosity: float = None,
+        packed_bed_particle_diameter: float = None,
+        fanning_factor: float = None,
+        molar_flow_in: dict = {},
+        molar_flow_out: dict = {},
+        catalyst_particle=None,
+    ) -> "StationaryPFR":
+        """Instantiate adiabatic nonisobaric StationaryPFR.
+
+        Parameters
+        ----------
+        mix : AbstractMix
+            Mixture object.
+        list_of_reactions : List[Callable]
+            List of functions that evaluate the reaction rates, each one
+            defined by the user with the following format:
+            callable(concentration_unit: list[float], temperature: float
+            ) -> float.
+            Where concentration_unit refers to the units in which the arguments
+            of the kinetic laws are expressed, for instance, concentrations or
+            partial_pressures.
+        stoichiometry : List[float]
+            A matrix that represents the stoichiometry of the reactive system.
+            Each row represents one reaction contained in the list_of_reactions
+            parameter and each column represents a substance in the mix
+            parameter. The stoichiometry matrix entrances are the
+            stoichiometric coefficients of each substance in each reaction.
+        kinetic_argument : str
+            This argument is used to define how to evaluate the composition
+            of the reactive mixture inside the reactor. Options:
+            'concentration': substance concentration. [mol/m³]
+            'partial_pressure': substance partial pressure. [Pa]
+        reactor_dim_minmax : List[float]
+            List containing the minimum and maximum [min, max] boundaries of
+            the reactor's length. E.g: a reactor modeled in the boundaries 0 m
+            to 3 m has a reactor_dim_minmax = [0, 3]. [m]
+        transversal_area : float
+            Transversal area of the reactor. [m²]
+        temperature_in_out: dict
+            Temperature at inlet and outlet length in non isothermic or
+            adiabatic operation. Eg: {'in': 500} or {'out': 800}. [K]
+        pressure_in_out: dict
+            Pressure at inlet and outlet length in non isothermic operation.
+            Eg: {'in': 1013250} or {'out': 101325}. [Pa]
+        pressure_loss_equation: str
+            Type of equation to calculate the pressure loss. Options:
+            "packed bed reactor" for Ergun's equation
+            "gas phase reaction" for reactors without catalyst
+        packed_bed_porosity: float
+            Packed bed porosity float between 0 and 1.
+        packed_bed_particle_diameter: float
+            Diameter of particle of packed bed. [m]
+        fanning_factor: float
+            Friction factor for pipe without catalyst. This number depends on
+            Reynolds and pipe roughness.
+        molar_flow_in : dict, optional
+            Dictionary containing the known inlet molar flows of the
+            substances, by default {}.  TODO
+        molar_flow_out : dict, optional
+            Dictionary containing the known outlet molar flows of the
+            substances, by default {}. TODO
+        catalyst_particle : _type_, optional
+            CatalystParticle object, by default None TODO
+
+        Returns
+        -------
+        StationaryPFR
+            Instantiated adiabatic noisobaric StationaryPFR.
+        """
+        adiabatic_noisobaric_pfr = cls(
+            mix=mix,
+            list_of_reactions=list_of_reactions,
+            stoichiometry=stoichiometry,
+            kinetic_argument=kinetic_argument,
+            reactor_dim_minmax=reactor_dim_minmax,
+            transversal_area=transversal_area,
+            temperature_in_out=temperature_in_out,
+            pressure_in_out=pressure_in_out,
+            pressure_loss_equation=pressure_loss_equation,
+            packed_bed_porosity=packed_bed_porosity,
+            packed_bed_particle_diameter=packed_bed_particle_diameter,
+            fanning_factor=fanning_factor,
+            molar_flow_in=molar_flow_in,
+            molar_flow_out=molar_flow_out,
+            catalyst_particle=catalyst_particle,
+        )
+
+        return adiabatic_noisobaric_pfr
+
+    @classmethod
+    def from_noisothermic_isobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -396,7 +567,7 @@ class StationaryPFR(ReactorBase):
         raise NotImplementedError("Not implemented yet")
 
     @classmethod
-    def set_adiabatic_noisobaric(cls) -> None:
+    def from_noisothermic_noisobaric(cls) -> None:
         """Not implemented yet.
 
         Raises
@@ -406,32 +577,10 @@ class StationaryPFR(ReactorBase):
         """
         raise NotImplementedError("Not implemented yet")
 
-    @classmethod
-    def set_noisothermic_isobaric(cls) -> None:
-        """Not implemented yet.
-
-        Raises
-        ------
-        NotImplementedError
-            Not implemented yet.
-        """
-        raise NotImplementedError("Not implemented yet")
-
-    @classmethod
-    def set_noisothermic_noisobaric(cls) -> None:
-        """Not implemented yet.
-
-        Raises
-        ------
-        NotImplementedError
-            Not implemented yet.
-        """
-        raise NotImplementedError("Not implemented yet")
-
-    # ==================================================================
+    # =========================================================================
     # Abastract methods
     # Settings for mass, energy and pressure balances.
-    # ==================================================================
+    # =========================================================================
 
     def _set_catalyst_operation(self) -> None:
         """Interpret the reactor's attributes to set the mass balance.
@@ -484,22 +633,25 @@ class StationaryPFR(ReactorBase):
             self._mass_balance_func = self._heterogeneous_mass_balance
             self._solver_func = self._heterogeneous_solver
 
-    def _set_thermal_operation(self):
+    def _set_thermal_operation(self) -> None:
         """Interpret the reactor's attributes to set the energy balance.
 
-        Method that validates and interprets the reactor's attributes
-        to select the correspondant solver and mass balance methods.
-        The method is called in the reactor's instantiation.
+        Method that validates and interprets the reactor's attributes to select
+        the correspondant solver and mass balance methods. The method is called
+        in the reactor's instantiation.
 
         Raises
         ------
         ValueError
-            Both isothermic and non isothermic configuration set is
-            ambiguous.
-        NotImplementedError
-            Non-isothermic operation not implemented yet.
+            Both isothermic and no isothermic data given becomes ambiguous.
         ValueError
-            No thermal configuration seted.
+            No border conditions given for temperature.
+        NotImplementedError
+            No isothermal operation not implemented yet.
+        ValueError
+            Ambiguous thermal specifications.
+        ValueError
+            No thermal specification were seted.
         """
         no_isothermic_args = [
             self.temperature_in_out,
@@ -537,14 +689,64 @@ class StationaryPFR(ReactorBase):
                 self._refrigerant_temperature_out_for_bc = None
 
         elif any(no_isothermic_args):
-            # Check non-isothermal operation:
-            raise NotImplementedError(
-                "No isothermic operation not implemented yet"
-            )
-        else:
-            raise ValueError("No thermal specification where seted.")
+            if self.temperature_in_out is None:
+                # Check if border conditions for temperature is given.
+                raise ValueError(
+                    "No border conditions given for temperature. "
+                    "Specify temperature_in_out."
+                )
+            else:
+                pass
 
-    def _set_pressure_operation(self):
+            if self.temperature_in_out and not any(no_isothermic_args[1:]):
+                # Check if temperature_in_out is given and no refrigerant or
+                # heat exchange information are given. This defines and
+                # adiabatic thermal operation.
+                self._thermal_operation = "adiabatic"
+
+                if self._catalyst_operation == "homogeneous":
+                    self._energy_balance_func = (
+                        self._homogeneous_adiabatic_energy_balance
+                    )
+                elif self._catalyst_operation == "heterogeneous":
+                    self._energy_balance_func = (
+                        self._heterogeneous_adiabatic_energy_balance
+                    )
+
+                self._temperature_in_for_bc = self.temperature_in_out.get("in")
+                self._temperature_out_for_bc = self.temperature_in_out.get(
+                    "out"
+                )
+                self._refrigerant_temperature_in_for_bc = 0
+                self._refrigerant_temperature_out_for_bc = None
+
+                # Init the standard reaction enthalpies
+                self.kinetics.std_reaction_enthalpies_init()
+
+            elif all(no_isothermic_args):
+                raise NotImplementedError(
+                    "No isothermal operation not implemented yet."
+                )
+
+            else:
+                raise ValueError(
+                    "Ambigous thermal specifications. \n"
+                    "For an adiabatic operation specify only:\n"
+                    "  - temperature_in_out\n"
+                    "For a no isothermal operation, specify all:\n"
+                    "  - temperature_in_out\n"
+                    "  - refrigerant\n"
+                    "  - refrigerant_molar_flow\n"
+                    "  - refrigerant_temperature_in\n"
+                    "  - refrigerant_constant_temperature\n"
+                    "  - refrigerant_flow_arrangement\n"
+                    "  - exchanger_wall_material\n"
+                    "  - correlation_heat_transfer"
+                )
+        else:
+            raise ValueError("No thermal specification were seted.")
+
+    def _set_pressure_operation(self) -> None:
         """Interpret the reactor's attributes to set the energy balance.
 
         Method that validates and interprets the reactor's attributes
@@ -554,8 +756,7 @@ class StationaryPFR(ReactorBase):
         Raises
         ------
         ValueError
-            Both isobaric and non-isobaric configuration set is
-            ambiguous.
+            Both isobaric and non-isobaric configuration set is ambiguous.
         NotImplementedError
             Non-isobaric operation not implemented yet.
         ValueError
@@ -622,11 +823,11 @@ class StationaryPFR(ReactorBase):
         else:
             raise ValueError("No pressure specification was set.")
 
-    # ==================================================================
+    # =========================================================================
     # Solvers aditional data needed - general used methods
-    # ==================================================================
+    # =========================================================================
 
-    def _grid_builder(self, grid_size: int) -> List[float]:
+    def _grid_builder(self, grid_size: int) -> np.ndarray:
         """Construct the reactor's length grid.
 
         Method to build the grid of the independent variables values.
@@ -655,7 +856,7 @@ class StationaryPFR(ReactorBase):
 
         Returns
         -------
-        List[float]
+        ndarray
             Grid for the reactor's independent variables.
         """
         return np.linspace(
@@ -690,22 +891,6 @@ class StationaryPFR(ReactorBase):
         tuple[Callable, List[float]]
             Border condition function needed and initial guess matrix for
             scipy.solve_bvp.
-
-        Raises
-        ------
-        NotImplementedError
-            Not implementd.
-        NotImplementedError
-            Not implementd.
-        NotImplementedError
-            Not implementd.
-        NotImplementedError
-            Not implementd.
-        NotImplementedError
-            Not implementd.
-        ValueError
-            Unkmown error. Maybe private attributes were changed?.
-            Restart the reactor configuration.
         """
         # ==============================================================
         # Border condition building
@@ -759,9 +944,9 @@ class StationaryPFR(ReactorBase):
             np.not_equal(self._outlet_information, None)
         ).ravel()
 
-        # ==============================================================
+        # =====================================================================
         # Initial guess building
-        # ==============================================================
+        # =====================================================================
 
         initial_guess = np.zeros((len(self._inlet_information), grid_size))
 
@@ -775,9 +960,9 @@ class StationaryPFR(ReactorBase):
 
         return border_conditions, initial_guess
 
-    # ==================================================================
+    # =========================================================================
     # Common reactor methods
-    # ==================================================================
+    # =========================================================================
     def _refrigerant_energy_balance(
         self,
         length_coordinate: float,
@@ -833,9 +1018,9 @@ class StationaryPFR(ReactorBase):
         """
         return self._solver_func(grid_size, tol, max_nodes, verbose)
 
-    # ==================================================================
+    # =========================================================================
     # Specifics mass balances
-    # ==================================================================
+    # =========================================================================
 
     @vectorize(signature="(),(n),(),()->(n)", excluded={0})
     def _homogeneous_mass_balance(
@@ -886,18 +1071,18 @@ class StationaryPFR(ReactorBase):
         """
         raise NotImplementedError("Abstract method not implemented.")
 
-    # ==================================================================
+    # =========================================================================
     # Specific energy balances
-    # ==================================================================
+    # =========================================================================
 
     def _isothermic_energy_balance(
         self,
         length_coordinate: float,
         molar_fluxes: List[float],
         temperature: float,
+        pressure: float,
         refrigerant_temperature: float,
-        pressure,
-    ) -> List[float]:
+    ) -> np.ndarray:
         """Energy balance evaluation for the reactor's bulk phase.
 
         Parameters
@@ -909,31 +1094,60 @@ class StationaryPFR(ReactorBase):
             [mol/s]
         temperature : float
             Temperature at the length coordinate. [K]
-        refrigerant_temperature : float
-            Refrigerant temperature at the length coordinate. [K]
         pressure : float
             Pressure at the length coordinate. [Pa]
+        refrigerant_temperature : float
+            Refrigerant temperature at the length coordinate. [K]
 
         Returns
         -------
-        float
+        ndarray
             Derivative of reactor's temperature respect to reactor's
             length. [K/m]
         """
         grid_length = np.size(length_coordinate)
         return np.zeros(grid_length)
 
-    def _homogeneous_adiabatic_energy_balance(self) -> None:
-        """Not implemented yet.
+    @vectorize(signature="(),(n),(),(),()->()", excluded={0})
+    def _homogeneous_adiabatic_energy_balance(
+        self,
+        length_coordinate: float,
+        molar_fluxes: List[float],
+        temperature: float,
+        pressure: float,
+        refrigerant_temperature: float,
+    ) -> np.ndarray:
+        """Energy balance evaluation for the reactor's bulk phase.
 
-        TODO
+        Parameters
+        ----------
+        length_coordinate : float
+            Reactor's length coordinate.
+        molar_fluxes : List[float]
+            Molar flux of each substances at the length_coordinate.
+            [mol/s]
+        temperature : float
+            Temperature at the length coordinate. [K]
+        pressure : float
+            Pressure at the length coordinate. [Pa]
+        refrigerant_temperature : float
+            Refrigerant temperature at the length coordinate. [K]
 
-        Raises
-        ------
-        NotImplementedError
-            Not implemented.
+        Returns
+        -------
+        ndarray
+            Derivative of reactor's temperature respect to reactor's
+            length. [K/m]
         """
-        raise NotImplementedError("Not implemented yet.")
+        a = self.transversal_area
+        ri = self.kinetics.kinetic_eval(molar_fluxes, temperature, pressure)[1]
+        dhi = self.kinetics.reaction_enthalpies(temperature, pressure)
+        cp = self.mix.mix_heat_capacity(molar_fluxes, temperature, pressure)
+        sum_fi = np.sum(molar_fluxes)
+
+        dt_dz = a * np.dot(ri, -dhi) / (sum_fi * cp)
+
+        return dt_dz
 
     def _heterogeneous_adiabatic_energy_balance(self) -> None:
         """Not implemented yet.
@@ -971,9 +1185,9 @@ class StationaryPFR(ReactorBase):
         """
         raise NotImplementedError("Not implemented yet.")
 
-    # ==================================================================
+    # =========================================================================
     # Specific pressure balances
-    # ==================================================================
+    # =========================================================================
 
     def _isobaric_pressure_balance(
         self,
@@ -1082,10 +1296,9 @@ class StationaryPFR(ReactorBase):
         """
         raise NotImplementedError("Not implemented yet.")
 
-    # ==================================================================
+    # =========================================================================
     # Specific solvers
-    # ==================================================================
-
+    # =========================================================================
     def _homogeneous_solver(
         self, grid_size=1000, tol=0.001, max_nodes=1000, verbose=0
     ) -> List[float]:
@@ -1159,8 +1372,8 @@ class StationaryPFR(ReactorBase):
                 length_coordinate,
                 molar_fluxes,
                 temperature,
-                refrigerant_temperature,
                 pressure,
+                refrigerant_temperature,
             ).T
 
             pressure_derivatives = self._pressure_balance_func(
