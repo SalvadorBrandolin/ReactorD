@@ -19,8 +19,6 @@ B.name = "B"
 mixture = rd.mix.IdealSolution(A=A, B=B)
 
 # A function for the reaction rate is defined:
-
-
 def rate(concentrations, temperature):
     return 0.00001 * concentrations[0]
 
@@ -45,20 +43,8 @@ pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
     molar_flow_in={"A": fa_in, "B": 0},
 )
 
-pfr2 = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
-    mix=mixture,
-    list_of_reactions=[rate],
-    stoichiometry=[-1, 1],
-    kinetic_argument="concentration",
-    reactor_dim_minmax=[0, v_pfr],
-    transversal_area=1,
-    isothermic_temperature=600,
-    isobaric_pressure=101325,
-    molar_flow_in={"A": fa_in, "B": 0},
-)
-
 # reactord solution
-solution = pfr2.simulate(grid_size=100)
+solution = pfr.simulate(grid_size=100)
 
 largo_reactor = solution.x
 var_dependientes = solution.y
@@ -71,9 +57,6 @@ ax1.set_xlabel("Reactor volume (m^3)", fontsize=10)
 ax1.set_ylabel("molar fluxes (mol/s)", fontsize=10)
 
 ax1.legend()
-# fig1.savefig("Butene_Isomerization.png")
+fig1.savefig("Butene_Isomerization.png")
 
-# plt.show()
-
-
-print(pfr2.kinetics._std_reaction_enthalpies)
+plt.show()
