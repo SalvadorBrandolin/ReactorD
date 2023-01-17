@@ -7,6 +7,10 @@ line-length = 79
 target-version = ["py310"]
 
 [tool.pytest.ini_options]
+markers = [
+    "sim: marks tests as reactor simulation (deselect with '-m \"not sim\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
 
 testpaths = [
     "tests",

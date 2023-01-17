@@ -437,7 +437,6 @@ class StationaryPFR(ReactorBase):
         catalyst_particle : _type_, optional
             CatalystParticle object, by default None TODO
         """
-
         adiabatic_isobaric_pfr = cls(
             mix=mix,
             list_of_reactions=list_of_reactions,
@@ -536,7 +535,6 @@ class StationaryPFR(ReactorBase):
         StationaryPFR
             Instantiated adiabatic noisobaric StationaryPFR.
         """
-
         adiabatic_noisobaric_pfr = cls(
             mix=mix,
             list_of_reactions=list_of_reactions,

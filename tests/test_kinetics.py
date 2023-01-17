@@ -212,7 +212,7 @@ def test_user_defined_reaction_enthalpies():
 
     assert kinetic.std_reaction_enthalpies is None
 
-    assert kinetic.reaction_enthalpies(500, 101325) == [1000, 2000]
+    assert (kinetic.reaction_enthalpies(500, 101325) == [1000, 2000]).all()
 
 
 def test_enthalpies_correction():
