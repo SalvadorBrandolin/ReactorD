@@ -1,13 +1,14 @@
 import numpy as np
 
-import reactord as rd
-
 import pytest
+
+import reactord as rd
 
 # ======================================================================
 # Fogler's Elements Of Chemical Reaction Engineering 4th ed.
 # p1.15
 # ======================================================================
+
 
 @pytest.mark.sim
 def test_fogler_p1_15a_ivp():
@@ -71,6 +72,7 @@ def test_fogler_p1_15a_ivp():
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
+
 
 @pytest.mark.sim
 def test_fogler_p1_15a_bvp():
@@ -139,6 +141,7 @@ def test_fogler_p1_15a_bvp():
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
+
 
 @pytest.mark.sim
 def test_fogler_p1_15a_ivp_outlet():
@@ -209,6 +212,7 @@ def test_fogler_p1_15a_ivp_outlet():
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
 
+
 @pytest.mark.sim
 def test_fogler_p1_15b():
     """Fogler fourth ed. P1.15b as initial value problem"""
@@ -270,6 +274,7 @@ def test_fogler_p1_15b():
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
+
 
 @pytest.mark.sim
 def test_fogler_p1_15b_bvp():
@@ -337,6 +342,7 @@ def test_fogler_p1_15b_bvp():
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
+
 
 @pytest.mark.sim
 def test_fogler_p1_15b_ivp_outlet():
@@ -406,6 +412,7 @@ def test_fogler_p1_15b_ivp_outlet():
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
 
+
 @pytest.mark.sim
 def test_fogler_p1_15c_ivp():
     """Fogler fourth ed. P1.15c as an initial value problem"""
@@ -468,6 +475,7 @@ def test_fogler_p1_15c_ivp():
         fogler_concentrations = np.append(fogler_concentrations, fogler(v))
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
+
 
 @pytest.mark.sim
 def test_fogler_p1_15c_bvp():
@@ -537,6 +545,7 @@ def test_fogler_p1_15c_bvp():
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
 
+
 @pytest.mark.sim
 def test_fogler_p1_15c_ivp_outlet():
     """Fogler fourth ed. P1.15c as an initial value problem but the
@@ -605,6 +614,7 @@ def test_fogler_p1_15c_ivp_outlet():
 
     assert np.allclose(reactord_concentrations, fogler_concentrations)
 
+
 @pytest.mark.sim
 def test_fogler_example_4_4():
     # Pressure border condition information is given at the reactor's inlet.
@@ -643,6 +653,7 @@ def test_fogler_example_4_4():
         reactord_pressures, fogler_pressures, rtol=1e-05, atol=0.1
     )
 
+
 @pytest.mark.sim
 def test_fogler_example_4_4_border_condition():
     # Pressure border condition information is given at the reactor's outlet.
@@ -680,6 +691,7 @@ def test_fogler_example_4_4_border_condition():
     assert np.allclose(
         reactord_pressures, fogler_pressures, rtol=1e-05, atol=0.1
     )
+
 
 @pytest.mark.sim
 @pytest.mark.slow
@@ -788,6 +800,7 @@ def test_fogler_example_8_5():
 
     conversion_reactord = (37.6 - result.sol(fogler_z_for_conversion)) / 37.6
     assert np.allclose(conversion_reactord, fogler_conversion)
+
 
 @pytest.mark.sim
 @pytest.mark.slow
