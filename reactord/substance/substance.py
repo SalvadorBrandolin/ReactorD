@@ -24,9 +24,9 @@ class Substance:
 
     Example:
 
-    water = Substance.from_thermo_data_base('water')
-    water.to_pickle('my_water_file')
-    water_pickle = water.from_pickle('my_water_file)
+    >>> water = Substance.from_thermo_data_base('water')
+    >>> water.to_pickle('my_water_file')
+    >>> water_pickle = water.from_pickle('my_water_file)
 
     Parameters
     ----------

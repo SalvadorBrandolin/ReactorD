@@ -1,4 +1,4 @@
-"""Mix."""
+"""Mixture module."""
 from .abstract_mix import AbstractMix
 from .ideal_gas import IdealGas
 from .ideal_solution import IdealSolution

@@ -19,7 +19,7 @@ def thermo_substance_constructor(cls, name: str, thermo_identification: str):
     name : str
         Name that will be assigned to the Substance object.
     thermo_identification : str
-        Name or CAS number of the substance that would be used to search in the
+        Name or CAS number of the substance that will be used to search in the
         Thermo library.
 
     Returns
