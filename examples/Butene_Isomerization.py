@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 
 # import the reactord package
@@ -47,17 +46,18 @@ pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
 # reactord solution
 solution = pfr.simulate(grid_size=100)
 
-largo_reactor = solution.x
-var_dependientes = solution.y
+# The solution is plotted
+reactor_length = solution.x
+dependent_variables = solution.y
 
 fig1, ax1 = plt.subplots(1)
-ax1.plot(largo_reactor, var_dependientes[0], "-r", label="Flux_A", linewidth=3)
-ax1.plot(largo_reactor, var_dependientes[1], "-g", label="Flux_B", linewidth=3)
+ax1.plot(reactor_length, dependent_variables[0], "-r", label="Flux_A", linewidth=3)
+ax1.plot(reactor_length, dependent_variables[1], "-g", label="Flux_B", linewidth=3)
 # ax1.set(xlabel="Reactor volume (m^3)", ylabel="molar fluxes (mol/s)")
 ax1.set_xlabel("Reactor volume (m^3)", fontsize=10)
 ax1.set_ylabel("molar fluxes (mol/s)", fontsize=10)
 
 ax1.legend()
-fig1.savefig("Butene_Isomerization.png")
+#fig1.savefig("Butene_Isomerization.png")
 
 plt.show()
