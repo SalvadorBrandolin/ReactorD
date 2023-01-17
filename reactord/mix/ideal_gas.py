@@ -5,7 +5,7 @@ import chemicals
 
 import numpy as np
 
-from reactord.mix.abstract_mix import AbstractMix
+from .abstract_mix import AbstractMix
 from reactord.substance import Substance
 
 
