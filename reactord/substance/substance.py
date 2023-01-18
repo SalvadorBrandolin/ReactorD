@@ -302,7 +302,7 @@ class Substance:
 
     @classmethod
     def from_pickle(cls, name_file: str) -> "Substance":
-        """Read a pickle Substance file and return the Substance object.
+        """Read a dill Substance file and return the Substance object.
 
         Parameters
         ----------
@@ -318,7 +318,7 @@ class Substance:
             return loads(f.read())
 
     def to_pickle(self, name_file: str) -> __file__:
-        """Serialize an object substance.
+        """Serialize an substance object with dill library.
 
         This method save an object substance as a file.
 
