@@ -51,13 +51,17 @@ reactor_length = solution.x
 dependent_variables = solution.y
 
 fig1, ax1 = plt.subplots(1)
-ax1.plot(reactor_length, dependent_variables[0], "-r", label="Flux_A", linewidth=3)
-ax1.plot(reactor_length, dependent_variables[1], "-g", label="Flux_B", linewidth=3)
+ax1.plot(
+    reactor_length, dependent_variables[0], "-r", label="Flux_A", linewidth=3
+)
+ax1.plot(
+    reactor_length, dependent_variables[1], "-g", label="Flux_B", linewidth=3
+)
 # ax1.set(xlabel="Reactor volume (m^3)", ylabel="molar fluxes (mol/s)")
 ax1.set_xlabel("Reactor volume (m^3)", fontsize=10)
 ax1.set_ylabel("molar fluxes (mol/s)", fontsize=10)
 
 ax1.legend()
-#fig1.savefig("Butene_Isomerization.png")
+# fig1.savefig("Butene_Isomerization.png")
 
 plt.show()

@@ -2,8 +2,9 @@
 
 Class to define a substance for ReactorD library.
 """
-import pickle
 from typing import Callable
+
+from dill import dumps, loads
 
 import numpy as np
 
@@ -188,39 +189,6 @@ class Substance:
             viscosity_gas, signature="(),()->()"
         )
 
-    def to_pickle(self, name_file) -> __file__:
-        """Serialize an object substance.
-
-        This method save an object substance as a file
-
-        Parameters
-        ----------
-        name_file : str
-            name of file to save the substance object
-
-        Returns
-        -------
-        _file_
-            A binary file with substance predefine object
-        """
-        with open(name_file, "wb") as f:
-            return pickle.dump(self, f)
-
-    @classmethod
-    def from_pickle(cls, name_file):
-        """Read save file of substance object.
-
-        Parameters
-        ----------
-        name_file : str
-
-        Returns
-        -------
-        Substance : Substance
-        """
-        with open(name_file, "rb") as f:
-            return pickle.load(f)
-
     @classmethod
     def from_thermo_database(cls, identification: str):
         """Substance instance from Bell Caleb's thermo library.
@@ -346,6 +314,47 @@ class Substance:
             viscosity_gas=viscosity_gas,
         )
         return substance_object
+
+    @classmethod
+    def from_pickle(cls, name_file: str) -> "Substance":
+        """Read a dill Substance file and return the Substance object.
+
+        Cite:
+        https://github.com/uqfoundation/dill
+
+        Parameters
+        ----------
+        name_file : str
+            Name of the file.
+        
+        Returns
+        -------
+        Substance : Substance
+            Substance object.
+        """
+        with open(name_file, "rb") as f:
+            return loads(f.read())
+
+    def to_pickle(self, name_file: str) -> __file__:
+        """Serialize an substance object with dill library.
+
+        This method save an object substance as a file.
+
+        Cite:
+        https://github.com/uqfoundation/dill
+
+        Parameters
+        ----------
+        name_file : str
+            Name of file to save the substance object.
+        
+        Returns
+        -------
+        _file_
+            A binary file with substance predefine object.
+        """
+        with open(name_file, "wb") as f:
+            f.write(dumps(self))
 
     def vaporization_enthalpy(self, temperature: float) -> float:
         """Return the vaporization enthalpy at a given temperature.
