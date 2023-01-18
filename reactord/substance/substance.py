@@ -577,7 +577,7 @@ class Substance:
         and temperature2
 
         .. math::
-            \int_{T_1}^{T_2} {C_{p_{solid}} (T)} \mathrm{d}T
+            \int_{T_1}^{T_2} {C_{p_{solid}} (T, P)} \mathrm{d}T
 
         Parameters
         ----------
@@ -605,7 +605,7 @@ class Substance:
         temperature1 and temperature2
 
         .. math::
-            \int_{T_1}^{T_2} {C_{p_{liquid}} (T)} \mathrm{d}T
+            \int_{T_1}^{T_2} {C_{p_{liquid}} (T, P)} \mathrm{d}T
 
         Parameters
         ----------
@@ -633,7 +633,7 @@ class Substance:
         temperature1 and temperature2.
 
         .. math::
-            \int_{T_1}^{T_2} {C_{p_{gas}} (T)} \mathrm{d}T
+            \int_{T_1}^{T_2} {C_{p_{gas}} (T, P)} \mathrm{d}T
 
         Parameters
         ----------
