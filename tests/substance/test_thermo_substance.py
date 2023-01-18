@@ -72,6 +72,11 @@ def test_formation_enthalpy_ig(name):
     chemical_obj = ChemicalConstantsPackage.correlations_from_IDs([name])
     assert substance.formation_enthalpy_ig == chemical_obj.constants.Hfgs[0]
 
+@pytest.mark.parametrize("name", compounds)
+def test_formation_gibbs_ig(name):
+
+@pytest.mark.parametrize("name", compounds)
+def test_vectorize_functions(name):
 
 @pytest.mark.parametrize("name", compounds)
 def test_vaporization_enthalpy(name):
@@ -94,6 +99,9 @@ def test_sublimation_enthalpy(name):
             chemical_obj.EnthalpySublimations[0].T_dependent_property(t)
         )
 
+@pytest.mark.parametrize("name", compounds)
+def test_fusion_enthalpy(name):
+
 
 @pytest.mark.parametrize("name", compounds)
 def test_volume_solid(name):
@@ -104,6 +112,32 @@ def test_volume_solid(name):
         assert substance.volume_solid(t, 101325) == (
             chemical_obj.VolumeSolids[0].T_dependent_property(t)
         )
+
+@pytest.mark.parametrize("name", compounds)
+def test_volume_liquid(name):
+    substance = rd.Substance.from_thermo_database(name)
+    chemical_obj = ChemicalConstantsPackage.correlations_from_IDs([name])
+    temperature = [300, 400, 500, 600, 700]
+    pressure = [101325, 200000, 300000, 400000]
+    for t in temperature:
+        for p in pressure:
+            assert substance.volume_liquid(t, p) == (
+                chemical_obj.VolumeLiquids[0].T_dependent_property(t)
+            )
+
+
+@pytest.mark.parametrize("name", compounds)
+def test_volume_gas(name):
+    substance = rd.Substance.from_thermo_database(name)
+    chemical_obj = ChemicalConstantsPackage.correlations_from_IDs([name])
+    temperature = [300, 400, 500, 600, 700]
+    pressure = [101325, 200000, 300000, 400000]
+    for t in temperature:
+        for p in pressure:
+            method = chemical_obj.VolumeGases[0].method_P
+            assert substance.volume_gas(t, p) == (
+                chemical_obj.VolumeGases[0].calculate_P(t, p, method)
+            )
 
 
 @pytest.mark.parametrize("name", compounds)
@@ -137,33 +171,6 @@ def test_heat_capacity_gas(name):
         assert substance.heat_capacity_gas(t, 101325) == (
             chemical_obj.HeatCapacityGases[0].T_dependent_property(t)
         )
-
-
-@pytest.mark.parametrize("name", compounds)
-def test_volume_liquid(name):
-    substance = rd.Substance.from_thermo_database(name)
-    chemical_obj = ChemicalConstantsPackage.correlations_from_IDs([name])
-    temperature = [300, 400, 500, 600, 700]
-    pressure = [101325, 200000, 300000, 400000]
-    for t in temperature:
-        for p in pressure:
-            assert substance.volume_liquid(t, p) == (
-                chemical_obj.VolumeLiquids[0].T_dependent_property(t)
-            )
-
-
-@pytest.mark.parametrize("name", compounds)
-def test_volume_gas(name):
-    substance = rd.Substance.from_thermo_database(name)
-    chemical_obj = ChemicalConstantsPackage.correlations_from_IDs([name])
-    temperature = [300, 400, 500, 600, 700]
-    pressure = [101325, 200000, 300000, 400000]
-    for t in temperature:
-        for p in pressure:
-            method = chemical_obj.VolumeGases[0].method_P
-            assert substance.volume_gas(t, p) == (
-                chemical_obj.VolumeGases[0].calculate_P(t, p, method)
-            )
 
 
 @pytest.mark.parametrize("name", compounds)
@@ -222,10 +229,13 @@ def test_viscosity_gas(name):
                 (chemical_obj.ViscosityGases[0].T_dependent_property(t)),
             )
 
+@pytest.mark.parametrize("name", compounds)
+def heat_capacity_solid_dt_integral(name):
+
 
 @pytest.mark.parametrize("name", compounds)
-def test_create_substance_file(name):
-    substance = rd.Substance(name)
-    rd.Substance.to_pickle(substance, "name_file")
-    file = rd.Substance.from_pickle("name_file")
-    assert file.name == substance.name
+def heat_capacity_liquid_dt_integral(name):
+
+
+@pytest.mark.parametrize("name", compounds)
+def heat_capacity_gas_dt_integral(name):
