@@ -326,7 +326,7 @@ class Substance:
         ----------
         name_file : str
             Name of the file.
-        
+
         Returns
         -------
         Substance : Substance
@@ -347,7 +347,7 @@ class Substance:
         ----------
         name_file : str
             Name of file to save the substance object.
-        
+
         Returns
         -------
         _file_
