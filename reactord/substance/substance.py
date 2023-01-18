@@ -2,7 +2,8 @@
 
 Class to define a substance for ReactorD library.
 """
-import pickle
+from dill import dumps, loads
+
 from typing import Callable
 
 import numpy as np
@@ -110,7 +111,7 @@ class Substance:
     vectorize_functions: bool, optional
         When True, numpy.vectorize() is applied to the temperature and pressure
         Substance Callable paramaters on Substance object init, by default
-        True.
+        False.
 
     Attributes
     ----------
@@ -137,7 +138,7 @@ class Substance:
         None.
     vectorize_functions: bool, optional
         When True, numpy.vectorize() is applied to the temperature and pressure
-        Substance functions on Substance object init, by default True.
+        Substance functions on Substance object init, by default False.
     """
 
     def __init__(
@@ -167,7 +168,7 @@ class Substance:
         heat_capacity_solid_dt_integral: Callable = None,
         heat_capacity_liquid_dt_integral: Callable = None,
         heat_capacity_gas_dt_integral: Callable = None,
-        vectorize_functions: bool = True,
+        vectorize_functions: bool = False,
     ) -> None:
 
         # Pure compound properties:
@@ -186,7 +187,7 @@ class Substance:
         self.vectorize_functions = vectorize_functions
 
         # Temperature and pressure-dependent properties calculation functions:
-        # numpy vectorization is made by default
+        # numpy vectorization is not made by default
         if self.vectorize_functions:
 
             self._vaporization_enthalpy = np.vectorize(
@@ -236,15 +237,15 @@ class Substance:
             )
 
             self._heat_capacity_solid_dt_integral = np.vectorize(
-                heat_capacity_solid_dt_integral, signature="(),()->()"
+                heat_capacity_solid_dt_integral, signature="(),(),()->()"
             )
 
             self._heat_capacity_liquid_dt_integral = np.vectorize(
-                heat_capacity_liquid_dt_integral, signature="(),()->()"
+                heat_capacity_liquid_dt_integral, signature="(),(),()->()"
             )
 
             self._heat_capacity_gas_dt_integral = np.vectorize(
-                heat_capacity_gas_dt_integral, signature="(),()->()"
+                heat_capacity_gas_dt_integral, signature="(),(),()->()"
             )
 
         else:
@@ -314,7 +315,7 @@ class Substance:
             Substance object.
         """
         with open(name_file, "rb") as f:
-            return pickle.load(f)
+            return loads(f.read())
 
     def to_pickle(self, name_file: str) -> __file__:
         """Serialize an object substance.
@@ -332,7 +333,7 @@ class Substance:
             A binary file with substance predefine object.
         """
         with open(name_file, "wb") as f:
-            return pickle.dump(self, f)
+            f.write(dumps(self))
 
     def vaporization_enthalpy(self, temperature: float) -> float:
         """Return the vaporization enthalpy at a given temperature.
@@ -594,7 +595,10 @@ class Substance:
             Integral of solid heat capacity between temperature1 and
             temperature2 in Joule per mol. [J/mol]
         """
-        return self._heat_capacity_solid_dt_integral
+        integral = self._heat_capacity_solid_dt_integral(
+            temperature1, temperature2, pressure
+        )
+        return integral
 
     def heat_capacity_liquid_dt_integral(
         self, temperature1: float, temperature2: float, pressure: float
@@ -622,7 +626,10 @@ class Substance:
             Definite integral of liquid heat capacity between temperature1
             and temperature2 in Joule per mol. [J/mol]
         """
-        return self._heat_capacity_liquid_dt_integral
+        integral = self._heat_capacity_liquid_dt_integral(
+            temperature1, temperature2, pressure
+        )
+        return integral
 
     def heat_capacity_gas_dt_integral(
         self, temperature1: float, temperature2: float, pressure: float
@@ -650,4 +657,7 @@ class Substance:
             Definite integral of gas heat capacity between temperature1
             and temperature2 in Joule per mol. [J/mol]
         """
-        return self._heat_capacity_gas_dt_integral
+        integral = self._heat_capacity_gas_dt_integral(
+            temperature1, temperature2, pressure
+        )
+        return integral

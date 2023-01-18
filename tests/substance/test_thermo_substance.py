@@ -74,9 +74,11 @@ def test_formation_enthalpy_ig(name):
 
 @pytest.mark.parametrize("name", compounds)
 def test_formation_gibbs_ig(name):
+    ...
 
 @pytest.mark.parametrize("name", compounds)
 def test_vectorize_functions(name):
+    ...
 
 @pytest.mark.parametrize("name", compounds)
 def test_vaporization_enthalpy(name):
@@ -101,6 +103,7 @@ def test_sublimation_enthalpy(name):
 
 @pytest.mark.parametrize("name", compounds)
 def test_fusion_enthalpy(name):
+    ...
 
 
 @pytest.mark.parametrize("name", compounds)
@@ -230,12 +233,15 @@ def test_viscosity_gas(name):
             )
 
 @pytest.mark.parametrize("name", compounds)
-def heat_capacity_solid_dt_integral(name):
+def test_heat_capacity_solid_dt_integral(name):
+    ...
 
 
 @pytest.mark.parametrize("name", compounds)
-def heat_capacity_liquid_dt_integral(name):
+def test_heat_capacity_liquid_dt_integral(name):
+    ...
 
 
 @pytest.mark.parametrize("name", compounds)
-def heat_capacity_gas_dt_integral(name):
+def test_heat_capacity_gas_dt_integral(name):
+    ...
