@@ -29,5 +29,5 @@ matplotlib
 # ReactorD dependecies
 dill>=0.3.6
 numpy>=1.21.4
-scipy>=1.9.0
+scipy>=1.7.3 
 thermo>=0.2.21
