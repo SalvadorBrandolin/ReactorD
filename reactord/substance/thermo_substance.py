@@ -6,6 +6,8 @@ of Chemical Engineering Design Library (ChEDL)
 https://github.com/CalebBell/thermo.
 """
 
+from scipy.integrate import quad
+
 from thermo import ChemicalConstantsPackage
 
 
@@ -105,28 +107,25 @@ def thermo_substance_constructor(cls, name: str, thermo_identification: str):
     def heat_capacity_solid_dt_integral(
         temperature1: float, temperature2: float, pressure: float
     ) -> float:
-        method = corr.HeatCapacitySolids[0].method
-        integral = corr.HeatCapacitySolids[0].calculate_integral(
-            temperature1, temperature2, method
-        )
+        integral = quad(corr.HeatCapacitySolids[0].T_dependent_property,
+            temperature1, temperature2
+        )[0]
         return integral
 
     def heat_capacity_liquid_dt_integral(
         temperature1: float, temperature2: float, pressure: float
     ) -> float:
-        method = corr.HeatCapacityLiquids[0].method
-        integral = corr.HeatCapacityLiquids[0].calculate_integral(
-            temperature1, temperature2, method
-        )
+        integral = quad(corr.HeatCapacityLiquids[0].T_dependent_property,
+            temperature1, temperature2
+        )[0]
         return integral
 
     def heat_capacity_gas_dt_integral(
         temperature1: float, temperature2: float, pressure: float
     ) -> float:
-        method = corr.HeatCapacityGases[0].method
-        integral = corr.HeatCapacityGases[0].calculate_integral(
-            temperature1, temperature2, method
-        )
+        integral = quad(corr.HeatCapacityGases[0].T_dependent_property,
+            temperature1, temperature2
+        )[0]
         return integral
 
     substance_object = cls(
