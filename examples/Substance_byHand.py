@@ -12,5 +12,3 @@ Ah = rd.Substance.create_substance_file(A, "name_file")
 
 Ar = rd.Substance.load_file("name_file")
 
-
-print(Ar.name)

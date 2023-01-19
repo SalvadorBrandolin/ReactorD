@@ -35,10 +35,14 @@ According to requirements, the operation settings can change as follows;
 - Pressure Balance:
 	- Isobaric
     - Non-isobaric
+      - Packed bed reactor
+      - Gas phase reaction
 
 
-## Available in version 0.0.1a1
-- Stationary PFR Isothermic - Isobaric Operation 
+## Available in version 0.0.1a2
+- Stationary PFR Isothermic - Isobaric Operation
+- Stationary PFR Isothermic - Non-isobaric packed bed reactor Operation
+- Stationary PFR Adiabatic  - Isobaric Operation
 
 
 ## Motivation
