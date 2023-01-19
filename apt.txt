@@ -1,1 +1,1 @@
-python3-matplotlib
+python3-matplotlib=3.5.3
