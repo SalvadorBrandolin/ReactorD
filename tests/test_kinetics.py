@@ -279,10 +279,10 @@ def test_making_it_explode():
 
     stoichiometry = np.array([[-1, -1, 1, 1], [0, -2, 0, 2]])
 
-    a = rd.Substance.from_thermo_database("acetic acid")
-    b = rd.Substance.from_thermo_database("ethanol")
-    c = rd.Substance.from_thermo_database("ethyl acetate")
-    d = rd.Substance.from_thermo_database("water")
+    a = rd.Substance.from_thermo_database("acetic acid", "acetic acid")
+    b = rd.Substance.from_thermo_database("ethanol", "ethanol")
+    c = rd.Substance.from_thermo_database("ethyl acetate", "ethyl acetate")
+    d = rd.Substance.from_thermo_database("water", "water")
 
     mix = rd.mix.IdealSolution(a=a, b=b, c=c, d=d)
 
@@ -344,6 +344,7 @@ def test_reaction_enthalpy_fogler_example_8_2():
     # Calculating using Fogler's data
     # ===============================
 
+    # Cp data
     def cp_h2(temperature, pressure):
         return 6.992 * 4.186  # cal/mol/K to Joule/mol/K
 
@@ -353,20 +354,32 @@ def test_reaction_enthalpy_fogler_example_8_2():
     def cp_nh3(temperature, pressure):
         return 8.92 * 4.186  # cal/mol/K to Joule/mol/K
 
+    # Cp integral
+    def cp_h2_integral(temperature1, temperature2, pressure):
+        return 6.992 * 4.186 * (temperature2 - temperature1)  # cal/mol/K to Joule/mol/K
+
+    def cp_n2_integral(temperature1, temperature2, pressure):
+        return 6.984 * 4.186 * (temperature2 - temperature1)  # cal/mol/K to Joule/mol/K
+
+    def cp_nh3_integral(temperature1, temperature2, pressure):
+        return 8.92 * 4.186 * (temperature2 - temperature1)  # cal/mol/K to Joule/mol/K
+
     n2 = rd.Substance(
         name="nitrogen",
         formation_enthalpy_ig=0,
         heat_capacity_gas=cp_n2,
+        heat_capacity_gas_dt_integral=cp_n2_integral
     )
 
     h2 = rd.Substance(
-        name="hydrogen", formation_enthalpy_ig=0, heat_capacity_gas=cp_h2
+        name="hydrogen", formation_enthalpy_ig=0, heat_capacity_gas=cp_h2,heat_capacity_gas_dt_integral=cp_h2_integral
     )
 
     nh3 = rd.Substance(
         name="ammonia",
         formation_enthalpy_ig=-11020 * 4.186,  # cal to Joule
         heat_capacity_gas=cp_nh3,
+        heat_capacity_gas_dt_integral=cp_nh3_integral
     )
 
     mixture2 = rd.mix.IdealGas(n2=n2, h2=h2, nh3=nh3)

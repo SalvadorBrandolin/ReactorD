@@ -315,6 +315,7 @@ def test_heat_capacity_gas_dt_integral(name):
                 )[0],
             )
 
+
 @pytest.mark.parametrize("name", compounds)
 def test_all_together_vectorized(name):
     substance = rd.Substance.from_thermo_database(name, name)
@@ -355,20 +356,281 @@ def test_all_together_vectorized(name):
     )
     assert isinstance(substance._heat_capacity_gas_dt_integral, np.vectorize)
 
-    #Eval
-    reactord_vaporization_enthalpy = substance.vaporization_enthalpy(temperature1)
-    reactord_sublimation_enthalpy = substance.sublimation_enthalpy(temperature1)
-    reactord_fusion_enthalpy = substance.fusion_enthalpy(temperature1)
-    reactord_volume_solid = substance.volume_solid(temperature1, pressure)
-    reactord_volume_liquid = substance.volume_liquid(temperature1, pressure)
-    reactord_volume_gas = substance.volume_gas(temperature1, pressure)
-    reactord_heat_capacity_solid = substance.heat_capacity_solid(temperature1, pressure)
-    reactord_heat_capacity_liquid = substance.heat_capacity_liquid(temperature1, pressure)
-    reactord_heat_capacity_gas = substance.heat_capacity_gas(temperature1, pressure)
-    reactord_thermal_conductivity_liquid = substance.thermal_conductivity_liquid(temperature1, pressure)
-    reactord_thermal_conductivity_gas = substance.thermal_conductivity_gas(temperature1, pressure)
-    reactord_viscosity_liquid = substance.viscosity_liquid(temperature1, pressure)
-    reactord_viscosity_gas = substance.viscosity_gas(temperature1, pressure)
-    reactord_heat_capacity_solid_dt_integral = substance.heat_capacity_solid_dt_integral(temperature1, temperature2, pressure)
-    reactord_heat_capacity_liquid_dt_integral = substance.heat_capacity_liquid_dt_integral(temperature1, temperature2, pressure)
-    reactord_heat_capacity_gas_dt_integral = substance.heat_capacity_gas_dt_integral(temperature1, temperature2, pressure)
+    # Eval reactord
+    substance_vaporization_enthalpy = substance.vaporization_enthalpy(
+        temperature1
+    )
+    substance_sublimation_enthalpy = substance.sublimation_enthalpy(
+        temperature1
+    )
+    substance_fusion_enthalpy = substance.fusion_enthalpy(temperature1)
+    substance_volume_solid = substance.volume_solid(temperature1, pressure)
+    substance_volume_liquid = substance.volume_liquid(temperature1, pressure)
+    substance_volume_gas = substance.volume_gas(temperature1, pressure)
+    substance_heat_capacity_solid = substance.heat_capacity_solid(
+        temperature1, pressure
+    )
+    substance_heat_capacity_liquid = substance.heat_capacity_liquid(
+        temperature1, pressure
+    )
+    substance_heat_capacity_gas = substance.heat_capacity_gas(
+        temperature1, pressure
+    )
+    substance_thermal_conductivity_liquid = (
+        substance.thermal_conductivity_liquid(temperature1, pressure)
+    )
+    substance_thermal_conductivity_gas = substance.thermal_conductivity_gas(
+        temperature1, pressure
+    )
+    substance_viscosity_liquid = substance.viscosity_liquid(
+        temperature1, pressure
+    )
+    substance_viscosity_gas = substance.viscosity_gas(temperature1, pressure)
+    substance_heat_capacity_solid_dt_integral = (
+        substance.heat_capacity_solid_dt_integral(
+            temperature1, temperature2, pressure
+        )
+    )
+    substance_heat_capacity_liquid_dt_integral = (
+        substance.heat_capacity_liquid_dt_integral(
+            temperature1, temperature2, pressure
+        )
+    )
+    substance_heat_capacity_gas_dt_integral = (
+        substance.heat_capacity_gas_dt_integral(
+            temperature1, temperature2, pressure
+        )
+    )
+
+    for idx, t in enumerate(temperature1):
+        assert substance_vaporization_enthalpy[idx] == (
+            chemical_obj.EnthalpyVaporizations[0].T_dependent_property(t)
+        )
+        assert substance_sublimation_enthalpy[idx] == (
+            chemical_obj.EnthalpySublimations[0].T_dependent_property(t)
+        )
+        assert substance_fusion_enthalpy[idx] == (
+            chemical_obj.EnthalpySublimations[0].T_dependent_property(t)
+            - chemical_obj.EnthalpyVaporizations[0].T_dependent_property(t)
+        )
+        assert substance_volume_solid[idx] == (
+            chemical_obj.VolumeSolids[0].T_dependent_property(t)
+        )
+        assert substance_volume_liquid[idx] == (
+            chemical_obj.VolumeLiquids[0].T_dependent_property(t)
+        )
+        assert substance_heat_capacity_solid[idx] == (
+            chemical_obj.HeatCapacitySolids[0].T_dependent_property(t)
+        )
+        assert substance_heat_capacity_liquid[idx] == (
+            chemical_obj.HeatCapacityLiquids[0].T_dependent_property(t)
+        )
+        assert substance_heat_capacity_gas[idx] == (
+            chemical_obj.HeatCapacityGases[0].T_dependent_property(t)
+        )
+        assert substance_thermal_conductivity_liquid[idx] == (
+            chemical_obj.ThermalConductivityLiquids[0].T_dependent_property(t)
+        )
+        assert substance_thermal_conductivity_gas[idx] == (
+            chemical_obj.ThermalConductivityGases[0].T_dependent_property(t)
+        )
+        assert substance_viscosity_liquid[idx] == (
+            chemical_obj.ViscosityLiquids[0].T_dependent_property(t)
+        )
+        assert np.allclose(
+            substance_viscosity_gas[idx],
+            (chemical_obj.ViscosityGases[0].T_dependent_property(t)),
+        )
+
+    for idx, (t, p) in enumerate(zip(temperature1, pressure)):
+        method = chemical_obj.VolumeGases[0].method_P
+        assert substance_volume_gas[idx] == (
+            chemical_obj.VolumeGases[0].calculate_P(t, p, method)
+        )
+
+    for idx, (t1, t2) in enumerate(zip(temperature1, temperature2)):
+        assert np.allclose(
+            substance_heat_capacity_solid_dt_integral[idx],
+            quad(
+                chemical_obj.HeatCapacitySolids[0].T_dependent_property,
+                t1,
+                t2,
+            )[0],
+        )
+        assert np.allclose(
+            substance_heat_capacity_liquid_dt_integral[idx],
+            quad(
+                chemical_obj.HeatCapacityLiquids[0].T_dependent_property,
+                t1,
+                t2,
+            )[0],
+        )
+        assert np.allclose(
+            substance_heat_capacity_gas_dt_integral[idx],
+            quad(
+                chemical_obj.HeatCapacityGases[0].T_dependent_property,
+                t1,
+                t2,
+            )[0],
+        )
+
+
+@pytest.mark.parametrize("name", compounds)
+def test_pickle(name):
+    substance_org = rd.Substance.from_thermo_database(name, name)
+    substance_org.to_pickle("name_file")
+    substance = rd.Substance.from_pickle("name_file")
+    chemical_obj = ChemicalConstantsPackage.correlations_from_IDs([name])
+    temperature1 = np.array([300, 350, 400, 450])
+    temperature2 = np.array([300, 350, 400, 450])
+    pressure = np.array([101325, 201325, 301325, 404325])
+
+    # Constants
+    assert substance.name == name
+    assert substance.molecular_weight == chemical_obj.constants.MWs[0]
+    assert substance.normal_boiling_point == chemical_obj.constants.Tbs[0]
+    assert substance.normal_melting_point == chemical_obj.constants.Tms[0]
+    assert substance.critical_temperature == chemical_obj.constants.Tcs[0]
+    assert substance.critical_pressure == chemical_obj.constants.Pcs[0]
+    assert substance.acentric_factor == chemical_obj.constants.omegas[0]
+    assert substance.formation_enthalpy == chemical_obj.constants.Hf_STPs[0]
+    assert substance.formation_enthalpy_ig == chemical_obj.constants.Hfgs[0]
+    assert substance.formation_gibbs_ig == chemical_obj.constants.Gfgs[0]
+    assert substance.vectorize_functions == True
+
+    # Functions
+    assert isinstance(substance._vaporization_enthalpy, np.vectorize)
+    assert isinstance(substance._sublimation_enthalpy, np.vectorize)
+    assert isinstance(substance._volume_solid, np.vectorize)
+    assert isinstance(substance._volume_liquid, np.vectorize)
+    assert isinstance(substance._volume_gas, np.vectorize)
+    assert isinstance(substance._heat_capacity_solid, np.vectorize)
+    assert isinstance(substance._heat_capacity_liquid, np.vectorize)
+    assert isinstance(substance._heat_capacity_gas, np.vectorize)
+    assert isinstance(substance._thermal_conductivity_liquid, np.vectorize)
+    assert isinstance(substance._thermal_conductivity_gas, np.vectorize)
+    assert isinstance(substance._viscosity_liquid, np.vectorize)
+    assert isinstance(substance._viscosity_gas, np.vectorize)
+    assert isinstance(substance._heat_capacity_solid_dt_integral, np.vectorize)
+    assert isinstance(
+        substance._heat_capacity_liquid_dt_integral, np.vectorize
+    )
+    assert isinstance(substance._heat_capacity_gas_dt_integral, np.vectorize)
+
+    # Eval reactord
+    substance_vaporization_enthalpy = substance.vaporization_enthalpy(
+        temperature1
+    )
+    substance_sublimation_enthalpy = substance.sublimation_enthalpy(
+        temperature1
+    )
+    substance_fusion_enthalpy = substance.fusion_enthalpy(temperature1)
+    substance_volume_solid = substance.volume_solid(temperature1, pressure)
+    substance_volume_liquid = substance.volume_liquid(temperature1, pressure)
+    substance_volume_gas = substance.volume_gas(temperature1, pressure)
+    substance_heat_capacity_solid = substance.heat_capacity_solid(
+        temperature1, pressure
+    )
+    substance_heat_capacity_liquid = substance.heat_capacity_liquid(
+        temperature1, pressure
+    )
+    substance_heat_capacity_gas = substance.heat_capacity_gas(
+        temperature1, pressure
+    )
+    substance_thermal_conductivity_liquid = (
+        substance.thermal_conductivity_liquid(temperature1, pressure)
+    )
+    substance_thermal_conductivity_gas = substance.thermal_conductivity_gas(
+        temperature1, pressure
+    )
+    substance_viscosity_liquid = substance.viscosity_liquid(
+        temperature1, pressure
+    )
+    substance_viscosity_gas = substance.viscosity_gas(temperature1, pressure)
+    substance_heat_capacity_solid_dt_integral = (
+        substance.heat_capacity_solid_dt_integral(
+            temperature1, temperature2, pressure
+        )
+    )
+    substance_heat_capacity_liquid_dt_integral = (
+        substance.heat_capacity_liquid_dt_integral(
+            temperature1, temperature2, pressure
+        )
+    )
+    substance_heat_capacity_gas_dt_integral = (
+        substance.heat_capacity_gas_dt_integral(
+            temperature1, temperature2, pressure
+        )
+    )
+
+    for idx, t in enumerate(temperature1):
+        assert substance_vaporization_enthalpy[idx] == (
+            chemical_obj.EnthalpyVaporizations[0].T_dependent_property(t)
+        )
+        assert substance_sublimation_enthalpy[idx] == (
+            chemical_obj.EnthalpySublimations[0].T_dependent_property(t)
+        )
+        assert substance_fusion_enthalpy[idx] == (
+            chemical_obj.EnthalpySublimations[0].T_dependent_property(t)
+            - chemical_obj.EnthalpyVaporizations[0].T_dependent_property(t)
+        )
+        assert substance_volume_solid[idx] == (
+            chemical_obj.VolumeSolids[0].T_dependent_property(t)
+        )
+        assert substance_volume_liquid[idx] == (
+            chemical_obj.VolumeLiquids[0].T_dependent_property(t)
+        )
+        assert substance_heat_capacity_solid[idx] == (
+            chemical_obj.HeatCapacitySolids[0].T_dependent_property(t)
+        )
+        assert substance_heat_capacity_liquid[idx] == (
+            chemical_obj.HeatCapacityLiquids[0].T_dependent_property(t)
+        )
+        assert substance_heat_capacity_gas[idx] == (
+            chemical_obj.HeatCapacityGases[0].T_dependent_property(t)
+        )
+        assert substance_thermal_conductivity_liquid[idx] == (
+            chemical_obj.ThermalConductivityLiquids[0].T_dependent_property(t)
+        )
+        assert substance_thermal_conductivity_gas[idx] == (
+            chemical_obj.ThermalConductivityGases[0].T_dependent_property(t)
+        )
+        assert substance_viscosity_liquid[idx] == (
+            chemical_obj.ViscosityLiquids[0].T_dependent_property(t)
+        )
+        assert np.allclose(
+            substance_viscosity_gas[idx],
+            (chemical_obj.ViscosityGases[0].T_dependent_property(t)),
+        )
+
+    for idx, (t, p) in enumerate(zip(temperature1, pressure)):
+        method = chemical_obj.VolumeGases[0].method_P
+        assert substance_volume_gas[idx] == (
+            chemical_obj.VolumeGases[0].calculate_P(t, p, method)
+        )
+
+    for idx, (t1, t2) in enumerate(zip(temperature1, temperature2)):
+        assert np.allclose(
+            substance_heat_capacity_solid_dt_integral[idx],
+            quad(
+                chemical_obj.HeatCapacitySolids[0].T_dependent_property,
+                t1,
+                t2,
+            )[0],
+        )
+        assert np.allclose(
+            substance_heat_capacity_liquid_dt_integral[idx],
+            quad(
+                chemical_obj.HeatCapacityLiquids[0].T_dependent_property,
+                t1,
+                t2,
+            )[0],
+        )
+        assert np.allclose(
+            substance_heat_capacity_gas_dt_integral[idx],
+            quad(
+                chemical_obj.HeatCapacityGases[0].T_dependent_property,
+                t1,
+                t2,
+            )[0],
+        )

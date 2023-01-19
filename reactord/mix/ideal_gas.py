@@ -30,7 +30,7 @@ class IdealGas(AbstractMix):
         substance_list = [
             value
             if isinstance(value, Substance)
-            else Substance.from_thermo_database(value)
+            else Substance.from_thermo_database(value, value)
             for value in substance_dict.values()
         ]
         self.substances = substance_list

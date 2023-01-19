@@ -107,24 +107,30 @@ def thermo_substance_constructor(cls, name: str, thermo_identification: str):
     def heat_capacity_solid_dt_integral(
         temperature1: float, temperature2: float, pressure: float
     ) -> float:
-        integral = quad(corr.HeatCapacitySolids[0].T_dependent_property,
-            temperature1, temperature2
+        integral = quad(
+            corr.HeatCapacitySolids[0].T_dependent_property,
+            temperature1,
+            temperature2,
         )[0]
         return integral
 
     def heat_capacity_liquid_dt_integral(
         temperature1: float, temperature2: float, pressure: float
     ) -> float:
-        integral = quad(corr.HeatCapacityLiquids[0].T_dependent_property,
-            temperature1, temperature2
+        integral = quad(
+            corr.HeatCapacityLiquids[0].T_dependent_property,
+            temperature1,
+            temperature2,
         )[0]
         return integral
 
     def heat_capacity_gas_dt_integral(
         temperature1: float, temperature2: float, pressure: float
     ) -> float:
-        integral = quad(corr.HeatCapacityGases[0].T_dependent_property,
-            temperature1, temperature2
+        integral = quad(
+            corr.HeatCapacityGases[0].T_dependent_property,
+            temperature1,
+            temperature2,
         )[0]
         return integral
 
