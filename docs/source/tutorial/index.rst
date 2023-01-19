@@ -8,3 +8,4 @@ Contents:
 
    substance.ipynb
    ideal_gas.ipynb
+   presentation/presentation.ipynb
