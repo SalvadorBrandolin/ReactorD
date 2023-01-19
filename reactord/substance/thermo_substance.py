@@ -12,6 +12,10 @@ from thermo import ChemicalConstantsPackage
 def thermo_substance_constructor(cls, name: str, thermo_identification: str):
     """Substance constructor from Thermo database.
 
+    The functions of the Thermo library are all exclusively temperature
+    functions (pressure is not used), except the volume_gas method which it
+    uses both temperature and pressure.
+
     Parameters
     ----------
     cls : Substance
@@ -87,14 +91,43 @@ def thermo_substance_constructor(cls, name: str, thermo_identification: str):
         return thermal_cond
 
     def viscosity_liquid(temperature: float, pressure: float) -> float:
-        thermal_cond = corr.ViscosityLiquids[0].T_dependent_property(
+        viscosity_liquid = corr.ViscosityLiquids[0].T_dependent_property(
             temperature
         )
-        return thermal_cond
+        return viscosity_liquid
 
     def viscosity_gas(temperature: float, pressure: float) -> float:
-        thermal_cond = corr.ViscosityGases[0].T_dependent_property(temperature)
-        return thermal_cond
+        viscosity_gas = corr.ViscosityGases[0].T_dependent_property(
+            temperature
+        )
+        return viscosity_gas
+
+    def heat_capacity_solid_dt_integral(
+        temperature1: float, temperature2: float, pressure: float
+    ) -> float:
+        method = corr.HeatCapacitySolids[0].method
+        integral = corr.HeatCapacitySolids[0].calculate_integral(
+            temperature1, temperature2, method
+        )
+        return integral
+
+    def heat_capacity_liquid_dt_integral(
+        temperature1: float, temperature2: float, pressure: float
+    ) -> float:
+        method = corr.HeatCapacityLiquids[0].method
+        integral = corr.HeatCapacityLiquids[0].calculate_integral(
+            temperature1, temperature2, method
+        )
+        return integral
+
+    def heat_capacity_gas_dt_integral(
+        temperature1: float, temperature2: float, pressure: float
+    ) -> float:
+        method = corr.HeatCapacityGases[0].method
+        integral = corr.HeatCapacityGases[0].calculate_integral(
+            temperature1, temperature2, method
+        )
+        return integral
 
     substance_object = cls(
         name=name,
@@ -119,6 +152,10 @@ def thermo_substance_constructor(cls, name: str, thermo_identification: str):
         thermal_conductivity_gas=thermal_conductivity_gas,
         viscosity_liquid=viscosity_liquid,
         viscosity_gas=viscosity_gas,
+        heat_capacity_solid_dt_integral=heat_capacity_solid_dt_integral,
+        heat_capacity_liquid_dt_integral=heat_capacity_liquid_dt_integral,
+        heat_capacity_gas_dt_integral=heat_capacity_gas_dt_integral,
+        vectorize_functions=True,
     )
 
     return substance_object
