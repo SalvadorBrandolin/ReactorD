@@ -77,6 +77,7 @@ Available in version 0.0.1a2
 - Stationary PFR Isothermic - Isobaric Operation
 - Stationary PFR Isothermic - Non-isobaric packed bed reactor Operation
 - Stationary PFR Adiabatic  - Isobaric Operation
+- Stationary PFR Adiabatic  - Non-isobaric packed bed reactor Operation
 
 Motivation
 ----------
