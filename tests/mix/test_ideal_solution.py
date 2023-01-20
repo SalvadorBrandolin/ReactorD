@@ -4,8 +4,10 @@ import reactord as rd
 
 
 def test_one_substance_mix():
-    hexane = rd.Substance.from_thermo_database("hexane")
-    lauric_acid = rd.Substance.from_thermo_database("lauric acid")
+    hexane = rd.Substance.from_thermo_database("hexane", "hexane")
+    lauric_acid = rd.Substance.from_thermo_database(
+        "lauric acid", "lauric acid"
+    )
 
     mixture = rd.mix.IdealSolution(A=hexane)
     mixture2 = rd.mix.IdealSolution(B=lauric_acid)
@@ -53,9 +55,9 @@ def test_one_substance_mix():
 
 
 def test_three_substance_mix():
-    hexane = rd.Substance.from_thermo_database("hexane")
-    toluene = rd.Substance.from_thermo_database("toluene")
-    butanol = rd.Substance.from_thermo_database("butanol")
+    hexane = rd.Substance.from_thermo_database("hexane", "hexane")
+    toluene = rd.Substance.from_thermo_database("toluene", "toluene")
+    butanol = rd.Substance.from_thermo_database("butanol", "butanol")
 
     mixture = rd.mix.IdealSolution(A=hexane, B=toluene, C=butanol)
 
@@ -128,9 +130,9 @@ def test_three_substance_mix():
 
 
 def test_formation_enthalpies():
-    substance1 = rd.Substance(formation_enthalpy=1000)
-    substance2 = rd.Substance(formation_enthalpy=2000)
-    substance3 = rd.Substance(formation_enthalpy=3000)
+    substance1 = rd.Substance(name="substance1", formation_enthalpy=1000)
+    substance2 = rd.Substance(name="substance2", formation_enthalpy=2000)
+    substance3 = rd.Substance(name="substance3", formation_enthalpy=3000)
 
     mix = rd.mix.IdealSolution(a=substance1, b=substance2, c=substance3)
 

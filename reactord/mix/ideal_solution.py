@@ -3,8 +3,9 @@ from typing import List
 
 import numpy as np
 
-from reactord.mix.abstract_mix import AbstractMix
 from reactord.substance import Substance
+
+from .abstract_mix import AbstractMix
 
 
 class IdealSolution(AbstractMix):
@@ -28,7 +29,7 @@ class IdealSolution(AbstractMix):
         substance_list = [
             value
             if isinstance(value, Substance)
-            else Substance.from_thermo_database(value)
+            else Substance.from_thermo_database(value, value)
             for value in substance_dict.values()
         ]
         self.substances = substance_list

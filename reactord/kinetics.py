@@ -3,7 +3,7 @@ from typing import List
 
 import numpy as np
 
-from .mix.abstract_mix import AbstractMix
+from reactord.mix import AbstractMix
 
 
 class Kinetics:
