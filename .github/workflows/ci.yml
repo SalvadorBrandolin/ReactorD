@@ -45,4 +45,4 @@ jobs:
          python -m pip install --upgrade pip build
          python -m build --sdist
          pip install twine
-         twine upload dist/*
+         twine upload --skip-existing dist/*
