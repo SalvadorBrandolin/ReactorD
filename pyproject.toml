@@ -19,7 +19,7 @@ testpaths = [
 
 [project]
 name = "reactord"
-version = "0.0.1a1"
+version = "0.0.1a2"
 authors = [{name = "Brandolín, Salvador Eduardo", email = "salvadorebrandolin@mi.unc.edu.ar"},
            {name = "Parodi, Adrián", email = "adrian.parodi@mi.unc.edu.ar"},
            {name = "Rovezzi, Juan Pablo", email = "juan.rovezzi@mi.unc.edu.ar"},
