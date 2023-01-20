@@ -1,11 +1,11 @@
 include LICENCE
 include README.md
 include requirements.txt
+include pyproject.toml
 
 recursive-include reactord *
 
 exclude tox.ini
-exclude pyproject.toml
 exclude .readthedocs.yml
 exclude requirements_dev.txt
 exclude *.png

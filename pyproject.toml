@@ -13,9 +13,8 @@ markers = [
 ]
 
 testpaths = [
-    "tests",
+    "tests"
 ]
-
 
 [project]
 name = "reactord"
@@ -39,7 +38,9 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
+
 urls = {Homepage = "https://github.com/SalvadorBrandolin/reactord"}
+
 dependencies = [
     "dill>=0.3.6",
     "numpy>=1.21.4",
