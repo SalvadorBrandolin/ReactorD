@@ -26,7 +26,7 @@ def test_constants():
     assert substance.formation_enthalpy == -100000
     assert substance.formation_enthalpy_ig == -110000
     assert substance.formation_gibbs_ig == -50000
-    assert substance.vectorize_functions == False
+    assert substance.vectorize_functions is False
 
 
 def test_functions_vectorize_false():
@@ -603,7 +603,7 @@ def test_create_pickle_vectorized_false():
     assert substance.formation_enthalpy == -100000
     assert substance.formation_enthalpy_ig == -110000
     assert substance.formation_gibbs_ig == -50000
-    assert substance.vectorize_functions == False
+    assert substance.vectorize_functions is False
 
     assert not isinstance(substance._vaporization_enthalpy, np.vectorize)
     assert not isinstance(substance._sublimation_enthalpy, np.vectorize)
@@ -867,7 +867,7 @@ def test_create_pickle_vectorized_true():
     assert substance.formation_enthalpy == -100000
     assert substance.formation_enthalpy_ig == -110000
     assert substance.formation_gibbs_ig == -50000
-    assert substance.vectorize_functions == True
+    assert substance.vectorize_functions is True
 
     assert isinstance(substance._vaporization_enthalpy, np.vectorize)
     assert isinstance(substance._sublimation_enthalpy, np.vectorize)

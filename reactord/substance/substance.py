@@ -2,9 +2,10 @@
 
 Class to define a substance for ReactorD library.
 """
-from dill import dumps, loads
 
 from typing import Callable
+
+from dill import dumps, loads
 
 import numpy as np
 

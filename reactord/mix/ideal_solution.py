@@ -3,8 +3,9 @@ from typing import List
 
 import numpy as np
 
-from .abstract_mix import AbstractMix
 from reactord.substance import Substance
+
+from .abstract_mix import AbstractMix
 
 
 class IdealSolution(AbstractMix):

@@ -84,7 +84,7 @@ def test_formation_gibbs_ig(name):
 @pytest.mark.parametrize("name", compounds)
 def test_vectorize_functions(name):
     substance = rd.Substance.from_thermo_database(name, name)
-    assert substance.vectorize_functions == True
+    assert substance.vectorize_functions is True
 
 
 @pytest.mark.parametrize("name", compounds)
@@ -283,7 +283,6 @@ def test_heat_capacity_liquid_dt_integral(name):
     temperature1 = [300, 400, 500, 600, 700]
     temperature2 = [400, 500, 600, 700, 800]
     pressure = [101325, 202325, 303325]
-    method = chemical_obj.HeatCapacityLiquids[0].method
     for t1, t2 in zip(temperature1, temperature2):
         for p in pressure:
             assert np.allclose(
@@ -303,7 +302,6 @@ def test_heat_capacity_gas_dt_integral(name):
     temperature1 = [300, 400, 500, 600, 700]
     temperature2 = [400, 500, 600, 700, 800]
     pressure = [101325, 200000, 300000, 400000]
-    method = chemical_obj.HeatCapacityGases[0].method
     for t1, t2 in zip(temperature1, temperature2):
         for p in pressure:
             assert np.allclose(
@@ -335,7 +333,7 @@ def test_all_together_vectorized(name):
     assert substance.formation_enthalpy == chemical_obj.constants.Hf_STPs[0]
     assert substance.formation_enthalpy_ig == chemical_obj.constants.Hfgs[0]
     assert substance.formation_gibbs_ig == chemical_obj.constants.Gfgs[0]
-    assert substance.vectorize_functions == True
+    assert substance.vectorize_functions is True
 
     # Functions
     assert isinstance(substance._vaporization_enthalpy, np.vectorize)
@@ -496,7 +494,7 @@ def test_pickle(name):
     assert substance.formation_enthalpy == chemical_obj.constants.Hf_STPs[0]
     assert substance.formation_enthalpy_ig == chemical_obj.constants.Hfgs[0]
     assert substance.formation_gibbs_ig == chemical_obj.constants.Gfgs[0]
-    assert substance.vectorize_functions == True
+    assert substance.vectorize_functions is True
 
     # Functions
     assert isinstance(substance._vaporization_enthalpy, np.vectorize)
