@@ -120,11 +120,11 @@ class StationaryPFR(ReactorBase):
         kinetic_argument: str,
         reactor_dim_minmax: List[float],
         transversal_area: float,
-        molar_flow_in: dict = None,
-        molar_flow_out: dict = None,
-        catalyst_particle: dict = None,
+        molar_flow_in: dict = {},
+        molar_flow_out: dict = {},
+        catalyst_particle=None,
         isothermic_temperature: float = None,
-        temperature_in_out: dict = None,
+        temperature_in_out: dict = {},
         refrigerant: AbstractMix = None,
         refrigerant_molar_flow: float = None,
         refrigerant_temperature_in: float = None,
@@ -133,7 +133,7 @@ class StationaryPFR(ReactorBase):
         exchanger_wall_material: Substance = None,
         correlation_heat_transfer: str = None,
         isobaric_pressure: float = None,
-        pressure_in_out: dict = None,
+        pressure_in_out: dict = {},
         pressure_loss_equation: str = None,
         packed_bed_porosity: float = None,
         packed_bed_particle_diameter: float = None,
@@ -604,6 +604,7 @@ class StationaryPFR(ReactorBase):
         #   The unexisting molar flux given are stored as None.
         #   The method _border_cond_and_initial_guesses handle with
         #   those two arrays.
+
         for substance in self.mix.substances:
             flow_inlet = self.molar_flow_in.get(substance.name)
             flow_outlet = self.molar_flow_out.get(substance.name)
@@ -791,9 +792,9 @@ class StationaryPFR(ReactorBase):
 
         elif any(no_isobaric_args):
             # Check non-isobaric operation:
-            if self.pressure_in_out is {}:
+            if self.pressure_in_out == {}:
                 raise ValueError(
-                    "If noe isobaric operation is setting specify on border"
+                    "If non-isobaric operation is setting specify one border"
                     "condition for pressure"
                 )
             else:
