@@ -6,6 +6,8 @@
 *.ipynb_checkpoints*
 *.vscode*
 *name_file*
+*substance_file*
+*water_file*
 *settings.json*
 
 /docs/build
