@@ -12,8 +12,13 @@ class AbstractMix(metaclass=ABCMeta):
 
     Parameters
     ----------
-    metaclass : AbstractMix, optional
+    metaclass : AbstractMix
         Mixture objects interface.
+
+    Attributes
+    ----------
+    substances : List[Substance]
+        List of substances.
 
     Raises
     ------
@@ -39,8 +44,8 @@ class AbstractMix(metaclass=ABCMeta):
         """Calculate the molar fractions of the mixture.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
-        row represent each substance and each colum represent each mixture
-        composition.
+        row represent each substance and each column represent each mixture
+        compositions set.
 
         Parameters
         ----------
@@ -58,23 +63,32 @@ class AbstractMix(metaclass=ABCMeta):
 
         return mol_fractions
 
-    def mixture_molecular_weight(self, moles: List[float]):
-        """Calculate the molecular weight of the mixture.
+    def mixture_molecular_weight(self, moles: List[float]) -> float:
+        r"""Calculate the molecular weight of the mixture.
+
+        .. math::
+            mix_{w} = \sum_{i=0}^{N} {w_{i}} x_{i}
+            
+        | :math:`N`: number of substances of the mixture.
+        | :math:`w_{i}`: molecular weight of the substance i.
+        | :math:`x_{i}`: molar fraction of the substance i.
+        | :math:`mix_{w}`: molecular weight of the mixture.
 
         Parameters
         ----------
-        moles : List[float]
-            moles of each substance specified in the same order as the
-            mix substances order.
+        moles : List or ndarray [float]
+            moles of each substance specified in the same order as the mix 
+            substances order.
 
         Returns
         -------
-        mixture_molecular_weight: ndarray [g/mol]
-            molecular weight of the mixture calculated based on molar fractions
+        mixture_molecular_weight: float
+            molecular weight of the mixture calculated based on molar 
+            fractions. [mol/g]
         """
-        pure_molecular_weights = [
-            substance.molecular_weight for substance in self.substances
-        ]
+        pure_molecular_weights = np.array(
+            [substance.molecular_weight for substance in self.substances]
+        )
 
         molar_fractions = self.mol_fractions(moles)
 
