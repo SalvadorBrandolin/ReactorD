@@ -3,8 +3,7 @@ name: ReactorD
 on:
   - push
   - pull_request
-  - release:
-      types: [created]
+  - release
   - workflow_dispatch
 
 jobs:
