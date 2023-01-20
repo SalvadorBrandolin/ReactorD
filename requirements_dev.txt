@@ -1,6 +1,3 @@
-# dill
-dill>=0.3.6
-
 # Style
 black[jupyter]
 flake8-nb
