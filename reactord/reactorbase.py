@@ -7,7 +7,7 @@ from typing import Callable, List
 
 import numpy
 
-from reactord import Kinetics
+from reactord.kinetics import Kinetics
 from reactord.mix import AbstractMix
 
 

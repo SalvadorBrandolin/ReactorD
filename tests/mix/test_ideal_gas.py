@@ -4,11 +4,11 @@ import reactord as rd
 
 
 def test_one_substance_mix():
-    methane = rd.Substance.from_thermo_database("methane")
+    methane = rd.Substance.from_thermo_database("methane", "methane")
 
-    oxygen = rd.Substance.from_thermo_database("oxygen")
+    oxygen = rd.Substance.from_thermo_database("oxygen", "oxygen")
 
-    hydrogen = rd.Substance.from_thermo_database("hydrogen")
+    hydrogen = rd.Substance.from_thermo_database("hydrogen", "hydrogen")
 
     mix1 = rd.mix.IdealGas(A=methane)
     mix2 = rd.mix.IdealGas(B=oxygen)
@@ -83,9 +83,9 @@ def test_one_substance_mix():
 
 
 def test_three_substances_mix():
-    co2 = rd.Substance.from_thermo_database("co2")
-    ethane = rd.Substance.from_thermo_database("ethane")
-    chlorine = rd.Substance.from_thermo_database("chlorine")
+    co2 = rd.Substance.from_thermo_database("co2", "carbon dioxide")
+    ethane = rd.Substance.from_thermo_database("ethane", "ethane")
+    chlorine = rd.Substance.from_thermo_database("chlorine", "chlorine")
 
     mixture = rd.mix.IdealGas(A=co2, B=ethane, C=chlorine)
 
