@@ -1,5 +1,7 @@
 import numpy as np
 
+import pytest
+
 import reactord as rd
 
 
@@ -141,3 +143,16 @@ def test_formation_enthalpies():
     assert enthalpies_mix[1] == 2000
 
     assert enthalpies_mix[2] == 3000
+
+
+def test_not_implemented():
+    hexane = rd.Substance.from_thermo_database("hexane")
+    toluene = rd.Substance.from_thermo_database("toluene")
+    butanol = rd.Substance.from_thermo_database("butanol")
+
+    mixture = rd.mix.IdealSolution(A=hexane, B=toluene, C=butanol)
+
+    with pytest.raises(NotImplementedError):
+        mixture.mixture_viscosity(
+            temperature=293, pressure=101300, moles=[1, 1, 1]
+        )

@@ -804,6 +804,7 @@ def test_fogler_example_8_5():
 
 @pytest.mark.sim
 @pytest.mark.slow
+# @pytest.mark.skip("slowest")
 def test_fogler_example_11_3():
     """Fogler 5th edition example 11-3
 
@@ -1099,3 +1100,170 @@ def test_fogler_example_11_3():
     assert np.allclose(
         fogler_conversion, reactord_conversion, atol=0.05, rtol=0.1
     )
+
+
+def test_arguments_mass_balance():
+    def kinetic(concentrations, temperature):
+        return 0
+
+    mixture = rd.mix.IdealGas(n="nitrogen", o="oxygen")
+    # Levanta error de falta de moles iniciales/finales
+    with pytest.raises(ValueError):
+        rd.idealreactor.StationaryPFR.from_isothermic_noisobaric(
+            mix=mixture,
+            list_of_reactions=[kinetic],
+            stoichiometry=[0, 0],
+            kinetic_argument="partial_pressure",
+            reactor_dim_minmax=[0, 18.288],
+            transversal_area=0.001313648986,
+            isothermic_temperature=260 + 273.15,
+            pressure_in_out={"in": 10 * 101325},
+            pressure_loss_equation="packed bed reactor",
+            packed_bed_porosity=0.45,
+            packed_bed_particle_diameter=0.00635,
+            molar_flow_in={},
+        )
+
+    with pytest.raises(ValueError):
+        rd.idealreactor.StationaryPFR.from_isothermic_noisobaric(
+            mix=mixture,
+            list_of_reactions=[kinetic],
+            stoichiometry=[0, 0],
+            kinetic_argument="partial_pressure",
+            reactor_dim_minmax=[0, 18.288],
+            transversal_area=0.001313648986,
+            isothermic_temperature=260 + 273.15,
+            pressure_in_out={"in": 10 * 101325},
+            pressure_loss_equation="packed bed reactor",
+            packed_bed_porosity=0.45,
+            packed_bed_particle_diameter=0.00635,
+            molar_flow_in={
+                "nitrogen": 0.3560387507669636,
+                "oxygen": 0.09983673036871321,
+            },
+            molar_flow_out={
+                "nitrogen": 0.3560387507669636,
+                "oxygen": 0.09983673036871321,
+            },
+        )
+
+
+def test_arguments_noisobaric_operation():
+    def kinetic(concentrations, temperature):
+        return 0
+
+    mixture = rd.mix.IdealGas(n="nitrogen", o="oxygen")
+    with pytest.raises(ValueError):
+        rd.idealreactor.StationaryPFR.from_isothermic_noisobaric(
+            mix=mixture,
+            list_of_reactions=[kinetic],
+            stoichiometry=[0, 0],
+            kinetic_argument="partial_pressure",
+            reactor_dim_minmax=[0, 18.288],
+            transversal_area=0.001313648986,
+            isothermic_temperature=260 + 273.15,
+            pressure_in_out={},
+            pressure_loss_equation="packed bed reactor",
+            packed_bed_porosity=0.45,
+            packed_bed_particle_diameter=0.00635,
+            molar_flow_in={
+                "nitrogen": 0.3560387507669636,
+                "oxygen": 0.09983673036871321,
+            },
+        )
+
+    with pytest.raises(ValueError):
+        rd.idealreactor.StationaryPFR.from_isothermic_noisobaric(
+            mix=mixture,
+            list_of_reactions=[kinetic],
+            stoichiometry=[0, 0],
+            kinetic_argument="partial_pressure",
+            reactor_dim_minmax=[0, 18.288],
+            transversal_area=0.001313648986,
+            isothermic_temperature=260 + 273.15,
+            pressure_in_out={"in": 10 * 101325},
+            pressure_loss_equation="packed bed reactor",
+            packed_bed_particle_diameter=0.00635,
+            molar_flow_in={
+                "nitrogen": 0.3560387507669636,
+                "oxygen": 0.09983673036871321,
+            },
+        )
+    with pytest.raises(ValueError):
+        rd.idealreactor.StationaryPFR.from_isothermic_noisobaric(
+            mix=mixture,
+            list_of_reactions=[kinetic],
+            stoichiometry=[0, 0],
+            kinetic_argument="partial_pressure",
+            reactor_dim_minmax=[0, 18.288],
+            transversal_area=0.001313648986,
+            isothermic_temperature=260 + 273.15,
+            pressure_in_out={"in": 10 * 101325},
+            pressure_loss_equation="gas phase reaction",
+            molar_flow_in={
+                "nitrogen": 0.3560387507669636,
+                "oxygen": 0.09983673036871321,
+            },
+        )
+
+
+def test_init_stationarypfr():
+    def kinetic(concentrations, temperature):
+        return 0
+
+    mixture = rd.mix.IdealGas(n="nitrogen", o="oxygen")
+    with pytest.raises(ValueError):
+        rd.idealreactor.StationaryPFR(
+            mix=mixture,
+            list_of_reactions=[kinetic],
+            stoichiometry=[0, 0],
+            kinetic_argument="partial_pressure",
+            reactor_dim_minmax=[0, 18.288],
+            transversal_area=0.001313648986,
+            isothermic_temperature=260 + 273.15,
+            isobaric_pressure=101325,
+            pressure_in_out={"out": 2.65 * 101325},
+            molar_flow_in={
+                "nitrogen": 0.3560387507669636,
+                "oxygen": 0.09983673036871321,
+            },
+        )
+    with pytest.raises(ValueError):
+        rd.idealreactor.StationaryPFR(
+            mix=mixture,
+            list_of_reactions=[kinetic],
+            stoichiometry=[0, 0],
+            kinetic_argument="partial_pressure",
+            reactor_dim_minmax=[0, 18.288],
+            transversal_area=0.001313648986,
+            isothermic_temperature=260 + 273.15,
+            temperature_in_out={"in": 273, "out": 500},
+            isobaric_pressure=101325,
+            molar_flow_in={
+                "nitrogen": 0.3560387507669636,
+                "oxygen": 0.09983673036871321,
+            },
+        )
+
+    with pytest.raises(ValueError):
+        rd.idealreactor.StationaryPFR(
+            mix=mixture,
+            list_of_reactions=[kinetic],
+            stoichiometry=[0, 0],
+            kinetic_argument="partial_pressure",
+            reactor_dim_minmax=[0, 18.288],
+            transversal_area=0.001313648986,
+            isothermic_temperature=260 + 273.15,
+            molar_flow_in={
+                "nitrogen": 0.3560387507669636,
+                "oxygen": 0.09983673036871321,
+            },
+        )
+
+
+def test_notimplemented():
+    with pytest.raises(NotImplementedError):
+        rd.idealreactor.StationaryPFR.from_noisothermic_isobaric()
+
+    with pytest.raises(NotImplementedError):
+        rd.idealreactor.StationaryPFR.from_noisothermic_noisobaric()
