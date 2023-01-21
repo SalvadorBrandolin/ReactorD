@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 from typing import List
 
 import numpy as np
+import numpy.typing as npt
 
 from reactord.substance import Substance
 
@@ -40,22 +41,29 @@ class AbstractMix(metaclass=ABCMeta):
     # Mixtures common methods
     # =========================================================================
 
-    def mol_fractions(self, moles: List[float]) -> np.ndarray:
-        """Calculate the molar fractions of the mixture.
+    def mole_fractions(self, moles: np.ndarray) -> np.ndarray:
+        r"""Calculate the mole fractions of the mixture's substances.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
-        row represent each substance and each column represent each mixture
-        compositions set.
+        column of the matrix represent each mixture and each row represent each 
+        substance's moles.
 
+        .. math::
+            z_{i} = \frac {n_{i}} {\sum_{i=0}^{N} n_{i}}
+
+        | :math:`z_{i}`: mole fraction of the mix's :math:`i`-th substance.
+        | :math:`n_{i}`: moles of the mix's :math:`i`-th substance.
+        | :math:`N`: total number of substances in the mixture.
+        
         Parameters
         ----------
-        moles: ndarray or list [float]
-            Moles of each substance specified in the same order as the mix
+        moles: array_like
+            Moles of each substance specified in the same order as the mix's
             substances order.
 
         Returns
         -------
-        mol_fractions : ndarray [float]
+        mol_fractions : ndarray
             Array of the molar fractions of mixture's substances.
         """
         total_moles = np.sum(moles, axis=0)
@@ -63,36 +71,43 @@ class AbstractMix(metaclass=ABCMeta):
 
         return mol_fractions
 
-    def mixture_molecular_weight(self, moles: List[float]) -> float:
+    def mix_molecular_weight(self, mole_fractions: np.ndarray) -> float:
         r"""Calculate the molecular weight of the mixture.
 
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represent each mixture and each row represent each 
+        substance's moles.
+
         .. math::
-            mix_{w} = \sum_{i=0}^{N} {w_{i}} x_{i}
-            
-        | :math:`N`: number of substances of the mixture.
-        | :math:`w_{i}`: molecular weight of the substance i.
-        | :math:`x_{i}`: molar fraction of the substance i.
-        | :math:`mix_{w}`: molecular weight of the mixture.
+            M_{mix} = \sum_{i=0}^{N} {M_{i}} z_{i}
+        
+        | :math:`M_{mix}`: molecular weight of the mixture.
+        | :math:`N`: total number of substances in the mixture.
+        | :math:`M_{i}`: molecular weight of the mix's :math:`i`-th substance.
+        | :math:`z_{i}`: mole fraction of the mix's :math:`i`-th substance.
 
         Parameters
         ----------
-        moles : List or ndarray [float]
+        mole_fractions : array_like
             moles of each substance specified in the same order as the mix 
             substances order.
 
         Returns
         -------
-        mixture_molecular_weight: float
+        mix_molecular_weight: float
             molecular weight of the mixture calculated based on molar 
-            fractions. [mol/g]
+            fractions. [g/mol]
+
+
+        Requires
+        --------
+            molecular_weight defined on each mix's Substance.
         """
         pure_molecular_weights = np.array(
             [substance.molecular_weight for substance in self.substances]
         )
 
-        molar_fractions = self.mol_fractions(moles)
-
-        return np.dot(pure_molecular_weights, molar_fractions)
+        return np.dot(pure_molecular_weights, mole_fractions)
 
     def partial_pressures(
         self, moles: List[float], temperature: float, pressure: float
