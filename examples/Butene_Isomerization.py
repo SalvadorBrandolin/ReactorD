@@ -31,7 +31,7 @@ v_pfr = 99 * 0.001  # m3
 
 
 # The tubular reactor is instantiated:
-pfr = rd.idealreactor.StationaryPFR.set_isothermic_isobaric(
+pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
     mix=mixture,
     list_of_reactions=[rate],
     stoichiometry=[-1, 1],
@@ -57,11 +57,12 @@ ax1.plot(
 ax1.plot(
     reactor_length, dependent_variables[1], "-g", label="Flux_B", linewidth=3
 )
-# ax1.set(xlabel="Reactor volume (m^3)", ylabel="molar fluxes (mol/s)")
-ax1.set_xlabel("Reactor volume (m^3)", fontsize=10)
-ax1.set_ylabel("molar fluxes (mol/s)", fontsize=10)
+
+ax1.set_xlabel(r"Reactor volume [$m^{3}$]", fontsize=10)
+ax1.set_ylabel("molar fluxes [mol/s]", fontsize=10)
 
 ax1.legend()
+
 # fig1.savefig("Butene_Isomerization.png")
 
 plt.show()

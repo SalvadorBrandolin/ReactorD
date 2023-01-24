@@ -336,7 +336,7 @@ class Substance:
             return loads(f.read())
 
     def to_pickle(self, name_file: str) -> __file__:
-        """Serialize an substance object with dill library.
+        """Serialize a substance object with dill library.
 
         This method save an object substance as a file.
 
@@ -346,12 +346,12 @@ class Substance:
         Parameters
         ----------
         name_file : str
-            Name of file to save the substance object.
+            Name of the file in which the substance object is saved.
 
         Returns
         -------
         _file_
-            A binary file with substance predefine object.
+            A binary file with substance predefined object.
         """
         with open(name_file, "wb") as f:
             f.write(dumps(self))

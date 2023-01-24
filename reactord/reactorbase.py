@@ -177,7 +177,8 @@ class ReactorBase(metaclass=ABCMeta):
     def kinetic_argument(self, new_kinetics_argument: str) -> None:
         """Replace kinetic argument with a new argument.
 
-        Argument to eval the kinetics function replaced in the Kinetics object.
+        Argument to evaluate the kinetics function replaced in the Kinetics
+        object.
 
         Parameters
         ----------
@@ -361,9 +362,9 @@ class ReactorBase(metaclass=ABCMeta):
     # Balances
     # ==================================================================
     def _refrigerant_energy_balance(self) -> None:
-        """Eval regrigerant energy balance.
+        """Evaluate refrigerant energy balance.
 
-        Method that evals and returns the evaluated refrigerant energy balance.
+        Method that evaluates and returns the refrigerant energy balance.
         The format of the method's returns corresponds to the specific solver's
         needs.
 
