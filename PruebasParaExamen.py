@@ -1,0 +1,114 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import reactord as rd
+
+# Primero describimos una reacción, por ejemplo
+# la bromacion del benceno
+
+
+# C6H6     +     Br2 ----> C6H5Br      +      HBr
+# benzene      Bromine   bromobenzene   hydrobromic acid
+#    A     +      B  ---->    C        +       D
+
+# Supongamos ademas que tenemos una reaccion secundaria de neutralizacion:
+# NaOH    +    HBr   ---->  NaBr    +     H2O
+#   E     +     D    ---->   F      +      G
+
+# Esto define la siguiente estequiometria:
+stoichiometry = [[-1, -1, 1, 1, 0, 0, 0],
+                 [0, 0, 0, -1, -1, 1, 1]]
+
+# Ahora creamos los objetos Substance que participan en ambas reacciones:
+
+ben = rd.Substance.from_thermo_database("benzene")
+br2 = rd.Substance.from_thermo_database("bromine")
+brben = rd.Substance.from_thermo_database("bromobenzene")
+hbr = rd.Substance.from_thermo_database("10035-10-6")  # using CAS number
+naoh = rd.Substance.from_thermo_database("naoh")
+nabr = rd.Substance.from_thermo_database("nabr")
+h2o = rd.Substance.from_thermo_database("water")
+
+# print (water.name, water.molecular_weight)
+
+
+# Comprobamos que las sustancias creadas sean los compuestos deseados
+"""
+print(ben.name, ben.molecular_weight, ben.normal_boiling_point)
+print(br2.name, br2.molecular_weight, br2.normal_boiling_point)
+print(brben.name, brben.molecular_weight, brben.normal_boiling_point)
+print(hbr.name, hbr.molecular_weight, hbr.normal_boiling_point)
+"""
+
+# Ahora creamos una mezcla líquida, que contiene todas las sustancias
+# involucradas. Usamos para esto la clase IdealSolution y asumimos que todo
+# es una solucion ideal (aunque en realidad no es asi):
+mezcla = rd.mix.IdealSolution(
+    ben=ben, br2=br2, brben=brben, hbr=hbr, naoh=naoh, nabr=nabr, h2o=h2o
+)
+
+# Definimos funciones para cada una de las velocidades de reaccion:
+
+def rate1(concentrations, temperature):
+    return 0.00003 * concentrations[0] * concentrations[1]
+
+def rate2(concentrations, temperature):
+    return 0.0005 * concentrations[4] * concentrations[5]
+
+# Definimos los flujos molares de entrada:
+flu_entrada = np.asarray([10, 10, 0, 0, 2, 0, 0])*1000 / 3600 # moles/s 
+vol_pfr = 125 * 0.001 # m³
+
+#print(flu_entrada, np.shape(flu_entrada))
+#for i in range(np.size(flu_entrada)):
+#    print(flu_entrada[i])
+
+# Instanciamos el reactor de flujo en piston
+"""pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
+    mezcla, 
+    list_of_reactions=[rate1, rate2],
+    stoichiometry=stoichiometry,
+    kinetic_argument="concentration",
+    reactor_dim_minmax=[0,vol_pfr],
+    transversal_area=1,
+    isothermic_temperature=350, # K
+    isobaric_pressure=200000, # Pa
+    molar_flow_in={"ben":flu_entrada[0], "br2":flu_entrada[1],
+    "brben":flu_entrada[2], "hbr":flu_entrada[3], "naoh":flu_entrada[4],
+    "nabr":flu_entrada[5], "h2o":flu_entrada[6]},
+    #molar_flow_out=None,
+    #catalyst_particle=None,
+)
+"""
+
+
+pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
+    mezcla, 
+    list_of_reactions=[rate1, rate2],
+    stoichiometry=stoichiometry,
+    kinetic_argument="concentration",
+    reactor_dim_minmax=[0,vol_pfr],
+    transversal_area=1,
+    isothermic_temperature=350, # K
+    isobaric_pressure=200000, # Pa
+    molar_flow_in={ben.name:flu_entrada[0], br2.name:flu_entrada[1],
+    brben.name:flu_entrada[2], hbr.name:flu_entrada[3], 
+    naoh.name:flu_entrada[4], nabr.name:flu_entrada[5], 
+    h2o.name:flu_entrada[6]},
+    #molar_flow_out=None,
+    #catalyst_particle=None,
+)
+
+#print(pfr.molar_flow_in["benzene"])
+
+# Simulamos el funcionamiento del reactor
+solution = pfr.simulate(grid_size=100)
+
+"""molar_flow_in={ben.name:flu_entrada[0], br2.name:flu_entrada[1],
+    brben.name:flu_entrada[2], hbr.name:flu_entrada[3], 
+    naoh.name:flu_entrada[4], nabr.name:flu_entrada[5], 
+    h2o.name:flu_entrada[6]}
+
+
+print (molar_flow_in, type(molar_flow_in))
+print(molar_flow_in["benzene"])"""
+
