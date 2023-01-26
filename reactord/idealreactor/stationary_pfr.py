@@ -1197,7 +1197,7 @@ class StationaryPFR(ReactorBase):
         temperature: float,
         pressure: float,
     ) -> List[float]:
-        """Pressure balance evaluation for each substance in mixture.
+        """Pressure balance evaluation of the reactor.
 
         latex math: # TODO
 
@@ -1231,8 +1231,6 @@ class StationaryPFR(ReactorBase):
         pressure: float,
     ) -> np.ndarray:
         """Pressure balance evaluation for packed bed reactor operation.
-
-        Pressure balance is calculated for each substance in mixture.
 
         Parameters
         ----------
