@@ -40,7 +40,7 @@ PFR = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
     list_of_reactions=[rate1],
     stoichiometry=stoichiometry,
     kinetic_argument="partial_pressure",
-    reactor_dim_minmax=[0, 0.2],
+    reactor_dim_minmax=[0, 2],
     transversal_area=1,
     isothermic_temperature=350,
     isobaric_pressure=5 * 101325,
@@ -66,3 +66,4 @@ ax.plot(reactor_volume, pfr_concentrations[3],"--g", linewidth=2)
 
 plt.show()
 
+fig.savefig("Combustion.png")

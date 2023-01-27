@@ -98,10 +98,12 @@ pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
     #catalyst_particle=None,
 )
 
-#print(pfr.molar_flow_in["benzene"])
+print (pfr.molar_flow_in)
+
+
 
 # Simulamos el funcionamiento del reactor
-solution = pfr.simulate(grid_size=100)
+#solution = pfr.simulate(grid_size=100)
 
 """molar_flow_in={ben.name:flu_entrada[0], br2.name:flu_entrada[1],
     brben.name:flu_entrada[2], hbr.name:flu_entrada[3], 
