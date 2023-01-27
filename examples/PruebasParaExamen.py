@@ -15,8 +15,7 @@ import reactord as rd
 #   E     +     D    ---->   F      +      G
 
 # Esto define la siguiente estequiometria:
-stoichiometry = [[-1, -1, 1, 1, 0, 0, 0],
-                 [0, 0, 0, -1, -1, 1, 1]]
+stoichiometry = [[-1, -1, 1, 1, 0, 0, 0], [0, 0, 0, -1, -1, 1, 1]]
 
 # Ahora creamos los objetos Substance que participan en ambas reacciones:
 
@@ -48,69 +47,90 @@ mezcla = rd.mix.IdealSolution(
 
 # Definimos funciones para cada una de las velocidades de reaccion:
 
+
 def rate1(concentrations, temperature):
-    return 0.00003 * concentrations[0] * concentrations[1]
+    return 3e-6 * concentrations[0] * concentrations[1]
+
 
 def rate2(concentrations, temperature):
-    return 0.0005 * concentrations[4] * concentrations[5]
+    return 1e-5 * concentrations[3] * concentrations[4]
+
 
 # Definimos los flujos molares de entrada:
-flu_entrada = np.asarray([10, 10, 0, 0, 2, 0, 0])*1000 / 3600 # moles/s 
-vol_pfr = 125 * 0.001 # m³
+flu_entrada = np.asarray([10, 13, 0, 0, 6, 0, 0]) * 1000 / 3600  # moles/s
 
-#print(flu_entrada, np.shape(flu_entrada))
-#for i in range(np.size(flu_entrada)):
-#    print(flu_entrada[i])
+# Instanciamos el reactor de flujo en piston. Hacemos graficas para dos simula
+# ciones diferentes, aumentando el volumen del reactor
 
-# Instanciamos el reactor de flujo en piston
-"""pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
-    mezcla, 
-    list_of_reactions=[rate1, rate2],
-    stoichiometry=stoichiometry,
-    kinetic_argument="concentration",
-    reactor_dim_minmax=[0,vol_pfr],
-    transversal_area=1,
-    isothermic_temperature=350, # K
-    isobaric_pressure=200000, # Pa
-    molar_flow_in={"ben":flu_entrada[0], "br2":flu_entrada[1],
-    "brben":flu_entrada[2], "hbr":flu_entrada[3], "naoh":flu_entrada[4],
-    "nabr":flu_entrada[5], "h2o":flu_entrada[6]},
-    #molar_flow_out=None,
-    #catalyst_particle=None,
-)
-"""
+volume = np.asarray([225, 230]) * 0.001
+# NOTA: Al aumentar el volumen arriba de 238 *0.001, la simulacion comienza
+# a tardar un huevo y las graficas salen feas.
+# Parece ser que el detonante de este comportamiento es que uno de los flujos de
+# reactivos se hace negativo, aunque no se por qué.
+num_col = 0
+plots = 2
+fig, ax = plt.subplots(1, plots)
 
+for v in volume:
 
-pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
-    mezcla, 
-    list_of_reactions=[rate1, rate2],
-    stoichiometry=stoichiometry,
-    kinetic_argument="concentration",
-    reactor_dim_minmax=[0,vol_pfr],
-    transversal_area=1,
-    isothermic_temperature=350, # K
-    isobaric_pressure=200000, # Pa
-    molar_flow_in={ben.name:flu_entrada[0], br2.name:flu_entrada[1],
-    brben.name:flu_entrada[2], hbr.name:flu_entrada[3], 
-    naoh.name:flu_entrada[4], nabr.name:flu_entrada[5], 
-    h2o.name:flu_entrada[6]},
-    #molar_flow_out=None,
-    #catalyst_particle=None,
-)
+    pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
+        mezcla,
+        list_of_reactions=[rate1, rate2],
+        stoichiometry=stoichiometry,
+        kinetic_argument="concentration",
+        reactor_dim_minmax=[0, v],
+        transversal_area=1,
+        isothermic_temperature=350,  # K
+        isobaric_pressure=200000,  # Pa
+        molar_flow_in={
+            ben.name: flu_entrada[0],
+            br2.name: flu_entrada[1],
+            brben.name: flu_entrada[2],
+            hbr.name: flu_entrada[3],
+            naoh.name: flu_entrada[4],
+            nabr.name: flu_entrada[5],
+            h2o.name: flu_entrada[6],
+        },
+        # molar_flow_out=None,
+        # catalyst_particle=None,
+    )
 
-print (pfr.molar_flow_in)
+    # Simulamos el funcionamiento del reactor
+    solution = pfr.simulate(grid_size=50)
+    reactor_volume = solution.x
+    pfr_concentrations = solution.y
 
 
+    ax[num_col].plot(
+        reactor_volume,
+        pfr_concentrations[0],
+        "-r",
+        linewidth=2,
+        label="benzene",
+    )
+    ax[num_col].plot(
+        reactor_volume, pfr_concentrations[1], "--r", linewidth=2, label="Br2"
+    )
+    ax[num_col].plot(
+        reactor_volume,
+        pfr_concentrations[2],
+        "-g",
+        linewidth=2,
+        label="Bromobenzene",
+    )
+    ax[num_col].plot(
+        reactor_volume, pfr_concentrations[3], "-k", linewidth=2, label="HBr"
+    )
+    ax[num_col].plot(
+        reactor_volume, pfr_concentrations[4], "--g", linewidth=2, label="NaOH"
+    )
+    ax[num_col].plot(
+        reactor_volume, pfr_concentrations[5], "--b", linewidth=2, label="NaBr"
+    )
+    ax[num_col].plot(
+        reactor_volume, pfr_concentrations[6], "-b", linewidth=2, label="H2O"
+    )
 
-# Simulamos el funcionamiento del reactor
-#solution = pfr.simulate(grid_size=100)
-
-"""molar_flow_in={ben.name:flu_entrada[0], br2.name:flu_entrada[1],
-    brben.name:flu_entrada[2], hbr.name:flu_entrada[3], 
-    naoh.name:flu_entrada[4], nabr.name:flu_entrada[5], 
-    h2o.name:flu_entrada[6]}
-
-
-print (molar_flow_in, type(molar_flow_in))
-print(molar_flow_in["benzene"])"""
-
+    num_col += 1
+    
+plt.show()

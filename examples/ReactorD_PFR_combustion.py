@@ -26,12 +26,12 @@ stoichiometry = np.array([[-1, -2, 2, 1]])
 
 
 def rate1(concentrations, temperature):
-    return 10000 * concentrations[0] 
+    return 10000 * concentrations[0]
 
 
 # Kinetics is instantiated and "concentration" are being used to make
 # the calculations
-#kinetics = rd.Kinetics(mixture, [rate1], stoichiometry, "concentration")
+# kinetics = rd.Kinetics(mixture, [rate1], stoichiometry, "concentration")
 
 # An instance of the stationary plug flow reactor class is instantiated
 # at isothermic and isobaric conditions:
@@ -58,11 +58,11 @@ reactor_volume = solution.x
 pfr_concentrations = solution.y
 
 # Plot the solution
-fig,ax = plt.subplots(1)
+fig, ax = plt.subplots(1)
 ax.plot(reactor_volume, pfr_concentrations[0], "-r", linewidth=2)
-ax.plot(reactor_volume, pfr_concentrations[1],"--r", linewidth=2)
-ax.plot(reactor_volume, pfr_concentrations[2],"-g", linewidth=2)
-ax.plot(reactor_volume, pfr_concentrations[3],"--g", linewidth=2)
+ax.plot(reactor_volume, pfr_concentrations[1], "--r", linewidth=2)
+ax.plot(reactor_volume, pfr_concentrations[2], "-g", linewidth=2)
+ax.plot(reactor_volume, pfr_concentrations[3], "--g", linewidth=2)
 
 plt.show()
 
