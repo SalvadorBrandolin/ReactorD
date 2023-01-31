@@ -85,20 +85,18 @@ class IdealSolution(AbstractMix):
         float
             Volume of the mixture [m³]
         """
-        mol_fractions = self.mol_fractions(moles)
-
         pure_volumes = np.array(
             [
                 substance.volume_liquid(temperature, pressure)
                 for substance in self.substances
             ]
         )
-        return np.dot(pure_volumes, mol_fractions)
+        return np.dot(pure_volumes, moles)
 
     def mix_heat_capacity(
         self, moles: List[float], temperature: float, pressure: float
     ):
-        """Calculate heat capacity of th mixture.
+        """Calculate the heat capacity of the mixture.
 
         Parameters
         ----------
