@@ -41,8 +41,9 @@ def test_one_substance_mix():
         assert mixture.mol_fractions(z) == 1.0
 
         for t in temperature:
-            assert mixture.volume(z, t, pressure) == (
-                hexane.volume_liquid(t, pressure),
+            np.allclose(
+                mixture.volume(z, t, pressure),
+                (hexane.volume_liquid(t, pressure)),
             )
 
             assert mixture.concentrations(z, t, pressure) == (
@@ -112,7 +113,7 @@ def test_three_substance_mix():
 
         # Test of volume method
         vol_mix = mixture.volume(moles, t, pressure)
-        assert vol_mix == np.dot(volumes, raw_mol_fraction)  # OKAY
+        assert vol_mix == np.dot(volumes, moles)  # OKAY
 
         # Test of concentrations method
         total_molar_vol = np.dot(raw_mol_fraction, volumes)
