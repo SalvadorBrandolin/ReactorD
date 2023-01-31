@@ -100,7 +100,6 @@ for v in volume:
     reactor_volume = solution.x
     pfr_concentrations = solution.y
 
-
     ax[num_col].plot(
         reactor_volume,
         pfr_concentrations[0],
@@ -132,5 +131,5 @@ for v in volume:
     )
 
     num_col += 1
-    
+
 plt.show()

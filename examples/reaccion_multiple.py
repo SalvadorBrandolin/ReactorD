@@ -66,20 +66,20 @@ volume = np.asarray([225, 230]) * 0.001
 
 # =========================================================================
 # NOTA:
-#------
+# ------
 # Al aumentar mucho volumen del reactor, la simulacion comienza
 # a tardar bastante y las graficas salen feas.
 # El problema parece estar relacionado con las condiciones de contorno del
 # problema. Este es un problema de condiciones iniciales y el solver parece
 # fallar en las condiciones de salida a altos volumenes del reactor. Otro
 # posible inconveniente puede ser el numero de pasos para la resolucion de las
-# ecuaciones diferenciales (la variable "grid"); al ser el grid un numero 
+# ecuaciones diferenciales (la variable "grid"); al ser el grid un numero
 # pequeño, pueden ocurrir fallas durante la integracion, ya que los pasos son
-# demasiado grandes a elevados voluemenes. 
+# demasiado grandes a elevados voluemenes.
 # Las posibles soluciones son:
 # ** Aumentar el numero de grid (Alertar al usuario sobre esta cuestion)
 # ** Modificar la manera en que el solver es llamdado, para que diferencie
-# entre problemas de condiciones iniciales y de condiciones en la frontera 
+# entre problemas de condiciones iniciales y de condiciones en la frontera
 # (no recuerdo si se llamaba asi)
 # =========================================================================
 num_col = 0
@@ -115,7 +115,6 @@ for v in volume:
     reactor_volume = solution.x
     pfr_concentrations = solution.y
 
-
     ax[num_col].plot(
         reactor_volume,
         pfr_concentrations[0],
@@ -146,7 +145,6 @@ for v in volume:
         reactor_volume, pfr_concentrations[6], "-b", linewidth=2, label="H2O"
     )
 
-    
     num_col += 1
-plt.legend()    
+plt.legend()
 plt.show()
