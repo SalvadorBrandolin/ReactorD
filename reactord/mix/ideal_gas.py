@@ -16,12 +16,12 @@ class IdealGas(AbstractMix):
 
     Parameters
     ----------
-    substance_list : list [float]
+    substance_list : list[Substance]
         list of substance objects
 
     Attributes
     ----------
-    substances : list [float]
+    substances : list[Substance]
         list of substance objects
     """
 
@@ -33,7 +33,7 @@ class IdealGas(AbstractMix):
             else Substance.from_thermo_database(value)
             for value in substance_dict.values()
         ]
-        self.substances = substance_list
+        self.substances: List[Substance] = substance_list
 
     def concentrations(
         self, moles: List[float], temperature: float, pressure: float
