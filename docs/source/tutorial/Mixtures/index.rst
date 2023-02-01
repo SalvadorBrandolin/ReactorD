@@ -1,3 +1,6 @@
+Mixture objects
+_______________
+
 .. toctree::
    :maxdepth: 1
 

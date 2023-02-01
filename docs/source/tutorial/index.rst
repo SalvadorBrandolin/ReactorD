@@ -4,13 +4,7 @@ Tutorial
 Contents:
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Substance
+   :maxdepth: 2
 
    substance.ipynb
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Mixture objects
-   
    Mixtures/index.rst
