@@ -14,10 +14,3 @@ Contents:
    :caption: Mixture objects
    
    Mixtures/index.rst
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Presentacion
-   :hidden:
-   
-   presentation/presentation.ipynb
