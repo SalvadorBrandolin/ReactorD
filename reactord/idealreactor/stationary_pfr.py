@@ -140,7 +140,6 @@ class StationaryPFR(ReactorBase):
         fanning_factor: float = None,
         reaction_enthalpies: List[float] = None,
     ) -> None:
-
         self._kinetics = Kinetics(
             list_of_reactions=list_of_reactions,
             mix=mix,

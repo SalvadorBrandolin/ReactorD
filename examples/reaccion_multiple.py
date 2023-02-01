@@ -87,7 +87,6 @@ plots = 2
 fig, ax = plt.subplots(1, plots)
 
 for v in volume:
-
     pfr = rd.idealreactor.StationaryPFR.from_isothermic_isobaric(
         mezcla,
         list_of_reactions=[rate1, rate2],

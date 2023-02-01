@@ -20,7 +20,6 @@ def test_one_substance_mix():
     nbp_lauric_acid = lauric_acid.normal_melting_point
 
     for t in temperature:
-
         assert mixture.formation_enthalpies_correction(
             t, pressure
         ) == hexane.heat_capacity_liquid_dt_integral(298.15, t, pressure)
