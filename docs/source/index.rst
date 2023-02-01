@@ -102,7 +102,7 @@ Also, ReactorD implements the mathematical representations of mass and energy ba
    :caption: Tutorials
 
    installation
-   tutorial/index
+   tutorial/tutorial_index.rst
 
 .. toctree::
    :maxdepth: 1

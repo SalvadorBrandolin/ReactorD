@@ -7,4 +7,5 @@ Contents:
    :maxdepth: 2
 
    substance.ipynb
-   Mixtures/index.rst
+   mix/mix_index.rst
+   ideal_reactor/ideal_reactor_index.rst
