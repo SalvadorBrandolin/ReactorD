@@ -7,4 +7,5 @@ sphinx_copybutton
 ipykernel
 ipython
 
+matplotlib
 #sphinxcontrib-bibtex
