@@ -140,7 +140,6 @@ class StationaryPFR(ReactorBase):
         fanning_factor: float = None,
         reaction_enthalpies: List[float] = None,
     ) -> None:
-
         self._kinetics = Kinetics(
             list_of_reactions=list_of_reactions,
             mix=mix,
@@ -893,9 +892,23 @@ class StationaryPFR(ReactorBase):
             Border condition function needed and initial guess matrix for
             scipy.solve_bvp.
         """
-        # ==============================================================
-        # Border condition building
-        # ==============================================================
+        self._inlet_information = np.append(
+            self._molar_flow_in_for_bc,
+            (
+                self._temperature_in_for_bc,
+                self._pressure_in_for_bc,
+                self._refrigerant_temperature_in_for_bc,
+            ),
+        )
+        self._outlet_information = np.append(
+            self._molar_flow_out_for_bc,
+            (
+                self._temperature_out_for_bc,
+                self._pressure_out_for_bc,
+                self._refrigerant_temperature_out_for_bc,
+            ),
+        )
+
         def border_conditions(ya: List[float], yb: List[float]) -> List[float]:
             """Border condition builder for scipy.solve_bvp.
 
@@ -920,23 +933,6 @@ class StationaryPFR(ReactorBase):
                 bc = np.append(bc, yb[j] - self._outlet_information[j])
 
             return bc
-
-        self._inlet_information = np.append(
-            self._molar_flow_in_for_bc,
-            (
-                self._temperature_in_for_bc,
-                self._pressure_in_for_bc,
-                self._refrigerant_temperature_in_for_bc,
-            ),
-        )
-        self._outlet_information = np.append(
-            self._molar_flow_out_for_bc,
-            (
-                self._temperature_out_for_bc,
-                self._pressure_out_for_bc,
-                self._refrigerant_temperature_out_for_bc,
-            ),
-        )
 
         self._in_index = np.argwhere(
             np.not_equal(self._inlet_information, None)

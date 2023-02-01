@@ -26,7 +26,6 @@ class IdealGas(AbstractMix):
     """
 
     def __init__(self, **substance_dict) -> None:
-
         substance_list = [
             value
             if isinstance(value, Substance)

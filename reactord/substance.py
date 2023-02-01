@@ -142,7 +142,6 @@ class Substance:
         viscosity_liquid: Callable = None,
         viscosity_gas: Callable = None,
     ) -> None:
-
         # Pure compound properties:
         self.name = name
         self.molecular_weight = molecular_weight

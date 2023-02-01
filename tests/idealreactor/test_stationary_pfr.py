@@ -693,7 +693,7 @@ def test_fogler_example_4_4_border_condition():
     )
 
 
-@pytest.mark.sim
+""" @pytest.mark.sim
 @pytest.mark.slow
 @pytest.mark.skip("need debug")
 def test_fogler_example_8_5():
@@ -800,6 +800,7 @@ def test_fogler_example_8_5():
 
     conversion_reactord = (37.6 - result.sol(fogler_z_for_conversion)) / 37.6
     assert np.allclose(conversion_reactord, fogler_conversion)
+ """
 
 
 @pytest.mark.sim

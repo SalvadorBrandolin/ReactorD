@@ -76,7 +76,6 @@ class Kinetics:
         kinetic_argument: str = "concentration",
         reaction_enthalpies=None,
     ) -> None:
-
         self.list_of_reactions = list_of_reactions
         self.mix = mix
         self.kinetic_argument = kinetic_argument.lower()
@@ -250,7 +249,6 @@ class Kinetics:
             return self.user_reaction_enthalpies
 
         else:
-
             formation_correction = self.mix.formation_enthalpies_correction(
                 temperature, pressure
             )
