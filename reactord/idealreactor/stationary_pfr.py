@@ -892,6 +892,7 @@ class StationaryPFR(ReactorBase):
             Border condition function needed and initial guess matrix for
             scipy.solve_bvp.
         """
+
         # ==============================================================
         # Border condition building
         # ==============================================================
