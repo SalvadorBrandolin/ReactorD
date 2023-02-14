@@ -17,7 +17,7 @@ class AbstractMix(metaclass=ABCMeta):
 
     Attributes
     ----------
-    substances : List[Substance]
+    substances : list [Substance]
         List of substances.
 
     Raises
@@ -29,9 +29,11 @@ class AbstractMix(metaclass=ABCMeta):
     NotImplementedError
         mix_heat_capacity abstract method not implemented.
     NotImplementedError
+        formation_enthalpies_correction abstract method not implemented.
+    NotImplementedError
         _formation_enthalpies_set abstract method not implemented.
     NotImplementedError
-        formation_enthalpies_correction abstract method not implemented.
+        mix_viscosity abstract method not implemented.
     """
 
     substances: List[Substance] = []
@@ -42,27 +44,29 @@ class AbstractMix(metaclass=ABCMeta):
     def mole_fractions(self, moles: np.ndarray) -> np.ndarray:
         r"""Calculate the mole fractions of the mixture's substances.
 
-        Multiple mixture compositions can be specified by a moles matrix. Each
-        column of the matrix represents each mixture and each row represent
-        each substance's moles.
+        Multiple mixture compositions can be specified by a moles matrix. Each 
+        column of the matrix represents each mixture and each row represent 
+        each substance's mole fraction.
 
         .. math::
-            z_{i} = \frac {n_{i}} {\sum_{i=0}^{N} n_{i}}
+            z_i = \frac {n_i} {\sum_{i=0}^{N} n_i}
 
-        | :math:`z_{i}`: mole fraction of the mix's :math:`i`-th substance.
-        | :math:`n_{i}`: moles of the mix's :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
+        | :math:`n_i`: moles of the mix's :math:`i`-th substance.
         | :math:`N`: total number of substances in the mixture.
 
         Parameters
         ----------
-        moles: array_like
+        moles: np.ndarray [float]
             Moles of each substance specified in the same order as the mix's
             substances order.
 
         Returns
         -------
         ndarray
-            The array of the molar fractions of the mix's substances.
+            The array of the molar fractions of the mix's substances. Each 
+            column of the matrix represents each mixture and each row represent
+            each substance's mole fraction.
         """
         total_moles = np.sum(moles, axis=0)
         mole_fractions = np.divide(moles, total_moles)
@@ -70,31 +74,31 @@ class AbstractMix(metaclass=ABCMeta):
         return mole_fractions
 
     def mix_molecular_weight(self, mole_fractions: np.ndarray) -> float:
-        r"""Calculate the molecular weight of the mixture [kg/kmol].
+        r"""Calculate the molecular weight of the mixture.
 
-        Multiple mixture compositions can be specified by a moles matrix. Each
-        column of the matrix represents each mixture and each row represent
-        each substance's mole fraction.
+        Multiple mixture compositions can be specified by a mole_fractions
+        matrix. Each column of the matrix represents each mixture and each row 
+        represent each substance's mole fraction. In this case, the return
+        is a 1D array with the molecular weight of each mix.
 
         .. math::
-            M_{mix} = \sum_{i=0}^{N} {M_{i}} z_{i}
+            M_{mix} = \sum_{i=0}^{N} M_i z_i
 
         | :math:`M_{mix}`: molecular weight of the mixture.
         | :math:`N`: total number of substances in the mixture.
-        | :math:`M_{i}`: molecular weight of the mix's :math:`i`-th substance.
-        | :math:`z_{i}`: mole fraction of the mix's :math:`i`-th substance.
+        | :math:`M_i`: molecular weight of the mix's :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
 
         Parameters
         ----------
-        mole_fractions : array_like
-            moles of each substance specified in the same order as the mix
-            substances order.
+        mole_fractions : np.ndarray [float]
+            Mole fractions of each substance specified in the same order as the
+            mix's substances order.
 
         Returns
         -------
         float
-            The molecular weight of the mixture from the substances mole
-            fractions. [kg/kmol]
+            The molecular weight of the mixture. [kg/kmol]
 
 
         Requires
@@ -110,11 +114,12 @@ class AbstractMix(metaclass=ABCMeta):
     def molar_density(
         self, mole_fractions: np.ndarray, temperature: float, pressure: float
     ) -> float:
-        r"""Calculate the mixture's molar density [mol/m3].
+        r"""Calculate the mixture's molar density.
 
-        Multiple mixture compositions can be specified by a moles matrix. Each
-        column of the matrix represents each mixture and each row represents
-        each substance's mole fractions.
+        Multiple mixture compositions can be specified by a mole_fractions
+        matrix. Each column of the matrix represents each mixture and each row 
+        represent each substance's mole fraction. Also with temperature and 
+        pressure vectors following de NumPy broadcasting rules.
 
         .. math::
             \rho_{mix} = \frac {1} {v_{(\vec{z}, T, P)}}
@@ -127,8 +132,9 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions: ndarray [float]
-            Mole fraction of each mix's substance.
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -146,31 +152,34 @@ class AbstractMix(metaclass=ABCMeta):
     def mass_density(
         self, mole_fractions: np.ndarray, temperature: float, pressure: float
     ) -> float:
-        r"""Return density in [kg/m3].
+        r"""Calculate the mixture's mass density.
 
-        Multiple mixture compositions can be specified by a moles matrix. Each
-        column of the matrix represents each mixture and each row represents
-        each substance's mole fractions.
+        Multiple mixture compositions can be specified by a mole_fractions
+        matrix. Each column of the matrix represents each mixture and each row 
+        represent each substance's mole fraction. Also with temperature and 
+        pressure vectors following de NumPy broadcasting rules.
 
         .. math::
-            \rho_{mix}^{mass} = \rho_{mix}^{molar} M_{mix}
+            \rho_{mix}^{mass} = \rho_{mix}^{mol} M_{mix}
 
         | :math:`\rho_{mix}^{mass}`: mix's masic density.
-        | :math:`\rho_{mix}^{molar}`: mix's molar density.
+        | :math:`\rho_{mix}^{mol}`: mix's molar density.
         | :math:`M_{mix}`: molecular weight of the mixture.
 
         Parameters
         ----------
-        mole_fractions: ndarray [float]
-            Mole fractions of each substance
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
         temperature: float
-            Temperature [K]
+            Temperature. [K]
         pressure: float
-            Pressure [Pa]
+            Pressure. [Pa]
 
         Returns
         -------
-        mass_density: float
+        float
+            Mixture's mass density. [kg/m3]
 
 
         Requires
@@ -190,33 +199,36 @@ class AbstractMix(metaclass=ABCMeta):
         temperature: float,
         pressure: float,
     ) -> np.ndarray:
-        """Calculate the partial pressures of the mixture's substances [Pa].
+        """Calculate the partial pressures of the mixture's substances.
 
-        Multiple mixture compositions can be specified by a moles matrix. Each
-        column of the matrix represents each mixture and each row represent
-        each substance's mole fractions.
+        Multiple mixture compositions can be specified by a mole_fractions
+        matrix. Each column of the matrix represents each mixture and each row 
+        represent each substance's mole fraction. Also with temperature and 
+        pressure vectors following de NumPy broadcasting rules.
 
         .. math::
-            P_{i} = P z_{i}
+            P_i = P z_i
 
-        | :math:`P_{i}`: partial pressure of the :math:`i`-th mix's substance.
+        | :math:`P_i`: partial pressure of the :math:`i`-th mix's substance.
         | :math:`P`: total system's pressure.
-        | :math:`z_{i}`: mole fraction of the mix's :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
 
         Parameters
         ----------
-        mole_fractions: ndarray [float]
-            Moles of each substance.
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
         temperature: float
             Temperature. [K]
         pressure: float
-            Total Pressure. [Pa]
+            Pressure. [Pa]
 
         Returns
         -------
         ndarray [float]
             An array that contains the partial pressures of mix's substances.
-            [Pa]
+            Each column of the matrix represents each mixture and each row 
+            represent each substance's partial pressure. [Pa]
         """
         partial_pressures = np.multiply(mole_fractions, pressure)
 
@@ -225,27 +237,29 @@ class AbstractMix(metaclass=ABCMeta):
     def concentrations(
         self, mole_fractions: np.ndarray, temperature: float, pressure: float
     ) -> np.ndarray:
-        r"""Concentrations of the mixture's substances [mol/m³].
+        r"""Concentrations of the mixture's substances.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
         column of the matrix represents each mixture and each row represents
-        each substance's mole fractions.
+        each substance's mole fractions. Also with temperature and pressure 
+        vectors following de NumPy broadcasting rules.
 
         .. math::
-            C_{i} = z_{i} \rho_{mix}
+            C_i = z_i \rho_{mix}
 
-        | :math:`C_{i}`: concentration of the mix's :math:`i`-th substance.
-        | :math:`z_{i}`: mole fraction of the mix's :math:`i`-th substance.
+        | :math:`C_i`: concentration of the mix's :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
         | :math:`\rho_{mix}`: mix's molar density.
 
         Parameters
         ----------
-        mole_fractions: ndarray [float]
-            Mole fractions of each substance.
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
         temperature: float
             Temperature. [K]
         pressure: float
-            Total Pressure. [Pa]
+            Pressure. [Pa]
 
         Returns
         -------
@@ -276,21 +290,22 @@ class AbstractMix(metaclass=ABCMeta):
     def volume(
         self, mole_fractions: np.ndarray, temperature: float, pressure: float
     ) -> None:
-        """Return the volume of the mixture.
+        """Return the molar volume of the mixture.
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure 
+        vectors following de NumPy broadcasting rules.
 
         Parameters
         ----------
-        moles: ndarray or list [float]
-            Moles of each substance.
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
         temperature: float
             Temperature. [K]
         pressure: float
-            Total Pressure. [Pa]
-
-        Returns
-        -------
-        float
-            volume of the mixture. [m³]
+            Pressure. [Pa]
 
         Raises
         ------
@@ -303,21 +318,22 @@ class AbstractMix(metaclass=ABCMeta):
     def mix_heat_capacity(
         self, mole_fractions: np.ndarray, temperature: float, pressure: float
     ) -> None:
-        """Return the heat capacity of the mixture.
+        """Calculate the mixture's heat capacity.
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure 
+        vectors following de NumPy broadcasting rules.
 
         Parameters
         ----------
-        moles: ndarray or list [float]
-            moles of each substance.
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
         temperature: float
             Temperature. [K]
         pressure: float
-            Total Pressure. [Pa]
-
-        Returns
-        -------
-        float
-            heat capacity of the mixture. [J/K]
+            Pressure. [Pa]
 
         Raises
         ------
@@ -336,7 +352,8 @@ class AbstractMix(metaclass=ABCMeta):
 
         Method that calculates the correction term for the formation enthalpies
         of the pure substances from 298.15 K and 101325 Pa to the given
-        temperature and pressure.
+        temperature and pressure. Multiple temperatures and pressures may be 
+        specified following de NumPy broadcasting rules.
 
         Parameters
         ----------
@@ -347,8 +364,8 @@ class AbstractMix(metaclass=ABCMeta):
 
         Returns
         -------
-        correction_enthalpies : ndarray [float]
-            Formation enthalpies correction for each substance. [J/mol/K]
+        ndarray [float]
+            Formation enthalpies correction for each mix's substance. [J/mol/K]
 
         Raises
         ------
@@ -372,13 +389,24 @@ class AbstractMix(metaclass=ABCMeta):
         """
         Evaluate the viscosity of the mixture.
 
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure 
+        vectors following de NumPy broadcasting rules.
+
         Parameters
         ----------
-        temperature : float
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
+        temperature: float
             Temperature. [K]
-        pressure : float
+        pressure: float
             Pressure. [Pa]
-        mole_fractions: np.ndarray [float]
-        |   An array of substances' mole fractions in the mixture.
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
         """
-        raise NotImplementedError()
+        raise NotImplementedError("Abstract method not implemented")

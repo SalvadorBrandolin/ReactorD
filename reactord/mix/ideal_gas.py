@@ -26,92 +26,95 @@ class IdealGas(AbstractMix):
         list of substance objects
     """
 
-    def __init__(self, **substance_dict) -> None:
-
-        substance_list = [
-            value
-            if isinstance(value, Substance)
-            else Substance.from_thermo_database(value, value)
-            for value in substance_dict.values()
-        ]
+    def __init__(self, substance_list: List[Substance]) -> None:
         self.substances = substance_list
 
-    def concentrations(
-        self, moles: List[float], temperature: float, pressure: float
-    ) -> List[float]:
-        """Calculate concentrations of the mixture.
-
-        Parameters
-        ----------
-        moles : ndarray or list [float]
-            Moles of each substance
-        temperature : float
-            System temperature [K]
-        pressure : float
-            System pressure [Pa]
-
-        Returns
-        -------
-        ndarray or list [float]
-            Concentration of each substance [mol/m³]
-        """
-        mol_fractions = self.mol_fractions(moles)
-
-        r = 8.31446261815324  # m³⋅Pa/K/mol
-        density = pressure / (r * temperature)
-        return np.multiply(mol_fractions, density)
-
     def volume(
-        self, moles: List[float], temperature: float, pressure: float
+        self, mole_fractions: np.ndarray, temperature: float, pressure: float
     ) -> float:
-        """Calculate the volume of the mixture.
+        r"""Return the molar volume of the mixture.
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure 
+        vectors following de NumPy broadcasting rules.
+
+        .. math::
+            v = \frac {R T} {P}
+
+        | :math:`v`: mix's molar volume.
+        | :math:`R`: Ideal gas constant = 8.31446261815324
+          :math:`\frac {m^3 Pa} {K mol}`  
+        | :math:`T`: temperature.
+        | :math:`P`: pressure.
 
         Parameters
         ----------
-        moles : ndarray or list[float]
-            Moles of each substance
-        temperature : float
-            System temperature [K]
-        pressure : float
-            System pressure [Pa]
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
+        temperature: float
+            Temperature. [K]
+        pressure: float
+            Pressure. [Pa]
 
         Returns
         -------
         float
-            Volume of the mixture [m³]
+            Mixture's molar volume. [m³/mol]
         """
-        total_moles = np.sum(moles)
-
         r = 8.31446261815324  # m3⋅Pa/K/mol
-        volume = total_moles * r * temperature / pressure
+        volume = r * np.divide(temperature, pressure)
         return volume
 
     def mix_heat_capacity(
-        self, moles: List[float], temperature: float, pressure: float
+        self, mole_fractions: np.ndarray, temperature: float, pressure: float
     ) -> float:
-        """Calculate heat capacity of th mixture.
+        r"""Calculate the mixture's heat capacity [J/mol].
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure 
+        vectors following de NumPy broadcasting rules.
+
+        .. math::
+            C_{p_{mix}} = \sum_{i=0}^{N} z_i C_{p_i}
+
+        | :math:`C_{p_{mix}}`: mix's heat capacity.
+        | :math:`N`: total number of substances in the mixture.
+        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's 
+          :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
 
         Parameters
         ----------
-        moles : ndarray or list [float]
-            Moles of each substance
-        temperature : float
-            System temperature [K]
+        mole_fractions : np.ndarray [float]
+            moles of each substance specified in the same order as the mix's
+            substances order.
+        temperature: float
+            Temperature. [K]
+        pressure: float
+            Pressure. [Pa]
 
         Returns
         -------
         float
-            Heat capacity of the mixture [J/K]
-        """
-        mol_fractions = self.mol_fractions(moles)
+            Mixture's heat capacity. [J/mol]
 
+
+        Requires
+        --------
+            heat_capacity_gas defined on each mix's Substance.
+        """
         pure_cp = np.array(
             [
                 substance.heat_capacity_gas(temperature, pressure)
                 for substance in self.substances
             ]
         )
-        mix_cp = np.dot(mol_fractions, pure_cp)
+        
+        # The next line is equal to a column wise dot product of the two arrays 
+        mix_cp = np.multiply(mole_fractions, pure_cp).sum(axis=0)
         return mix_cp
 
     def _formation_enthalpies_set(self):
@@ -132,14 +135,23 @@ class IdealGas(AbstractMix):
 
         return enthalpies
 
-    def formation_enthalpies_correction(
+    def formation_enthalpies(
         self, temperature: float, pressure: float
     ):
         """Calculate the correction term for the formation enthalpy.
 
-        Method that calculates the correction term for the formation
-        enthalpies of the pure substances from 298.15 K and 101325 Pa to
-        the given temperature and pressure using Kirchhoff's equation.
+        Method that calculates the correction term for the formation enthalpies 
+        of the pure substances from 298.15 K and 101325 Pa to the given 
+        temperature and pressure.
+
+        .. math::
+           \Delta H_{f T_{(g)}} = \Delta H_{f 298.15_{(g)}}^0
+
+        | :math:`C_{p_{mix}}`: mix's heat capacity.
+        | :math:`N`: total number of substances in the mixture.
+        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's 
+          :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
 
         Parameters
         ----------

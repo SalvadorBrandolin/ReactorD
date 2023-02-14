@@ -6,7 +6,6 @@ import reactord as rd
 
 
 def test_simple_evaluation1():
-
     mix = rd.mix.IdealSolution(a="water", b="ethanol", c="acetone")
 
     def law1(concentrations, temperature):
@@ -45,7 +44,6 @@ def test_simple_evaluation1():
 
 
 def test_user_reaction_enthalpies():
-
     """ethanol = rd.Substance.from_thermo_database("ethanol")
     acetic = rd.Substance.from_thermo_database("acetic acid")
     water = rd.Substance.from_thermo_database("water")

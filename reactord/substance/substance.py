@@ -80,7 +80,7 @@ class Substance:
         default None.
     heat_capacity_gas : Callable, optional
         A function that receives temperature and pressure, and returns the
-        heat capacity of the gas at temperature and pressure [J/mol/K], by
+        ideal gas heat capacity at temperature and pressure [J/mol/K], by
         default None.
     thermal_conductivity_liquid : Callable, optional
         A function that receives temperature and pressure, and returns the
@@ -171,7 +171,6 @@ class Substance:
         heat_capacity_gas_dt_integral: Callable = None,
         vectorize_functions: bool = False,
     ) -> None:
-
         # Pure compound properties:
         self.name = name
         self.molecular_weight = molecular_weight
@@ -190,7 +189,6 @@ class Substance:
         # Temperature and pressure-dependent properties calculation functions:
         # numpy vectorization is not made by default
         if self.vectorize_functions:
-
             self._vaporization_enthalpy = np.vectorize(
                 vaporization_enthalpy, signature="()->()"
             )
@@ -347,7 +345,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Vaporization enthalpy in Joule per mol. [J/mol]
+            Vaporization enthalpy. [J/mol]
         """
         return self._vaporization_enthalpy(temperature)
 
@@ -362,7 +360,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Sublimation enthalpy in Joule per mol. [J/mol]
+            Sublimation enthalpy. [J/mol]
         """
         return self._sublimation_enthalpy(temperature)
 
@@ -381,7 +379,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Fusion enthalpy in Joule per mol. [J/mol]
+            Fusion enthalpy. [J/mol]
         """
         fusion_h = self._sublimation_enthalpy(
             temperature
@@ -401,7 +399,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Solid molar volume in cubic meters per mol. [m³/mol]
+            Solid molar volume. [m³/mol]
         """
         return self._volume_solid(temperature, pressure)
 
@@ -418,7 +416,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Liquid molar volume in cubic meters per mol. [m³/mol]
+            Liquid molar volume. [m³/mol]
         """
         return self._volume_liquid(temperature, pressure)
 
@@ -435,7 +433,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Liquid molar volume in cubic meters per mol. [m³/mol]
+            Liquid molar volume. [m³/mol]
         """
         return self._volume_gas(temperature, pressure)
 
@@ -454,7 +452,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Pure solid heat capacity in Joule per mol per Kelvin. [J/mol/K]
+            Solid heat capacity. [J/mol/K]
         """
         return self._heat_capacity_solid(temperature, pressure)
 
@@ -473,12 +471,12 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Pure liquid heat capacity in Joule per mol per Kelvin. [J/mol/K]
+            Liquid heat capacity. [J/mol/K]
         """
         return self._heat_capacity_liquid(temperature, pressure)
 
     def heat_capacity_gas(self, temperature: float, pressure: float) -> float:
-        """Return the pure gas heat capacity at a given temperature.
+        """Return the ideal gas heat capacity at a given temperature.
 
         Parameters
         ----------
@@ -490,7 +488,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Pure gas heat capacity in Joule per mol per Kelvin. [J/mol/K]
+            Ideal gas heat capacity. [J/mol/K]
         """
         return self._heat_capacity_gas(temperature, pressure)
 
@@ -509,7 +507,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Liquid thermal conductivity in Watts per meter per Kelvin. [W/m/K]
+            Liquid thermal conductivity. [W/m/K]
         """
         return self._thermal_conductivity_liquid(temperature, pressure)
 
@@ -528,7 +526,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Gas thermal conductivity in Watts per meter per Kelvin. [W/m/K]
+            Gas thermal conductivity. [W/m/K]
         """
         return self._thermal_conductivity_gas(temperature, pressure)
 
@@ -547,7 +545,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Pure liquid viscosity. [Pa*s]
+            Liquid viscosity. [Pa s]
         """
         return self._viscosity_liquid(temperature, pressure)
 
@@ -566,7 +564,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Pure gas viscosity. [Pa*s]
+            Gas viscosity. [Pa s]
         """
         return self._viscosity_gas(temperature, pressure)
 
@@ -581,6 +579,10 @@ class Substance:
         .. math::
             \int_{T_1}^{T_2} {C_{p_{solid}} (T, P)} \mathrm{d}T
 
+        | :math:`T_1`: temperature1.
+        | :math:`T_2`: temperature2.
+        | :math:`C_{p_{solid}} (T, P)`: solid heat capacity.
+
         Parameters
         ----------
         temperature1 : float or ndarray[float]
@@ -594,7 +596,7 @@ class Substance:
         -------
         float or ndarray[float]
             Integral of solid heat capacity between temperature1 and
-            temperature2 in Joule per mol. [J/mol]
+            temperature2. [J/mol]
         """
         integral = self._heat_capacity_solid_dt_integral(
             temperature1, temperature2, pressure
@@ -612,6 +614,10 @@ class Substance:
         .. math::
             \int_{T_1}^{T_2} {C_{p_{liquid}} (T, P)} \mathrm{d}T
 
+        | :math:`T_1`: temperature1.
+        | :math:`T_2`: temperature2.
+        | :math:`C_{p_{liquid}} (T, P)`: liquid heat capacity.
+
         Parameters
         ----------
         temperature1 : float or ndarray[float]
@@ -625,7 +631,7 @@ class Substance:
         -------
         float or ndarray[float]
             Definite integral of liquid heat capacity between temperature1
-            and temperature2 in Joule per mol. [J/mol]
+            and temperature2. [J/mol]
         """
         integral = self._heat_capacity_liquid_dt_integral(
             temperature1, temperature2, pressure
@@ -643,6 +649,10 @@ class Substance:
         .. math::
             \int_{T_1}^{T_2} {C_{p_{gas}} (T, P)} \mathrm{d}T
 
+        | :math:`T_1`: temperature1.
+        | :math:`T_2`: temperature2.
+        | :math:`C_{p_{gas}} (T, P)`: ideal gas heat capacity.
+
         Parameters
         ----------
         temperature1 : float or ndarray[float]
@@ -655,8 +665,8 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Definite integral of gas heat capacity between temperature1
-            and temperature2 in Joule per mol. [J/mol]
+            Definite integral of gas heat capacity between temperature1 and 
+            temperature2. [J/mol]
         """
         integral = self._heat_capacity_gas_dt_integral(
             temperature1, temperature2, pressure

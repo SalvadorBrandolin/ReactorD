@@ -6,9 +6,7 @@ import reactord as rd
 
 
 def test_abstract_error_raises():
-
     with pytest.raises(TypeError):
-
         a = rd.Substance()
         b = rd.Substance()
 
@@ -23,7 +21,6 @@ def test_abstract_error_raises():
 
 
 def test_heritage_methods():
-
     # =========================================================================
     # Not implemented all abstract methods
     # =========================================================================
@@ -217,7 +214,6 @@ def test_asignation_kinetics_arguments():
             stoichiometry,
             kinetic_argument,
         ):
-
             self._kinetics = rd.Kinetics(
                 list_of_reactions=list_of_reactions,
                 mix=mix,
