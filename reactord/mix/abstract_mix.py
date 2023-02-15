@@ -19,6 +19,8 @@ class AbstractMix(metaclass=ABCMeta):
     ----------
     substances : list [Substance]
         List of substances.
+    viscosity_mixing_rule : str
+        Viscosity mixing rule method. Method available:
 
     Raises
     ------
@@ -37,6 +39,7 @@ class AbstractMix(metaclass=ABCMeta):
     """
 
     substances: List[Substance] = []
+    viscosity_mixing_rule : str = "linear"
 
     # =========================================================================
     # Mixtures' common methods
@@ -58,8 +61,8 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         moles: np.ndarray [float]
-            Moles of each substance specified in the same order as the mix's
-            substances order.
+            Mole fractions of each substance specified in the same order as the 
+            mix's substances order.
 
         Returns
         -------
@@ -133,8 +136,8 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            Mole fractions of each substance specified in the same order as the 
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -169,8 +172,8 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            Mole fractions of each substance specified in the same order as the 
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -216,8 +219,8 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            Mole fractions of each substance specified in the same order as the 
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -254,8 +257,8 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            Mole fractions of each substance specified in the same order as the 
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -300,8 +303,8 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            Mole fractions of each substance specified in the same order as the 
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -328,8 +331,8 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            Mole fractions of each substance specified in the same order as the 
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -397,8 +400,8 @@ class AbstractMix(metaclass=ABCMeta):
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            Mole fractions of each substance specified in the same order as the 
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float

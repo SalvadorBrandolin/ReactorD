@@ -36,7 +36,7 @@ class IdealGas(AbstractMix):
 
         Multiple mixture compositions can be specified by a moles matrix. Each
         column of the matrix represents each mixture and each row represents
-        each substance's mole fractions. Also with temperature and pressure 
+        each substance's mole fractions. Also with temperature and pressure
         vectors following de NumPy broadcasting rules.
 
         .. math::
@@ -44,15 +44,15 @@ class IdealGas(AbstractMix):
 
         | :math:`v`: mix's molar volume.
         | :math:`R`: Ideal gas constant = 8.31446261815324
-          :math:`\frac {m^3 Pa} {K mol}`  
+          :math:`\frac {m^3 Pa} {K mol}`
         | :math:`T`: temperature.
         | :math:`P`: pressure.
 
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            mole fractions of each substance specified in the same order as the
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -74,7 +74,7 @@ class IdealGas(AbstractMix):
 
         Multiple mixture compositions can be specified by a moles matrix. Each
         column of the matrix represents each mixture and each row represents
-        each substance's mole fractions. Also with temperature and pressure 
+        each substance's mole fractions. Also with temperature and pressure
         vectors following de NumPy broadcasting rules.
 
         .. math::
@@ -82,15 +82,15 @@ class IdealGas(AbstractMix):
 
         | :math:`C_{p_{mix}}`: mix's heat capacity.
         | :math:`N`: total number of substances in the mixture.
-        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's 
+        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's
           :math:`i`-th substance.
         | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
 
         Parameters
         ----------
         mole_fractions : np.ndarray [float]
-            moles of each substance specified in the same order as the mix's
-            substances order.
+            mole fractions of each substance specified in the same order as the
+            mix's substances order.
         temperature: float
             Temperature. [K]
         pressure: float
@@ -112,8 +112,8 @@ class IdealGas(AbstractMix):
                 for substance in self.substances
             ]
         )
-        
-        # The next line is equal to a column wise dot product of the two arrays 
+
+        # The next line is equal to a column wise dot product of the two arrays
         mix_cp = np.multiply(mole_fractions, pure_cp).sum(axis=0)
         return mix_cp
 
@@ -135,13 +135,11 @@ class IdealGas(AbstractMix):
 
         return enthalpies
 
-    def formation_enthalpies(
-        self, temperature: float, pressure: float
-    ):
+    def formation_enthalpies(self, temperature: float, pressure: float):
         """Calculate the correction term for the formation enthalpy.
 
-        Method that calculates the correction term for the formation enthalpies 
-        of the pure substances from 298.15 K and 101325 Pa to the given 
+        Method that calculates the correction term for the formation enthalpies
+        of the pure substances from 298.15 K and 101325 Pa to the given
         temperature and pressure.
 
         .. math::
@@ -149,7 +147,7 @@ class IdealGas(AbstractMix):
 
         | :math:`C_{p_{mix}}`: mix's heat capacity.
         | :math:`N`: total number of substances in the mixture.
-        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's 
+        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's
           :math:`i`-th substance.
         | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
 

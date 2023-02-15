@@ -665,7 +665,7 @@ class Substance:
         Returns
         -------
         float or ndarray[float]
-            Definite integral of gas heat capacity between temperature1 and 
+            Definite integral of gas heat capacity between temperature1 and
             temperature2. [J/mol]
         """
         integral = self._heat_capacity_gas_dt_integral(
