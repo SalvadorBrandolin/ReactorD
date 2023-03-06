@@ -9,84 +9,79 @@ from .abstract_mix import AbstractMix
 
 
 class IdealSolution(AbstractMix):
-    """IdealGas object class.
+    """IdealSolution object class.
 
-    This class should be used when the mixture is considered an ideal gas.
+    This class should be used when the mixture is considered an ideal solution.
 
     Parameters
     ----------
     substance_list : list [float]
         list of substance objects
+    viscosity_mixing_rule : str, optional
+        Viscosity mixing rule method. Options available: "linear",
+        "grunberg_nissan", "herning_zipperer"., by default "grunberg_nissan"
 
     Attributes
     ----------
-    substances : list [float]
-        list of substance objects
+    phase_nature : str
+        liquid.
+    substances : List [Substance]
+        List of substances.
+    viscosity_mixing_rule : str
+        Viscosity mixing rule method.
     """
 
-    def __init__(self, **substance_dict) -> None:
-
-        substance_list = [
-            value
-            if isinstance(value, Substance)
-            else Substance.from_thermo_database(value, value)
-            for value in substance_dict.values()
-        ]
-        self.substances = substance_list
-
-    def concentrations(
-        self, moles: List[float], temperature: float, pressure: float
-    ) -> List[float]:
-        """Calculate concentrations of the mixture.
-
-        Parameters
-        ----------
-        moles : ndarray or list[float]
-            Moles of each substance
-        temperature : float
-            System temperature [T]
-        pressure : float
-            System pressure [Pa]
-
-        Returns
-        -------
-        ndarray or list [float]
-            Concentration of each substance [mol/m³]
-        """
-        mol_fractions = self.mol_fractions(moles)
-
-        molar_volumes = np.array(
-            [
-                substance.volume_liquid(temperature, pressure)
-                for substance in self.substances
-            ]
+    def __init__(
+        self,
+        substance_list: List[Substance],
+        viscosity_mixing_rule: str = "grunberg_nissan",
+    ) -> None:
+        super().__init__(
+            substance_list=substance_list,
+            phase_nature="liquid",
+            viscosity_mixing_rule=viscosity_mixing_rule,
         )
 
-        total_molar_vol = np.dot(mol_fractions, molar_volumes)
-        concentrations = np.divide(mol_fractions, total_molar_vol)
-
-        return concentrations
-
     def volume(
-        self, moles: List[float], temperature: float, pressure: float
+        self, mole_fractions: List[float], temperature: float, pressure: float
     ) -> float:
-        """Calculate the volume of the mixture.
+        r"""Return the molar volume of the mixture.
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure
+        vectors following de NumPy broadcasting rules.
+
+        .. math::
+            v = \sum z_i {v_i}_{(T,P)}
+
+        | :math:`v`: mix's molar volume.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
+        | :math:`{v_i}_{(T,P)`: liquid molar volume of the mix's :math:`i`-th
+          substance.
+        | :math:`T`: temperature.
+        | :math:`P`: pressure.
 
         Parameters
         ----------
-        moles : ndarray or list [float]
-            Moles of each substance
-        temperature : float
-            System temperature [K]
-        pressure : float
-            System pressure [Pa]
+        mole_fractions : np.ndarray [float]
+            mole fractions of each substance specified in the same order as the
+            mix's substances order.
+        temperature: float
+            Temperature. [K]
+        pressure: float
+            Pressure. [Pa]
 
         Returns
         -------
         float
-            Volume of the mixture [m³]
+            Mixture's molar volume. [m³/mol]
+
+
+        Requires
+        --------
+            volume_liquid defined on each mix's Substance.
         """
-        mol_fractions = self.mol_fractions(moles)
 
         pure_volumes = np.array(
             [
@@ -94,34 +89,59 @@ class IdealSolution(AbstractMix):
                 for substance in self.substances
             ]
         )
-        return np.dot(pure_volumes, mol_fractions)
+
+        mix_volumes = np.multiply(pure_volumes, mole_fractions).sum(axis=0)
+
+        return mix_volumes
 
     def mix_heat_capacity(
-        self, moles: List[float], temperature: float, pressure: float
+        self, mole_fractions: List[float], temperature: float, pressure: float
     ):
-        """Calculate heat capacity of th mixture.
+        r"""Calculate the mixture's heat capacity [J/mol].
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure
+        vectors following de NumPy broadcasting rules.
+
+        .. math::
+            C_{p_{mix}} = \sum_{i=0}^{N} z_i C_{p_i}
+
+        | :math:`C_{p_{mix}}`: mix's heat capacity.
+        | :math:`N`: total number of substances in the mixture.
+        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's
+          :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
 
         Parameters
         ----------
-        moles : ndarray or list [float]
-            Moles of each substance
-        temperature : float
-            System temperature [K]
+        mole_fractions : np.ndarray [float]
+            mole fractions of each substance specified in the same order as the
+            mix's substances order.
+        temperature: float
+            Temperature. [K]
+        pressure: float
+            Pressure. [Pa]
 
         Returns
         -------
         float
-            Heat capacity of the mixture [J/K]
-        """
-        mol_fractions = self.mol_fractions(moles)
+            Mixture's heat capacity. [J/mol]
 
+
+        Requires
+        --------
+            heat_capacity_liquid defined on each mix's Substance.
+        """
         pure_cp = np.array(
             [
                 substance.heat_capacity_liquid(temperature, pressure)
                 for substance in self.substances
             ]
         )
-        mix_cp = np.dot(mol_fractions, pure_cp)
+
+        # The next line is equal to a column-wise dot product of the two arrays
+        mix_cp = np.multiply(mole_fractions, pure_cp).sum(axis=0)
         return mix_cp
 
     def _formation_enthalpies_set(self):
@@ -187,24 +207,3 @@ class IdealSolution(AbstractMix):
                     ),
                 )
         return correction_enthalpies
-
-    def mixture_viscosity(
-        self, temperature: float, pressure: float, moles: list
-    ):
-        """
-        Evaluate viscosity of the mixture.
-
-        Parameters
-        ----------
-        temperature : float
-            Temperature at which formation enthalpies are to be calculated. [K]
-        pressure : float
-            Pressure at which formation enthalpies are to be calculated. [Pa]
-        moles: list
-        |   List of moles substance in the mixture
-        Returns
-        -------
-         mixture_viscosity: float
-            Viscosity of the mixture
-        """
-        raise NotImplementedError()

@@ -2,7 +2,7 @@ reactord package
 ================
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 5
 
    reactord.idealreactor
    reactord.mix

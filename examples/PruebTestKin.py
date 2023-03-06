@@ -6,7 +6,6 @@ import reactord as rd
 
 
 def test_user_reaction_enthalpies():
-
     ethanol = rd.Substance.from_thermo_database("ethanol")
     acetic = rd.Substance.from_thermo_database("acetic acid")
     water = rd.Substance.from_thermo_database("water")
@@ -22,7 +21,6 @@ def test_user_reaction_enthalpies():
     wrong_reaction_enthalpies = np.array([10, 10])
 
     with pytest.raises(IndexError):
-
         rd.Kinetics(
             mix=mix2,
             list_of_reactions=[reaction_rate],
