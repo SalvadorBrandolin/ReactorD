@@ -11,17 +11,17 @@ oxygen = rd.Substance.from_thermo_database("oxygen")
 hydrogen = rd.Substance.from_thermo_database("hydrogen")
 hexane = rd.Substance.from_thermo_database("hexane")
 
-mix1 = rd.mix.IdealGas([methane])
-mix2 = rd.mix.IdealGas([oxygen])
-mix3 = rd.mix.IdealGas([hydrogen])
+mix1 = rd.mix.IdealGas(A=methane)
+mix2 = rd.mix.IdealGas(B=oxygen)
+mix3 = rd.mix.IdealGas(C=hydrogen)
 
 # Se evalua el metodo formation_enthalpies_correction de la clase
 # IdealGas (AbstractMix)
 
 
-cpdt = methane.heat_capacity_gas_dt_integral(298.15, 500)
+cpdt = methane.heat_capacity_gas_dt_integral(298.15, 500, 101325)
 hf0 = methane.formation_enthalpy_ig
-print(mix1.formation_enthalpies_correction(500))
+print(mix1.formation_enthalpies_correction(500, 101325))
 print(hf0, cpdt, "hfcorregido: ", cpdt + hf0, "\n\n")
 
 # RESULTADO: cpdt es igual a mix.1formation_enthalpies_correction(500)
@@ -64,19 +64,19 @@ lauric_acid = rd.Substance.from_thermo_database(
     "lauric acid"
 )  # Sustancia con PF > 298.15
 # calcium = rd.Substance.from_thermo_database("calcium")
-mix4 = rd.mix.IdealSolution([hexane])
-mix5 = rd.mix.IdealSolution([lauric_acid])
+mix4 = rd.mix.IdealSolution(A=hexane)
+mix5 = rd.mix.IdealSolution(B=lauric_acid)
 print("Ideal solutions testing:")
-print(lauric_acid._sublimation_enthalpy_t(458.65))
-print(lauric_acid._vaporization_enthalpy_t(460))
+print(lauric_acid._sublimation_enthalpy(458.65))
+print(lauric_acid._vaporization_enthalpy(460))
 print("Caso con PF<298.15 -Hexano- PF= ", hexane.normal_melting_point)
 print(
     "CpDt del compuesto: ",
-    hexane.heat_capacity_liquid_dt_integral(298.15, 500),
+    hexane.heat_capacity_liquid_dt_integral(298.15, 500, 101325),
 )
 print(
     "CpDt de la mezcla hexano: ",
-    mix4.formation_enthalpies_correction(500),
+    mix4.formation_enthalpies_correction(500, 101325),
     "\n\n",
 )
 
@@ -84,10 +84,12 @@ print(
 # Caso con Punto de fusion > 298.15 K
 T_Prueba = 300
 PF_ac_lau = lauric_acid.normal_melting_point
-Cpdt_solido = lauric_acid.heat_capacity_solid_dt_integral(298.15, PF_ac_lau)
+Cpdt_solido = lauric_acid.heat_capacity_solid_dt_integral(
+    298.15, PF_ac_lau, 101325
+)
 Hfusion = lauric_acid.fusion_enthalpy(PF_ac_lau)
 Cpdt_liquido = lauric_acid.heat_capacity_liquid_dt_integral(
-    PF_ac_lau, T_Prueba
+    PF_ac_lau, T_Prueba, 101325
 )
 print("Caso con PF>298.15 -acido laurico- PF= ", PF_ac_lau)
 print("CpDt del solido: ", Cpdt_solido)
@@ -100,7 +102,7 @@ print(
 
 print(
     "CpDt de la mezcla acido laurico: ",
-    mix5.formation_enthalpies_correction(T_Prueba),
+    mix5.formation_enthalpies_correction(T_Prueba, 101325),
     "\n\n",
 )
 
@@ -117,7 +119,7 @@ co2 = rd.Substance.from_thermo_database("co2")
 ethane = rd.Substance.from_thermo_database("ethane")
 chlorine = rd.Substance.from_thermo_database("chlorine")
 
-mixture = rd.mix.IdealGas([co2, ethane, chlorine])
+mixture = rd.mix.IdealGas(A=co2, B=ethane, C=chlorine)
 
 print(mixture)
 
@@ -139,17 +141,17 @@ pressure = np.array([101325, 150000, 200000, 300000])
 for t, p in zip(temperature, pressure):
     heat_cap_correction = np.array(
         [
-            co2.heat_capacity_gas_dt_integral(298.15, t),
-            ethane.heat_capacity_gas_dt_integral(298.15, t),
-            chlorine.heat_capacity_gas_dt_integral(298.15, t),
+            co2.heat_capacity_gas_dt_integral(298.15, t, p),
+            ethane.heat_capacity_gas_dt_integral(298.15, t, p),
+            chlorine.heat_capacity_gas_dt_integral(298.15, t, p),
         ]
     )
 
     raw_heat_capacities = np.array(
         [
-            co2.heat_capacity_gas(t),
-            ethane.heat_capacity_gas(t),
-            chlorine.heat_capacity_gas(t),
+            co2.heat_capacity_gas(t, p),
+            ethane.heat_capacity_gas(t, p),
+            chlorine.heat_capacity_gas(t, p),
         ]
     )
 
@@ -195,16 +197,16 @@ for t, p in zip(temperature, pressure):
 
         # Para test de formation_enthalpies_correction
         raw_formation_enthalpies_correction = [
-            co2.heat_capacity_gas_dt_integral(298.15, t),
-            ethane.heat_capacity_gas_dt_integral(298.15, t),
-            chlorine.heat_capacity_gas_dt_integral(298.15, t),
+            co2.heat_capacity_gas_dt_integral(298.15, t, p),
+            ethane.heat_capacity_gas_dt_integral(298.15, t, p),
+            chlorine.heat_capacity_gas_dt_integral(298.15, t, p),
         ]
 
         method_formation_enthalpies_correction = (
-            mixture.formation_enthalpies_correction(t)
+            mixture.formation_enthalpies_correction(t, p)
         )
 
-        print(
+    """    print(
             "r_H_cor: ",
             raw_formation_enthalpies_correction,
             "\nm_H_cor: ",
@@ -214,3 +216,71 @@ for t, p in zip(temperature, pressure):
             == method_formation_enthalpies_correction,
             "\n",
         )
+        """
+
+# ------------------------------------------------------------------------------
+# PRUEBAS PARA MIXTURE_MOLECULAR_WEIGHT, MOLAR_DENSITY Y MASS_DENSITY
+# ------------------------------------------------------------------------------
+
+hexane = rd.Substance.from_thermo_database("hexane")
+toluene = rd.Substance.from_thermo_database("toluene")
+butanol = rd.Substance.from_thermo_database("butanol")
+
+mixture = rd.mix.IdealSolution(A=hexane, B=toluene, C=butanol)
+
+compositions = np.array(
+    [
+        [1, 5, 8],
+        [10, 15, 20],
+        [100, 50, 30],
+        [1000, 8000, 500],
+        [10000, 500, 4000],
+    ]
+)
+temperature = np.array([300, 400, 500, 600])
+pressure = 101325
+
+
+print("MOLECULAR WEIGHTS")
+#print(toluene.molecular_weight)
+raw_molecular_weight = [
+    substance.molecular_weight for substance in [hexane, toluene, butanol]
+]
+print(f"raw_molecular_weight: {raw_molecular_weight}")
+
+for moles in compositions:
+    raw_total_moles = sum(moles)
+    raw_mol_fraction = moles / raw_total_moles
+    
+
+    # Test of mixture_molecular_weight method
+
+    raw_mixture_molecular_weight = np.dot(
+        raw_mol_fraction, raw_molecular_weight
+    )
+
+#    print(
+#        f"""raw_mix_molec_weight: {np.round(raw_mixture_molecular_weight,3)},\
+#    Metodo: {np.round(mixture.mixture_molecular_weight(moles),3)}, Frac molar: {raw_mol_fraction}"""
+#    )
+
+# ------------------------------------------------------------------------------
+# MOLAR_DENSITY Y MASS_DENSITY
+# ------------------------------------------------------------------------------
+    for t in temperature:
+        raw_pure_molar_volumes = np.array(
+            [
+                substance.volume_liquid(t, pressure)
+                for substance in mixture.substances
+            ]
+        )
+
+        raw_molar_density = raw_total_moles / np.dot(raw_pure_molar_volumes,moles)
+        
+        print(f"Raw_molar_density: {raw_molar_density}, metodo: {mixture.molar_density(moles, t, pressure)}")
+
+        #assert np.allclose(raw_molar_density,mixture.molar_density(moles, t, pressure))
+
+# MASS DENSITY
+        raw_mass_density = raw_molar_density * raw_mixture_molecular_weight / 1000
+        print(f"raw_mass_density: {raw_mass_density}, metodo: {mixture.mass_density(moles, t, pressure)}")
