@@ -242,7 +242,7 @@ pressure = 101325
 
 
 print("MOLECULAR WEIGHTS")
-#print(toluene.molecular_weight)
+# print(toluene.molecular_weight)
 raw_molecular_weight = [
     substance.molecular_weight for substance in [hexane, toluene, butanol]
 ]
@@ -251,7 +251,6 @@ print(f"raw_molecular_weight: {raw_molecular_weight}")
 for moles in compositions:
     raw_total_moles = sum(moles)
     raw_mol_fraction = moles / raw_total_moles
-    
 
     # Test of mixture_molecular_weight method
 
@@ -259,14 +258,14 @@ for moles in compositions:
         raw_mol_fraction, raw_molecular_weight
     )
 
-#    print(
-#        f"""raw_mix_molec_weight: {np.round(raw_mixture_molecular_weight,3)},\
-#    Metodo: {np.round(mixture.mixture_molecular_weight(moles),3)}, Frac molar: {raw_mol_fraction}"""
-#    )
+    #    print(
+    #        f"""raw_mix_molec_weight: {np.round(raw_mixture_molecular_weight,3)},\
+    #    Metodo: {np.round(mixture.mixture_molecular_weight(moles),3)}, Frac molar: {raw_mol_fraction}"""
+    #    )
 
-# ------------------------------------------------------------------------------
-# MOLAR_DENSITY Y MASS_DENSITY
-# ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
+    # MOLAR_DENSITY Y MASS_DENSITY
+    # ------------------------------------------------------------------------------
     for t in temperature:
         raw_pure_molar_volumes = np.array(
             [
@@ -275,12 +274,20 @@ for moles in compositions:
             ]
         )
 
-        raw_molar_density = raw_total_moles / np.dot(raw_pure_molar_volumes,moles)
-        
-        print(f"Raw_molar_density: {raw_molar_density}, metodo: {mixture.molar_density(moles, t, pressure)}")
+        raw_molar_density = raw_total_moles / np.dot(
+            raw_pure_molar_volumes, moles
+        )
 
-        #assert np.allclose(raw_molar_density,mixture.molar_density(moles, t, pressure))
+        print(
+            f"Raw_molar_density: {raw_molar_density}, metodo: {mixture.molar_density(moles, t, pressure)}"
+        )
 
-# MASS DENSITY
-        raw_mass_density = raw_molar_density * raw_mixture_molecular_weight / 1000
-        print(f"raw_mass_density: {raw_mass_density}, metodo: {mixture.mass_density(moles, t, pressure)}")
+        # assert np.allclose(raw_molar_density,mixture.molar_density(moles, t, pressure))
+
+        # MASS DENSITY
+        raw_mass_density = (
+            raw_molar_density * raw_mixture_molecular_weight / 1000
+        )
+        print(
+            f"raw_mass_density: {raw_mass_density}, metodo: {mixture.mass_density(moles, t, pressure)}"
+        )

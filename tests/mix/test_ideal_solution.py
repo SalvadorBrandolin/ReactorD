@@ -131,8 +131,7 @@ def test_three_substance_mix():
 
         # Test of mixture_molecular_weight method
         raw_molecular_weight = [
-            substance.molecular_weight
-            for substance in mixture.substances
+            substance.molecular_weight for substance in mixture.substances
         ]
         raw_mixture_molecular_weight = np.dot(
             raw_mol_fraction, raw_molecular_weight
@@ -141,7 +140,7 @@ def test_three_substance_mix():
             raw_mixture_molecular_weight,
             mixture.mixture_molecular_weight(moles),
         )
-          # OKAY
+        # OKAY
 
         # Test of molar_density method
         for t in temperature:
@@ -152,17 +151,23 @@ def test_three_substance_mix():
                 ]
             )
 
-            raw_molar_density = raw_total_moles / np.dot(raw_pure_molar_volumes, moles)
-            
-            assert np.allclose(raw_molar_density,
+            raw_molar_density = raw_total_moles / np.dot(
+                raw_pure_molar_volumes, moles
+            )
+
+            assert np.allclose(
+                raw_molar_density,
                 mixture.molar_density(moles, t, pressure),
             )
             # OKAY
 
-        # Test of mass_density method
-            raw_mass_density = raw_molar_density * raw_mixture_molecular_weight / 1000
-            assert np.allclose(raw_mass_density, mixture.mass_density(moles, t, pressure))
-        
+            # Test of mass_density method
+            raw_mass_density = (
+                raw_molar_density * raw_mixture_molecular_weight / 1000
+            )
+            assert np.allclose(
+                raw_mass_density, mixture.mass_density(moles, t, pressure)
+            )
 
 
 def test_formation_enthalpies():
