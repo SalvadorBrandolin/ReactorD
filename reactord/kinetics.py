@@ -203,9 +203,7 @@ class Kinetics:
             ]
         )
 
-        # Rates for each compound:
-        rates_i = np.matmul(reaction_rates, self.stoichiometry)
-        return rates_i, reaction_rates
+        return reaction_rates
 
     def std_reaction_enthalpies_init(self) -> None:
         """Calculate the standard reaction enthalpies.
@@ -278,3 +276,6 @@ class Kinetics:
         """
         formation_enthalpies = self.mix._formation_enthalpies_set()
         return np.dot(self.stoichiometry, formation_enthalpies)
+
+    def __len__(self):
+        return len(self.list_of_reactions)

@@ -175,21 +175,21 @@ def test_broadcast():
         name="sus1",
         molecular_weight=10,
         heat_capacity_liquid=cp1,
-        volume_liquid=vol1
+        volume_liquid=vol1,
     )
 
     substance2 = rd.Substance(
         name="sus2",
         molecular_weight=20,
         heat_capacity_liquid=cp2,
-        volume_liquid=vol2
+        volume_liquid=vol2,
     )
 
     substance3 = rd.Substance(
         name="sus3",
         molecular_weight=30,
         heat_capacity_liquid=cp3,
-        volume_liquid=vol3
+        volume_liquid=vol3,
     )
 
     mixture = rd.mix.IdealSolution([substance1, substance2, substance3])
@@ -257,7 +257,7 @@ def test_broadcast():
     raw_concentrations = np.ones((6, 3))
 
     for idx, (t, p) in enumerate(zip(temperatures, pressures)):
-        volume = np.dot(mole_fractions.T[idx], [10,20,30])
+        volume = np.dot(mole_fractions.T[idx], [10, 20, 30])
         density = 1 / volume
 
         conc = np.multiply(mole_fractions.T[idx], density)
@@ -286,7 +286,7 @@ def test_broadcast():
     raw_volumes = np.ones(6)
 
     for idx, (t, p) in enumerate(zip(temperatures, pressures)):
-        volume = np.dot(mole_fractions.T[idx], [10,20,30])
+        volume = np.dot(mole_fractions.T[idx], [10, 20, 30])
 
         raw_volumes[idx] = volume
 
@@ -300,7 +300,7 @@ def test_broadcast():
     raw_molar_densities = np.ones(6)
 
     for idx, (t, p) in enumerate(zip(temperatures, pressures)):
-        volume = np.dot(mole_fractions.T[idx], [10,20,30])
+        volume = np.dot(mole_fractions.T[idx], [10, 20, 30])
         molar_density = 1 / volume
 
         raw_molar_densities[idx] = molar_density
@@ -315,7 +315,7 @@ def test_broadcast():
     raw_mass_densities = np.ones(6)
 
     for idx, (t, p) in enumerate(zip(temperatures, pressures)):
-        volume = np.dot(mole_fractions.T[idx], [10,20,30])
+        volume = np.dot(mole_fractions.T[idx], [10, 20, 30])
         molar_density = 1 / volume
         mass_density = np.sum(
             molar_density * mole_fractions.T[idx] * np.array([10, 20, 30])

@@ -59,11 +59,6 @@ def thermo_substance_constructor(cls, name: str, thermo_identification: str):
         volume = corr.VolumeLiquids[0].T_dependent_property(temperature)
         return volume
 
-    def volume_gas(temperature: float, pressure: float) -> float:
-        method = corr.VolumeGases[0].method_P
-        volume = corr.VolumeGases[0].calculate_P(temperature, pressure, method)
-        return volume
-
     def heat_capacity_solid(temperature: float, pressure: float) -> float:
         heat_cap = corr.HeatCapacitySolids[0].T_dependent_property(temperature)
         return heat_cap
@@ -144,12 +139,10 @@ def thermo_substance_constructor(cls, name: str, thermo_identification: str):
         acentric_factor=corr.constants.omegas[0],
         formation_enthalpy=corr.constants.Hf_STPs[0],
         formation_enthalpy_ig=corr.constants.Hfgs[0],
-        formation_gibbs_ig=corr.constants.Gfgs[0],
         vaporization_enthalpy=vaporization_enthalpy,
         sublimation_enthalpy=sublimation_enthalpy,
         volume_solid=volume_solid,
         volume_liquid=volume_liquid,
-        volume_gas=volume_gas,
         heat_capacity_solid=heat_capacity_solid,
         heat_capacity_liquid=heat_capacity_liquid,
         heat_capacity_gas=heat_capacity_gas,
