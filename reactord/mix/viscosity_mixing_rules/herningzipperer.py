@@ -55,12 +55,7 @@ def herning_zipperer(
         molecular_weight defined on each mix's Substance.
     """
 
-    # Take pure molecular weights
-    molecular_weights = np.array(
-        [substance.molecular_weight for substance in mixture.substances]
-    )
-
-    sqrt_molecular_weights = np.sqrt(molecular_weights)
+    sqrt_molecular_weights = np.sqrt(mixture.molecular_weights)[:, np.newaxis]
 
     # Take pure viscosities
     if mixture.phase_nature == "liquid":
@@ -70,7 +65,6 @@ def herning_zipperer(
                 for substance in mixture.substances
             ]
         )
-
     elif mixture.phase_nature == "gas":
         pure_viscosities = np.array(
             [
@@ -78,7 +72,6 @@ def herning_zipperer(
                 for substance in mixture.substances
             ]
         )
-
     else:
         raise ValueError(f"{mixture.phase_nature} is not a valid phase nature")
 

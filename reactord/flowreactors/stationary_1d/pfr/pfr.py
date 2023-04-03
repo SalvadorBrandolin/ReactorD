@@ -29,6 +29,8 @@ class PFR:
         self.transversal_area = transversal_area
         self._initial_grid_size = grid_size
         self.grid_size = grid_size
+        self.subs_n = len(self.mix)
+        self.reac_n = len(self.kinetics)
 
         # =====================================================================
         # Balances
@@ -50,27 +52,24 @@ class PFR:
 
     def initial_profile_builder(self):
         self.z = np.linspace(0, self.reactor_length, self.grid_size)
-        self.mass_profile = self.mass_balance.initial_profile(self)
-        (
-            self.temperature_profile,
-            self.refrigerant_temperature_profile,
-        ) = self.energy_balance.initial_profile(self)
-        self.pressure_profile = self.pressure_balance.initial_profile(self)
+        mass_profile = self.mass_balance.initial_profile(self)
+        temperatures_profile = self.energy_balance.initial_profile(self)
+        pressure_profile = self.pressure_balance.initial_profile(self)
 
         self.initial_variables_profile = np.vstack(
             (
-                self.mass_profile,
-                self.temperature_profile,
-                self.refrigerant_temperature_profile,
-                self.pressure_profile,
+                mass_profile,
+                temperatures_profile,
+                pressure_profile,
             )
         )
-    
+
     def border_conditions_builder(self):
         self.mass_bc = self.mass_balance.border_conditions(self)
         self.temperature_bc = self.energy_balance.border_conditions(self)
         self.pressure_bc = self.pressure_balance.border_conditions(self)
 
+        # Inlet conditions:
         self.inlet_conditions = np.append(
             self.mass_bc[0], self.temperature_bc[0]
         )
@@ -78,6 +77,7 @@ class PFR:
             self.inlet_conditions, self.pressure_bc[0]
         )
 
+        # Outlet conditions:
         self.outlet_conditions = np.append(
             self.mass_bc[1], self.temperature_bc[1]
         )
@@ -85,6 +85,7 @@ class PFR:
             self.outlet_conditions, self.pressure_bc[1]
         )
 
+        # Index where border conditions are specified:
         self._in_index = np.argwhere(
             np.not_equal(self.inlet_conditions, None)
         ).ravel()
@@ -104,17 +105,13 @@ class PFR:
         return bc
 
     def evaluate_balances(self, z, variables):
-        n = len(self.mix)
         self.z = z
-        self.grid_size = len(z)
-        self.mass_profile = variables[0:n, :]
-        self.temperature_profile = variables[-3, :]
-        self.refrigerant_temperature_profile = variables[-2, :]
-        self.pressure_profile = variables[-1, :]
+        self.grid_size = np.size(z)
+        self.mass_balance.update_profile(self, variables)
+        self.energy_balance.update_profile(self, variables)
+        self.pressure_balance.update_profile(self, variables)
 
-        self.mole_fraction_profile = self.mix.mole_fractions(
-            self.mass_profile
-        )
+        self.mole_fraction_profile = self.mix.mole_fractions(self.mass_profile)
 
         self.r_rates_profile = self.kinetics.kinetic_eval(
             self.mole_fraction_profile,
@@ -136,7 +133,7 @@ class PFR:
         self.grid_size = self._initial_grid_size
         self.initial_profile_builder()
         self.border_conditions_builder()
-        
+
         self.simulation = solve_bvp(
             fun=self.evaluate_balances,
             bc=self.border_conditions,
@@ -147,25 +144,27 @@ class PFR:
             verbose=verbose,
             bc_tol=bc_tol,
         )
-        
+
         result = np.vstack((self.simulation.x, self.simulation.y))
         z = np.array(["z"])
         names = self.mix.names
-        last = np.array(["temperature", "refrigerant_temperature", "pressure"])
-        
+
+        if self.refrigerant_temperature_profile is not None:
+            last = np.array(
+                ["temperature", "refrigerant_temperature", "pressure"]
+            )
+        else:
+            last = np.array(["temperature", "pressure"])
+
         columns = np.append(z, names)
         columns = np.append(columns, last)
-        
-        self._sim_df = pd.DataFrame(
-            result.T,
-            columns=columns,
-            index=None
-        )
+
+        self._sim_df = pd.DataFrame(result.T, columns=columns, index=None)
 
     @property
     def sim_df(self):
         return self._sim_df
-    
+
     @property
     def irepr(self):
         print("Mass balance:")

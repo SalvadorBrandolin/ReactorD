@@ -18,11 +18,14 @@ class Isobaric:
     def initial_profile(self, reactor: PFR):
         return np.full(reactor.grid_size, self.pressure)
 
+    def update_profile(self, reactor: PFR, variables):
+        reactor.pressure_profile = variables[-1, :]
+
     def border_conditions(self, reactor: PFR):
         return self.pressure, None
 
     def evaluate_balance(self, reactor: PFR):
         return np.zeros(reactor.grid_size)
-    
+
     def __repr__(self):
         return r"\frac{dP}{dz}=0"

@@ -7,7 +7,7 @@ from sympy import symbols
 from reactord.flowreactors.stationary_1d.pfr.pfr import PFR
 
 
-class df_dz:
+class MolarFlow:
     def __init__(self, molar_flows_in: dict, molar_flows_out: dict) -> None:
         self.molar_flows_in = molar_flows_in
         self.molar_flows_out = molar_flows_out
@@ -40,11 +40,14 @@ class df_dz:
                 )
             else:
                 raise ValueError(
-                    "Mass balance error: No border condition found for:"
+                    "Mass balance error: No border condition found for: "
                     f"{substance}."
                 )
 
-            return initial_mass_profile
+        return initial_mass_profile
+
+    def update_profile(self, reactor: PFR, variables):
+        reactor.mass_profile = variables[0 : reactor.subs_n, :]
 
     def border_conditions(self, reactor: PFR):
         flows_in = np.array([])
