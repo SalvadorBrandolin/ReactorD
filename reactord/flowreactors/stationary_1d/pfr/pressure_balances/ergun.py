@@ -57,9 +57,11 @@ class Ergun:
         )
         u = (
             np.sum(reactor.mass_profile[:, 0])
-            * reactor.mix.mix_molecular_weight(reactor.mole_fraction_profile[:, 0])
-            / m_rho[0] 
-            / 1000 
+            * reactor.mix.mix_molecular_weight(
+                reactor.mole_fraction_profile[:, 0]
+            )
+            / m_rho[0]
+            / 1000
             / reactor.transversal_area
         )
 

@@ -8,7 +8,9 @@ from reactord.flowreactors.stationary_1d.pfr.pfr import PFR
 
 
 class MolarFlow:
-    def __init__(self, molar_flows_in: dict={}, molar_flows_out: dict={}) -> None:
+    def __init__(
+        self, molar_flows_in: dict = {}, molar_flows_out: dict = {}
+    ) -> None:
         self.molar_flows_in = molar_flows_in
         self.molar_flows_out = molar_flows_out
 

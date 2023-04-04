@@ -31,7 +31,6 @@ class PFR:
         self.grid_size = grid_size
         self.subs_n = len(self.mix)
         self.reac_n = len(self.kinetics)
-        
 
         # =====================================================================
         # Balances
@@ -134,7 +133,7 @@ class PFR:
         self.grid_size = self._initial_grid_size
         self.initial_profile_builder()
         self.border_conditions_builder()
-        
+
         # Simualate
         self.ode_solution = solve_bvp(
             fun=self.evaluate_balances,
@@ -146,7 +145,7 @@ class PFR:
             verbose=verbose,
             bc_tol=bc_tol,
         )
-        
+
         if self.ode_solution.success:
             # Update profiles with solution
             self.z = self.ode_solution.x
@@ -161,7 +160,7 @@ class PFR:
                 self.temperature_profile,
                 self.pressure_profile,
             )
-            
+
             # Build data frame
             result = np.vstack((self.z, self.ode_solution.y))
             z = np.array(["z"])

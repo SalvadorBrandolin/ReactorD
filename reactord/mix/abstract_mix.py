@@ -5,7 +5,9 @@ from typing import Callable, List
 import numpy as np
 
 from reactord.mix.viscosity_mixing_rules.grunbergnissan import grunberg_nissan
-from reactord.mix.viscosity_mixing_rules.herningzipperer import herning_zipperer
+from reactord.mix.viscosity_mixing_rules.herningzipperer import (
+    herning_zipperer,
+)
 from reactord.mix.viscosity_mixing_rules.linearmix import linear
 
 from reactord.substance.substance import Substance
