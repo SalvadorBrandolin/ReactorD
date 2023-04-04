@@ -31,6 +31,7 @@ class PFR:
         self.grid_size = grid_size
         self.subs_n = len(self.mix)
         self.reac_n = len(self.kinetics)
+        
 
         # =====================================================================
         # Balances
@@ -133,8 +134,9 @@ class PFR:
         self.grid_size = self._initial_grid_size
         self.initial_profile_builder()
         self.border_conditions_builder()
-
-        self.simulation = solve_bvp(
+        
+        # Simualate
+        self.ode_solution = solve_bvp(
             fun=self.evaluate_balances,
             bc=self.border_conditions,
             x=self.z,
@@ -144,26 +146,35 @@ class PFR:
             verbose=verbose,
             bc_tol=bc_tol,
         )
-
-        result = np.vstack((self.simulation.x, self.simulation.y))
-        z = np.array(["z"])
-        names = self.mix.names
-
-        if self.refrigerant_temperature_profile is not None:
-            last = np.array(
-                ["temperature", "refrigerant_temperature", "pressure"]
+        
+        if self.ode_solution.success:
+            # Update profiles with solution
+            self.z = self.ode_solution.x
+            self.mass_balance.update_profile(self, self.ode_solution.y)
+            self.energy_balance.update_profile(self, self.ode_solution.y)
+            self.pressure_balance.update_profile(self, self.ode_solution.y)
+            self.mole_fraction_profile = self.mix.mole_fractions(
+                self.mass_profile
             )
-        else:
-            last = np.array(["temperature", "pressure"])
+            self.r_rates_profile = self.kinetics.kinetic_eval(
+                self.mole_fraction_profile,
+                self.temperature_profile,
+                self.pressure_profile,
+            )
+            
+            # Build data frame
+            result = np.vstack((self.z, self.ode_solution.y))
+            z = np.array(["z"])
+            names = self.mix.names
+            if self.refrigerant_temperature_profile is not None:
+                last = np.array(
+                    ["temperature", "refrigerant_temperature", "pressure"]
+                )
+            else:
+                last = np.array(["temperature", "pressure"])
 
-        columns = np.append(z, names)
-        columns = np.append(columns, last)
-
-        self._sim_df = pd.DataFrame(result.T, columns=columns, index=None)
-
-    @property
-    def sim_df(self):
-        return self._sim_df
+            columns = np.concatenate((z, names, last))
+            self.sim_df = pd.DataFrame(result.T, columns=columns, index=None)
 
     @property
     def irepr(self):

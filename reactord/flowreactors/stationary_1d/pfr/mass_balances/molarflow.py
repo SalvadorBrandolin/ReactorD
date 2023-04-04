@@ -8,7 +8,7 @@ from reactord.flowreactors.stationary_1d.pfr.pfr import PFR
 
 
 class MolarFlow:
-    def __init__(self, molar_flows_in: dict, molar_flows_out: dict) -> None:
+    def __init__(self, molar_flows_in: dict={}, molar_flows_out: dict={}) -> None:
         self.molar_flows_in = molar_flows_in
         self.molar_flows_out = molar_flows_out
 
@@ -23,25 +23,25 @@ class MolarFlow:
         inlet_substances = list(self.molar_flows_in.keys())
         outlet_substances = list(self.molar_flows_out.keys())
 
-        for idx, substance in enumerate(reactor.mix.names):
-            if substance in (inlet_substances and outlet_substances):
+        for idx, name in enumerate(reactor.mix.names):
+            if name in inlet_substances and name in outlet_substances:
                 raise ValueError(
-                    "Mass balance error: both inlet and outlet border"
-                    "conditions for the same substance not allowed. Check"
-                    f"border conditions of the substance: {substance}."
+                    "Mass balance error: both inlet and outlet border "
+                    "conditions for the same substance not allowed. Check "
+                    f"border conditions of the substance: {name}."
                 )
-            elif substance in inlet_substances:
+            elif name in inlet_substances:
                 initial_mass_profile[idx, :] = np.full(
-                    reactor.grid_size, self.molar_flows_in[substance]
+                    reactor.grid_size, self.molar_flows_in[name]
                 )
-            elif substance in outlet_substances:
+            elif name in outlet_substances:
                 initial_mass_profile[idx, :] = np.full(
-                    reactor.grid_size, self.molar_flows_out[substance]
+                    reactor.grid_size, self.molar_flows_out[name]
                 )
             else:
                 raise ValueError(
                     "Mass balance error: No border condition found for: "
-                    f"{substance}."
+                    f"{name}."
                 )
 
         return initial_mass_profile
