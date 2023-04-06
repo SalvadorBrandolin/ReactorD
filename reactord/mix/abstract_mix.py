@@ -269,9 +269,11 @@ class AbstractMix(metaclass=ABCMeta):
         --------
             molecular_weight defined on each mix's Substance.
         """
-        mass_density = self.molar_density(
-            mole_fractions, temperature, pressure
-        ) * self.mix_molecular_weight(mole_fractions)
+        mass_density = (
+            self.molar_density(mole_fractions, temperature, pressure)
+            * self.mix_molecular_weight(mole_fractions)
+            / 1000
+        )
 
         return mass_density
 

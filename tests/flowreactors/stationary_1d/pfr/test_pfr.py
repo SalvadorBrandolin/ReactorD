@@ -494,44 +494,42 @@ def test_fogler_example_4_4():
     # Pressure border condition information is given at the reactor's inlet.
     def ra(concentrations, temperature):
         return np.zeros(np.size(temperature))
-    
+
     n = rd.Substance.from_thermo_database("N", "nitrogen")
     o = rd.Substance.from_thermo_database("O", "oxygen")
 
     mixture = rd.mix.IdealGas([n, o])
-    
+
     kinetic = rd.Kinetics(mixture, [ra], np.array([0, 0]))
-    
-    mb = pfr.mass_balances.MolarFlow(molar_flows_in={
+
+    mb = pfr.mass_balances.MolarFlow(
+        molar_flows_in={
             "N": 0.3560387507669636,
             "O": 0.09983673036871321,
-        })
+        }
+    )
     eb = pfr.energy_balances.Isothermic(260 + 273.15)
     pb = pfr.pressure_balances.Ergun(
-        pressure={"in": 10 * 101325},
-        porosity=0.45,
-        particle_diameter=0.00635
+        pressure={"in": 10 * 101325}, porosity=0.45, particle_diameter=0.00635
     )
-    
+
     reactor = pfr.PFR(
-        mix = mixture, 
-        kinetics = kinetic, 
-        reactor_length = 18.288,
-        transversal_area = 0.001313648986,
-        grid_size = 100,
+        mix=mixture,
+        kinetics=kinetic,
+        reactor_length=18.288,
+        transversal_area=0.001313648986,
+        grid_size=100,
         mass_balance=mb,
         energy_balance=eb,
-        pressure_balance=pb
+        pressure_balance=pb,
     )
-    
-    reactor.simulate(tol = 0.001)
-    
+
+    reactor.simulate(tol=0.001)
+
     fogler_z = np.array([0, 10, 20, 30, 40, 50, 60]) * 0.30480370641
     fogler_pressures = np.array([10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65])
     reactord_pressures = reactor.ode_solution.sol(fogler_z)[-1] / 101325
-    
+
     assert np.allclose(
         reactord_pressures, fogler_pressures, rtol=1e-05, atol=0.1
     )
-    
-    

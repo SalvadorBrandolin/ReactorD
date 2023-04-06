@@ -55,22 +55,22 @@ class Ergun:
             reactor.temperature_profile,
             reactor.pressure_profile,
         )
-        u = (
+        g = (
             np.sum(reactor.mass_profile[:, 0])
             * reactor.mix.mix_molecular_weight(
                 reactor.mole_fraction_profile[:, 0]
             )
-            / m_rho[0]
             / 1000
             / reactor.transversal_area
         )
 
         pressure_gradient = (
-            -u
+            -g
+            / m_rho
             / dp
             * (1 - phi)
             / phi**3
-            * (150 * (1 - phi) * mu / dp + 1.75 * u * m_rho)
+            * (150 * (1 - phi) * mu / dp + 1.75 * g)
         )
         return pressure_gradient
 
