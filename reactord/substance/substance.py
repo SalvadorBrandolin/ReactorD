@@ -9,10 +9,11 @@ from dill import dumps, loads
 
 import numpy as np
 
+from .symbolic import Symbolic
 from .thermo_substance import thermo_substance_constructor
 
 
-class Substance:
+class Substance(Symbolic):
     """Substance object class.
 
     Class to define a substance object. Specific attributes definition will be
@@ -159,6 +160,9 @@ class Substance:
         heat_capacity_gas_dt_integral: Callable = None,
         vectorize_functions: bool = False,
     ) -> None:
+        # Symbolic init
+        super().__init__(names=name)
+
         # Pure compound properties:
         self.name = name
         self.molecular_weight = molecular_weight
