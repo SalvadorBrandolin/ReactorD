@@ -131,6 +131,38 @@ class Symbolic:
         """
         return self.__rmul__(coeff)
 
+    def __truediv__(self, coeff: Union[int, float]) -> "Symbolic":
+        """Redefine the '/' operand.
+
+        Redefines the '/' operand to specify the stoichiometric of each
+        substance.
+
+        Parameters
+        ----------
+        coeff : Union[int, float]
+            Stoichiometric coefficient.
+
+        Returns
+        -------
+        Symbolic
+            New Symbolic object with the respective stoichiometric coefficient.
+
+        Raises
+        ------
+        TypeError
+            "'/' operand defined only for 'int' or 'float' types."
+        """
+        if not isinstance(coeff, (int, float)):
+            raise TypeError(
+                "'/' operand defined only for 'int' or 'float' types."
+            )
+
+        new_sym = Symbolic(
+            names=self._names,
+            expression=self._expression / coeff,
+        )
+        return new_sym
+
     def __add__(self, other_sym: "Symbolic") -> "Symbolic":
         """Redefine the '+' operand.
 
