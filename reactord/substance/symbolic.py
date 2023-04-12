@@ -62,25 +62,6 @@ class Symbolic:
         else:
             self._chem_equality = chem_equality
 
-    @property
-    def chem_expression(self) -> Math:
-        """Return the chemical expression.
-
-        Returns the expression or the chemical equality created from the '>'
-        operand if exist.
-
-        Returns
-        -------
-        Math
-            IPython.display.Math object with the chemical expression.
-        """
-        if self._chem_equality is None:
-            return Math(latex(self._expression))
-        else:
-            return Math(
-                latex(self._chem_equality).replace("=", r"\rightarrow")
-            )
-
     def __rmul__(self, coeff: Union[int, float]) -> "Symbolic":
         """Redefine the reverse '*' operand.
 
