@@ -9,10 +9,11 @@ from dill import dumps, loads
 
 import numpy as np
 
+from .symbolic import Symbolic
 from .thermo_substance import thermo_substance_constructor
 
 
-class Substance:
+class Substance(Symbolic):
     """Substance object class.
 
     Class to define a substance object. Specific attributes definition will be
@@ -50,9 +51,6 @@ class Substance:
         Standard state molar enthalpy of formation [J/mol], by default None.
     formation_enthalpy_ig : float, optional
         Ideal-gas molar enthalpy of formation [J/mol], by default None.
-    formation_gibbs_ig : float, optional
-        Ideal-gas molar change of Gibbs energy of formation [J/mol], by default
-        None.
     vaporization_enthalpy : Callable, optional
         A function that receives a temperature and returns the vaporization
         enthalpy at temperature [J/mol], by default None.
@@ -66,10 +64,6 @@ class Substance:
         A function that receives temperature and pressure, and returns the
         molar volume of liquid at temperature and pressure [m³/mol], by default
         None.
-    volume_gas : Callable, optional
-        A function that receives temperature and pressure, and returns the
-        molar volume of the gas at temperature and pressure [m³/mol], by
-        default None.
     heat_capacity_solid : Callable, optional
         A function that receives temperature and pressure, and returns the
         heat capacity of the solid at temperature and pressure [J/mol/K], by
@@ -134,9 +128,6 @@ class Substance:
         Standard state molar enthalpy of formation [J/mol], by default None.
     formation_enthalpy_ig : float, optional
         Ideal-gas molar enthalpy of formation [J/mol], by default None.
-    formation_gibbs_ig : float, optional
-        Ideal-gas molar change of Gibbs energy of formation [J/mol], by default
-        None.
     vectorize_functions: bool, optional
         When True, numpy.vectorize() is applied to the temperature and pressure
         Substance functions on Substance object init, by default False.
@@ -153,12 +144,10 @@ class Substance:
         acentric_factor: float = None,
         formation_enthalpy: float = None,
         formation_enthalpy_ig: float = None,
-        formation_gibbs_ig: float = None,
         vaporization_enthalpy: Callable = None,
         sublimation_enthalpy: Callable = None,
         volume_solid: Callable = None,
         volume_liquid: Callable = None,
-        volume_gas: Callable = None,
         heat_capacity_solid: Callable = None,
         heat_capacity_liquid: Callable = None,
         heat_capacity_gas: Callable = None,
@@ -171,6 +160,9 @@ class Substance:
         heat_capacity_gas_dt_integral: Callable = None,
         vectorize_functions: bool = False,
     ) -> None:
+        # Symbolic init
+        super().__init__(names=name)
+
         # Pure compound properties:
         self.name = name
         self.molecular_weight = molecular_weight
@@ -181,7 +173,6 @@ class Substance:
         self.acentric_factor = acentric_factor
         self.formation_enthalpy = formation_enthalpy
         self.formation_enthalpy_ig = formation_enthalpy_ig
-        self.formation_gibbs_ig = formation_gibbs_ig
 
         # Vectorize option
         self.vectorize_functions = vectorize_functions
@@ -204,8 +195,6 @@ class Substance:
             self._volume_liquid = np.vectorize(
                 volume_liquid, signature="(),()->()"
             )
-
-            self._volume_gas = np.vectorize(volume_gas, signature="(),()->()")
 
             self._heat_capacity_solid = np.vectorize(
                 heat_capacity_solid, signature="(),()->()"
@@ -254,7 +243,6 @@ class Substance:
             self._sublimation_enthalpy = sublimation_enthalpy
             self._volume_solid = volume_solid
             self._volume_liquid = volume_liquid
-            self._volume_gas = volume_gas
             self._heat_capacity_solid = heat_capacity_solid
             self._heat_capacity_liquid = heat_capacity_liquid
             self._heat_capacity_gas = heat_capacity_gas
@@ -419,23 +407,6 @@ class Substance:
             Liquid molar volume. [m³/mol]
         """
         return self._volume_liquid(temperature, pressure)
-
-    def volume_gas(self, temperature: float, pressure: float) -> float:
-        """Return the gas molar volume at a given temperature and pressure.
-
-        Parameters
-        ----------
-        temperature : float or ndarray[float]
-            Temperature in Kelvin degrees. [K]
-        pressure : float or ndarray[float]
-            Pressure in Pascal. [Pa]
-
-        Returns
-        -------
-        float or ndarray[float]
-            Liquid molar volume. [m³/mol]
-        """
-        return self._volume_gas(temperature, pressure)
 
     def heat_capacity_solid(
         self, temperature: float, pressure: float
@@ -629,7 +600,7 @@ class Substance:
 
         Returns
         -------
-        float or ndarray[float]
+        float or ndarray[float]heat_capacity_gas_dt_integral
             Definite integral of liquid heat capacity between temperature1
             and temperature2. [J/mol]
         """

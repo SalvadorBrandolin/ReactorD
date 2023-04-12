@@ -38,7 +38,7 @@ class IdealGas(AbstractMix):
     ) -> None:
         super().__init__(
             substance_list=substance_list,
-            phase_nature="liquid",
+            phase_nature="gas",
             viscosity_mixing_rule=viscosity_mixing_rule,
         )
 

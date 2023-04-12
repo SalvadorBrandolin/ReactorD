@@ -4,12 +4,13 @@ from typing import Callable, List
 
 import numpy as np
 
-from reactord.mix.viscosity_mixing_rules import (
-    grunberg_nissan,
+from reactord.mix.viscosity_mixing_rules.grunbergnissan import grunberg_nissan
+from reactord.mix.viscosity_mixing_rules.herningzipperer import (
     herning_zipperer,
-    linear,
 )
-from reactord.substance import Substance
+from reactord.mix.viscosity_mixing_rules.linearmix import linear
+
+from reactord.substance.substance import Substance
 
 
 class AbstractMix(metaclass=ABCMeta):
@@ -70,6 +71,8 @@ class AbstractMix(metaclass=ABCMeta):
             )
 
         # Choose the function for viscosity mixing rule.
+        # TODO: TAL VEZ ESTO DEBERIA SER ALGO INYECTABLE SINO ESTAS LIMITADO AL
+        # HARDCODEO DEL SOURCE DE AbstractMix
         if self.viscosity_mixing_rule == "grunberg_nissan":
             self._viscosity_mixing_rule_function = grunberg_nissan
         elif self.viscosity_mixing_rule == "herning_zipperer":
@@ -80,6 +83,46 @@ class AbstractMix(metaclass=ABCMeta):
             raise ValueError(
                 f"""{self.viscosity_mixing_rule} is not a valid viscosity
                 mixing rule."""
+            )
+
+        # =====================================================================
+        # Put substances attributes in arrays.
+        # =====================================================================
+        self.names = np.array([])
+        self.molecular_weights = np.array([])
+        self.normal_boiling_points = np.array([])
+        self.normal_melting_points = np.array([])
+        self.critical_temperatures = np.array([])
+        self.critical_pressures = np.array([])
+        self.acentric_factors = np.array([])
+        self.formation_enthalpies = np.array([])
+        self.formation_enthalpies_ig = np.array([])
+
+        for substance in self.substances:
+            self.names = np.append(self.names, substance.name)
+            self.molecular_weights = np.append(
+                self.molecular_weights, substance.molecular_weight
+            )
+            self.normal_boiling_points = np.append(
+                self.normal_boiling_points, substance.normal_boiling_point
+            )
+            self.normal_melting_points = np.append(
+                self.normal_melting_points, substance.normal_melting_point
+            )
+            self.critical_temperatures = np.append(
+                self.critical_temperatures, substance.critical_temperature
+            )
+            self.critical_pressures = np.append(
+                self.critical_pressures, substance.critical_pressure
+            )
+            self.acentric_factors = np.append(
+                self.acentric_factors, substance.acentric_factor
+            )
+            self.formation_enthalpies = np.append(
+                self.formation_enthalpies, substance.formation_enthalpy
+            )
+            self.formation_enthalpies_ig = np.append(
+                self.formation_enthalpies_ig, substance.formation_enthalpy_ig
             )
 
     # =========================================================================
@@ -149,11 +192,7 @@ class AbstractMix(metaclass=ABCMeta):
         --------
             molecular_weight defined on each mix's Substance.
         """
-        pure_molecular_weights = np.array(
-            [substance.molecular_weight for substance in self.substances]
-        )
-
-        return np.dot(pure_molecular_weights, mole_fractions)
+        return np.dot(self.molecular_weights, mole_fractions)
 
     def molar_density(
         self, mole_fractions: np.ndarray, temperature: float, pressure: float
@@ -230,9 +269,11 @@ class AbstractMix(metaclass=ABCMeta):
         --------
             molecular_weight defined on each mix's Substance.
         """
-        mass_density = self.molar_density(
-            mole_fractions, temperature, pressure
-        ) * self.mix_molecular_weight(mole_fractions)
+        mass_density = (
+            self.molar_density(mole_fractions, temperature, pressure)
+            * self.mix_molecular_weight(mole_fractions)
+            / 1000
+        )
 
         return mass_density
 
@@ -266,7 +307,7 @@ class AbstractMix(metaclass=ABCMeta):
         """
 
         mixture_viscosities = self._viscosity_mixing_rule_function(
-            mole_fractions, temperature, pressure
+            self, mole_fractions, temperature, pressure
         )
 
         return mixture_viscosities
@@ -346,9 +387,11 @@ class AbstractMix(metaclass=ABCMeta):
             An array that contains the concentrations of the mixture's
             substances. [mol/m³]
         """
-        molar_volumes = self.volume(mole_fractions, temperature, pressure)
+        molar_densities = self.molar_density(
+            mole_fractions, temperature, pressure
+        )
 
-        return np.divide(mole_fractions, molar_volumes)
+        return np.multiply(molar_densities, mole_fractions)
 
     def __len__(self):
         """Return the number of substances in the mixture.
