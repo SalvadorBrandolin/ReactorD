@@ -9,7 +9,6 @@ from reactord.mix.viscosity_mixing_rules.herningzipperer import (
     herning_zipperer,
 )
 from reactord.mix.viscosity_mixing_rules.linearmix import linear
-
 from reactord.substance.substance import Substance
 
 

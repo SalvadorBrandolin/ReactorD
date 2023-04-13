@@ -1,10 +1,8 @@
 from typing import Union
 
-from IPython.display import Math
-
 import numpy as np
 
-from sympy import Eq, Equality, Symbol, latex, symbols
+from sympy import Eq, Equality, Symbol, symbols
 
 
 class Symbolic:

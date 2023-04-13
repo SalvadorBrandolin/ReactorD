@@ -1,10 +1,10 @@
-import numpy as np
-
 from IPython.display import display
 
-from sympy import symbols
+import numpy as np
 
 from reactord.flowreactors.stationary_1d.pfr.pfr import PFR
+
+from sympy import symbols
 
 
 class Isobaric:
