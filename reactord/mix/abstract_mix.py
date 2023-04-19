@@ -124,6 +124,10 @@ class AbstractMix(metaclass=ABCMeta):
                 self.formation_enthalpies_ig, substance.formation_enthalpy_ig
             )
 
+        # Check for duplicates:
+        if np.size(np.unique(self.names)) != np.size(self.names):
+            raise ValueError("All mix's substances must have different names.")
+
     # =========================================================================
     # Mixtures' common methods
     # =========================================================================
