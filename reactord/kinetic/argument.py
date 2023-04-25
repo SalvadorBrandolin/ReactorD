@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class KineticsArgument:
+class KineticArgument:
     def __init__(self, names) -> None:
         
         # Dictionary with substance indexing
@@ -9,11 +9,11 @@ class KineticsArgument:
         for idx, name in enumerate(names):
             self.ref_dict[name] = idx
             
-        self.r_arguments = np.full(np.size(names), None)
+        self.values = np.full(np.size(names), None)
         
     def __getitem__(self, key: str):
         try:
-            return self.r_arguments[self.ref_dict[key]]
+            return self.values[self.ref_dict[key]]
         except KeyError:
             raise KeyError(
                 f"There is no substance named '{key}' in the Kinetic object."

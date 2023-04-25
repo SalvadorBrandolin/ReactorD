@@ -2,7 +2,7 @@ import numpy as np
 
 import pandas as pd
 
-from reactord.kinetics import Kinetics
+from reactord.kinetics_old import Kinetics
 from reactord.mix.abstract_mix import AbstractMix
 
 from scipy.integrate import solve_bvp
