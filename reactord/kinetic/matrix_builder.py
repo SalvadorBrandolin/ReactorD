@@ -5,7 +5,7 @@ import numpy as np
 from reactord.mix.abstract_mix import AbstractMix
 from reactord.substance.symbolic import Symbolic
 
-from sympy import symbols, linear_eq_to_matrix
+from sympy import linear_eq_to_matrix, symbols
 
 
 def stoichiometry_matrix_builder(mix: AbstractMix, equations: List[Symbolic]):

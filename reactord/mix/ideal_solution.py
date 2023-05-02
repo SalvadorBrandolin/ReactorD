@@ -144,24 +144,6 @@ class IdealSolution(AbstractMix):
         mix_cp = np.multiply(mole_fractions, pure_cp).sum(axis=0)
         return mix_cp
 
-    def _formation_enthalpies_set(self):
-        """Return the formation enthalpies in a ordered ndarray.
-
-        Method that read the formation enthalpies of mix and returns
-        them in a ordered ndarray.
-
-        Returns
-        -------
-        ndarray [float]
-            Formation enthalpies of each substance
-        """
-        enthalpies = np.array([])
-
-        for substance in self.substances:
-            enthalpies = np.append(enthalpies, substance.formation_enthalpy)
-
-        return enthalpies
-
     def formation_enthalpies_correction(
         self, temperature: float, pressure: float
     ):
@@ -207,3 +189,21 @@ class IdealSolution(AbstractMix):
                     ),
                 )
         return correction_enthalpies
+
+    def get_formation_enthalpies(self):
+        """Return the formation enthalpies in a ordered ndarray.
+
+        Method that read the formation enthalpies of mix and returns
+        them in a ordered ndarray.
+
+        Returns
+        -------
+        ndarray [float]
+            Formation enthalpies of each substance
+        """
+        enthalpies = np.array([])
+
+        for substance in self.substances:
+            enthalpies = np.append(enthalpies, substance.formation_enthalpy)
+
+        return enthalpies

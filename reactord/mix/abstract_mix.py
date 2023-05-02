@@ -500,6 +500,6 @@ class AbstractMix(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
-    def _formation_enthalpies_set(self) -> None:
+    def get_formation_enthalpies(self) -> None:
         """Calculate the formation enthalpy of the mixture's substances."""
         raise NotImplementedError("Abstract method not implemented")
