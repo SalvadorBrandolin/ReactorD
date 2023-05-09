@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Union
 
+import numpy as np
 from numpy.typing import NDArray
 
 if TYPE_CHECKING:
@@ -11,7 +12,12 @@ def dh_specified(
     temperature: Union[NDArray, float],
     pressure: Union[NDArray, float],
 ) -> NDArray:
-    return kinetic.r_dh
+    dh = np.full(
+        (len(kinetic), np.size(temperature)),
+        fill_value=kinetic._user_r_dhs[:, np.newaxis],
+    )
+
+    return dh
 
 
 def dh_not_specified(
@@ -20,4 +26,7 @@ def dh_not_specified(
     pressure: Union[NDArray, float],
 ) -> NDArray:
     corrs = kinetic.mix.formation_enthalpies_correction(temperature, pressure)
-    return kinetic.std_reaction_enthalpies + corrs
+    dh = kinetic.std_reaction_enthalpies + np.matmul(
+        corrs, kinetic.stoichiometry.T
+    )
+    return dh

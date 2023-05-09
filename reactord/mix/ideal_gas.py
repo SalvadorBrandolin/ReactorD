@@ -5,6 +5,8 @@ import numpy as np
 
 from reactord.substance import Substance
 
+from scipy.constants import R
+
 from .abstract_mix import AbstractMix
 
 
@@ -76,8 +78,7 @@ class IdealGas(AbstractMix):
         float
             Mixture's molar volume. [m³/mol]
         """
-        r = 8.31446261815324  # m3⋅Pa/K/mol
-        volume = r * np.divide(temperature, pressure)
+        volume = R * np.divide(temperature, pressure)
         return volume
 
     def mix_heat_capacity(

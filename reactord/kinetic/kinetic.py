@@ -30,10 +30,18 @@ class Kinetic:
         self.r_dics: List[dict] = [reactions[name] for name in self.r_names]
         self.r_eqs: List[Symbolic] = [rdic.get("eq") for rdic in self.r_dics]
         self.r_rates: List[Callable] = [rd.get("rate") for rd in self.r_dics]
-        self.r_dh: List[float] = np.array(
+        self._user_r_dhs: List[float] = np.array(
             [rdict.get("DH") for rdict in self.r_dics]
         )
         self.kinetic_constants = kinetic_constants
+
+        # Check if all user_dh are specified, else raise error.
+        if any(self._user_r_dhs) and not all(self._user_r_dhs):
+            raise NotImplementedError(
+                "All reactions must have a reaction enthalpy"
+                " specification or no reaction must have a reaction"
+                " enthalpy specification."
+            )
 
         # Argument evaluation functions
         if self.r_argument == "concentration":
@@ -43,28 +51,23 @@ class Kinetic:
 
         # Build stochiometry matrix from the substances' algebraic expression
         self.stoichiometry = stoichiometry_matrix_builder(self.mix, self.r_eqs)
-        
-        # Check if all dh are specified, else raise error.
-        if any(self.r_dh):
-            if not all(self.r_dh):
-                raise NotImplementedError(
-                    "All reactions must have a reaction enthalpy"
-                    " specification or no reaction must have a reaction"
-                    " enthalpy specification."
-                )
-            else:
-                self.std_reaction_enthalpies = np.array([])
-                self._enthalpy_func = dh_specified
-        else:
-            hf = self.mix.get_formation_enthalpies()
-            self.std_reaction_enthalpies = np.matmul(self.stoichiometry, hf)
-            self._enthalpy_func = dh_not_specified
 
         # Kinetic compositional argument object
         self.comp_argument = CompositionalArgument(self.mix.names)
 
         # Reaction rates state
         self.r_rates = np.array([])
+
+    @property
+    def user_r_dh(self):
+        return self._user_r_dhs
+
+    @user_r_dh.setter
+    def user_r_dh(self, new_dhs: NDArray):
+        raise ValueError(
+            "User reaction enthalpies not mutable, instantiate a new "
+            "kinetic object."
+        )
 
     def evaluate(
         self,
@@ -83,8 +86,22 @@ class Kinetic:
         )
         return self.r_rates
 
-    def dhs_evaluate(self, temperature, pressure):
-        return self._enthalpy_func(temperature, pressure)
+    def dhs_evaluate(
+        self,
+        temperature: Union[NDArray, float],
+        pressure: Union[NDArray, float],
+    ):
+        return self._enthalpy_func(self, temperature, pressure)
+
+    def init_dh_function(self):
+        # Check if all dh are specified, else raise error.
+        if all(self._user_r_dhs):
+            self.std_reaction_enthalpies = np.array([])
+            self._enthalpy_func = dh_specified
+        else:
+            hf = self.mix.get_formation_enthalpies()
+            self.std_reaction_enthalpies = np.matmul(self.stoichiometry, hf)
+            self._enthalpy_func = dh_not_specified
 
     @property
     def irepr(self):
