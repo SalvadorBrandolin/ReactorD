@@ -93,7 +93,7 @@ class Kinetic:
     ):
         return self._enthalpy_func(self, temperature, pressure)
 
-    def init_dh_function(self):
+    def set_dh_function(self):
         # Check if all dh are specified, else raise error.
         if all(self._user_r_dhs):
             self.std_reaction_enthalpies = np.array([])

@@ -26,7 +26,13 @@ def dh_not_specified(
     pressure: Union[NDArray, float],
 ) -> NDArray:
     corrs = kinetic.mix.formation_enthalpies_correction(temperature, pressure)
-    dh = kinetic.std_reaction_enthalpies + np.matmul(
-        corrs, kinetic.stoichiometry.T
-    )
+
+    if np.size(temperature) > 1:
+        corrs = corrs.reshape((len(kinetic.mix), np.size(temperature)))
+
+    dh = (
+        kinetic.std_reaction_enthalpies
+        + np.matmul(kinetic.stoichiometry, corrs).T
+    ).T
+
     return dh

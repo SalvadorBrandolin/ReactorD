@@ -30,8 +30,8 @@ def test_one_reaction1():
     assert np.ndim(kinetic.stoichiometry) == 2
     assert np.shape(kinetic.stoichiometry) == (1, 4)
 
-    p = 101325
-    t = 303.15
-    x = [0.25, 0.25, 0.25, 0.25]
+    # p = 101325
+    # t = 303.15
+    # x = [0.25, 0.25, 0.25, 0.25]
 
-    density = p / R / t
+    # density = p / R / t
