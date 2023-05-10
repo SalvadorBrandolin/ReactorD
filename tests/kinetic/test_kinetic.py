@@ -7,7 +7,6 @@ from scipy.constants import R
 
 def test_one_reaction1():
     """NOT REAL KINETIC PARAMETERS."""
-
     a = rd.Substance.from_thermo_database("etol", "ethanol")
     b = rd.Substance.from_thermo_database("ach", "acetic acid")
     c = rd.Substance.from_thermo_database("etac", "ethyl acetate")
@@ -17,7 +16,7 @@ def test_one_reaction1():
 
     def r1_rate(c, t, cons):
         a, e = cons["a"], cons["e"]
-        return a * np.exp(-e / 8.314 / t) * c["etol"] * c["ach"]
+        return a * np.exp(-e / R / t) * c["etol"] * c["ach"]
 
     kinetic = rd.Kinetic(
         mix=mix,
@@ -26,12 +25,21 @@ def test_one_reaction1():
         rates_argument="concentration",
     )
 
-    assert (kinetic.stoichiometry == np.array([-1, -1, 1, 1])).all()
-    assert np.ndim(kinetic.stoichiometry) == 2
-    assert np.shape(kinetic.stoichiometry) == (1, 4)
-
-    # p = 101325
-    # t = 303.15
-    # x = [0.25, 0.25, 0.25, 0.25]
-
-    # density = p / R / t
+    temperatures = np.linspace(300, 600, 50)
+    pressures = np.linspace(100_000, 300_000, 50)
+    moles = np.array([np.linspace(0.1, 1, 50), np.linspace(0, 4, 50), np.linspace(0, 0.8, 50), np.linspace(0, 0.3, 50)])
+    
+    # One by one
+    for m, t, p in zip(moles.T, temperatures, pressures):
+        import ipdb
+        ipdb.set_trace()
+        z_rd = kinetic.mix.mole_fractions(m)
+        r_reactord = kinetic.evaluate(z_rd, t, p)
+        
+        # by hand
+        z_bh = m / np.sum(m)
+        rho = p / R / t
+        c = z_bh * rho
+        r_byhand = 10 * np.exp(-10000 / R / t) * c[0] * c[1]
+        
+        assert r_reactord == r_byhand
