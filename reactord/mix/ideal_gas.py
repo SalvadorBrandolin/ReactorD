@@ -5,6 +5,8 @@ import numpy as np
 
 from reactord.substance import Substance
 
+from scipy.constants import R
+
 from .abstract_mix import AbstractMix
 
 
@@ -76,8 +78,7 @@ class IdealGas(AbstractMix):
         float
             Mixture's molar volume. [m³/mol]
         """
-        r = 8.31446261815324  # m3⋅Pa/K/mol
-        volume = r * np.divide(temperature, pressure)
+        volume = R * np.divide(temperature, pressure)
         return volume
 
     def mix_heat_capacity(
@@ -130,24 +131,6 @@ class IdealGas(AbstractMix):
         mix_cp = np.multiply(mole_fractions, pure_cp).sum(axis=0)
         return mix_cp
 
-    def _formation_enthalpies_set(self):
-        """Return the ideal gas formation enthalpies in a ordered ndarray.
-
-        Method that read the ideal gas formation enthalpies of the mix
-        class and returns them in an ordered ndarray.
-
-        Returns
-        -------
-        ndarray [float]
-            Ideal gas formation enthalpies of each substance [J/mol/K]
-        """
-        enthalpies = np.array([])
-
-        for substance in self.substances:
-            enthalpies = np.append(enthalpies, substance.formation_enthalpy_ig)
-
-        return enthalpies
-
     def formation_enthalpies_correction(
         self, temperature: float, pressure: float
     ):
@@ -189,3 +172,16 @@ class IdealGas(AbstractMix):
             )
 
         return correction_enthalpies
+
+    def get_formation_enthalpies(self):
+        """Return the ideal gas formation enthalpies in an ordered ndarray.
+
+        Method that read the ideal gas formation enthalpies of the mix
+        class and returns them in an ordered ndarray.
+
+        Returns
+        -------
+        ndarray [float]
+            Ideal gas formation enthalpies of each substance [J/mol/K]
+        """
+        return self.formation_enthalpies_ig

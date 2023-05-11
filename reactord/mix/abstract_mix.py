@@ -9,7 +9,6 @@ from reactord.mix.viscosity_mixing_rules.herningzipperer import (
     herning_zipperer,
 )
 from reactord.mix.viscosity_mixing_rules.linearmix import linear
-
 from reactord.substance.substance import Substance
 
 
@@ -124,6 +123,10 @@ class AbstractMix(metaclass=ABCMeta):
             self.formation_enthalpies_ig = np.append(
                 self.formation_enthalpies_ig, substance.formation_enthalpy_ig
             )
+
+        # Check for duplicates:
+        if np.size(np.unique(self.names)) != np.size(self.names):
+            raise ValueError("All mix's substances must have different names.")
 
     # =========================================================================
     # Mixtures' common methods
@@ -497,6 +500,6 @@ class AbstractMix(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
-    def _formation_enthalpies_set(self) -> None:
+    def get_formation_enthalpies(self) -> None:
         """Calculate the formation enthalpy of the mixture's substances."""
         raise NotImplementedError("Abstract method not implemented")

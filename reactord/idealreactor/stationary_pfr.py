@@ -11,7 +11,7 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 
-from reactord.kinetics import Kinetics
+from reactord.kinetics_old import Kinetics
 from reactord.mix import AbstractMix
 from reactord.reactorbase import ReactorBase
 from reactord.substance import Substance

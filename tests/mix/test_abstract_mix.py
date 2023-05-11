@@ -34,8 +34,8 @@ def test_abastract_class_not_implemented_errors():
         ):
             return super().mix_heat_capacity(moles, temperature, pressure)
 
-        def _formation_enthalpies_set(self):
-            return super()._formation_enthalpies_set()
+        def get_formation_enthalpies(self):
+            return super().get_formation_enthalpies()
 
         def formation_enthalpies_correction(
             self,
@@ -59,7 +59,7 @@ def test_abastract_class_not_implemented_errors():
         mixture.mix_heat_capacity([1, 1], 298.15, 101325)
 
     with pytest.raises(NotImplementedError):
-        mixture._formation_enthalpies_set()
+        mixture.get_formation_enthalpies()
 
     with pytest.raises(NotImplementedError):
         mixture.formation_enthalpies_correction(298.15, 101325)
@@ -77,9 +77,6 @@ def test_abastract_class_viscosity_mixing_rule():
         ):
             return super().mix_heat_capacity(moles, temperature, pressure)
 
-        def _formation_enthalpies_set(self):
-            return super()._formation_enthalpies_set()
-
         def formation_enthalpies_correction(
             self,
             temperature: float,
@@ -88,6 +85,9 @@ def test_abastract_class_viscosity_mixing_rule():
             return super().formation_enthalpies_correction(
                 temperature, pressure
             )
+
+        def get_formation_enthalpies(self):
+            return super().get_formation_enthalpies()
 
     mixture = AnotherMixture(
         substance_list=[],

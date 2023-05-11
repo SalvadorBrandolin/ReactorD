@@ -20,9 +20,9 @@ def test_one_substance_mix():
     temperature = np.array([300, 400, 500, 600])
     pressure = np.array([101325, 150000, 200000, 300000])
 
-    assert mix1._formation_enthalpies_set() == methane.formation_enthalpy_ig
-    assert mix2._formation_enthalpies_set() == oxygen.formation_enthalpy_ig
-    assert mix3._formation_enthalpies_set() == hydrogen.formation_enthalpy_ig
+    assert mix1.formation_enthalpies_ig == methane.formation_enthalpy_ig
+    assert mix2.formation_enthalpies_ig == oxygen.formation_enthalpy_ig
+    assert mix3.formation_enthalpies_ig == hydrogen.formation_enthalpy_ig
 
     for t, p in zip(temperature, pressure):
         assert (
@@ -157,7 +157,7 @@ def test_three_substances_mix():
             )
 
             assert (
-                mixture._formation_enthalpies_set() == raw_enthalpies_set
+                mixture.formation_enthalpies_ig == raw_enthalpies_set
             ).all()  # OKAY
 
             # Test of formation_enthalpies_correction method
@@ -323,8 +323,11 @@ def test_broadcast():
 
     for idx, (t, p) in enumerate(zip(temperatures, pressures)):
         r = 8.31446261815324  # m3⋅Pa/K/mol
-        mass_density = np.sum(
-            p / (r * t) * mole_fractions.T[idx] * np.array([10, 20, 30])
+        mass_density = (
+            np.sum(
+                p / (r * t) * mole_fractions.T[idx] * np.array([10, 20, 30])
+            )
+            / 1000
         )
 
         raw_mass_densities[idx] = mass_density
@@ -486,8 +489,11 @@ def test_broadcast_thermo():
 
     for idx, (t, p) in enumerate(zip(temperatures, pressures)):
         r = 8.31446261815324  # m3⋅Pa/K/mol
-        mass_density = np.sum(
-            p / (r * t) * mole_fractions.T[idx] * pure_molecular_weights
+        mass_density = (
+            np.sum(
+                p / (r * t) * mole_fractions.T[idx] * pure_molecular_weights
+            )
+            / 1000
         )
 
         raw_mass_densities[idx] = mass_density

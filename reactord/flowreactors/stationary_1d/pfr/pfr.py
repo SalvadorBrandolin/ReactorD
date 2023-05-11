@@ -1,11 +1,11 @@
 import numpy as np
 
-from reactord.kinetics import Kinetics
+import pandas as pd
+
+from reactord.kinetics_old import Kinetics
 from reactord.mix.abstract_mix import AbstractMix
 
 from scipy.integrate import solve_bvp
-
-import pandas as pd
 
 
 class PFR:

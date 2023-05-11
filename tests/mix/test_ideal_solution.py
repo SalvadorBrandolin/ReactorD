@@ -130,22 +130,6 @@ def test_three_substance_mix():
         )  # OKAY
 
 
-def test_formation_enthalpies():
-    substance1 = rd.Substance(name="substance1", formation_enthalpy=1000)
-    substance2 = rd.Substance(name="substance2", formation_enthalpy=2000)
-    substance3 = rd.Substance(name="substance3", formation_enthalpy=3000)
-
-    mix = rd.mix.IdealSolution([substance1, substance2, substance3])
-
-    enthalpies_mix = mix._formation_enthalpies_set()
-
-    assert enthalpies_mix[0] == 1000
-
-    assert enthalpies_mix[1] == 2000
-
-    assert enthalpies_mix[2] == 3000
-
-
 def test_broadcast():
     def cp1(temperature, pressure):
         cp = np.ones(np.size(temperature)) * 10
@@ -317,8 +301,11 @@ def test_broadcast():
     for idx, (t, p) in enumerate(zip(temperatures, pressures)):
         volume = np.dot(mole_fractions.T[idx], [10, 20, 30])
         molar_density = 1 / volume
-        mass_density = np.sum(
-            molar_density * mole_fractions.T[idx] * np.array([10, 20, 30])
+        mass_density = (
+            np.sum(
+                molar_density * mole_fractions.T[idx] * np.array([10, 20, 30])
+            )
+            / 1000
         )
 
         raw_mass_densities[idx] = mass_density

@@ -75,13 +75,6 @@ def test_formation_enthalpy_ig(name):
 
 
 @pytest.mark.parametrize("name", compounds)
-def test_formation_gibbs_ig(name):
-    substance = rd.Substance.from_thermo_database(name, name)
-    chemical_obj = ChemicalConstantsPackage.correlations_from_IDs([name])
-    assert substance.formation_gibbs_ig == chemical_obj.constants.Gfgs[0]
-
-
-@pytest.mark.parametrize("name", compounds)
 def test_vectorize_functions(name):
     substance = rd.Substance.from_thermo_database(name, name)
     assert substance.vectorize_functions is True
@@ -144,20 +137,6 @@ def test_volume_liquid(name):
         for p in pressure:
             assert substance.volume_liquid(t, p) == (
                 chemical_obj.VolumeLiquids[0].T_dependent_property(t)
-            )
-
-
-@pytest.mark.parametrize("name", compounds)
-def test_volume_gas(name):
-    substance = rd.Substance.from_thermo_database(name, name)
-    chemical_obj = ChemicalConstantsPackage.correlations_from_IDs([name])
-    temperature = [300, 400, 500, 600, 700]
-    pressure = [101325, 200000, 300000, 400000]
-    for t in temperature:
-        for p in pressure:
-            method = chemical_obj.VolumeGases[0].method_P
-            assert substance.volume_gas(t, p) == (
-                chemical_obj.VolumeGases[0].calculate_P(t, p, method)
             )
 
 
@@ -332,7 +311,6 @@ def test_all_together_vectorized(name):
     assert substance.acentric_factor == chemical_obj.constants.omegas[0]
     assert substance.formation_enthalpy == chemical_obj.constants.Hf_STPs[0]
     assert substance.formation_enthalpy_ig == chemical_obj.constants.Hfgs[0]
-    assert substance.formation_gibbs_ig == chemical_obj.constants.Gfgs[0]
     assert substance.vectorize_functions is True
 
     # Functions
@@ -340,7 +318,6 @@ def test_all_together_vectorized(name):
     assert isinstance(substance._sublimation_enthalpy, np.vectorize)
     assert isinstance(substance._volume_solid, np.vectorize)
     assert isinstance(substance._volume_liquid, np.vectorize)
-    assert isinstance(substance._volume_gas, np.vectorize)
     assert isinstance(substance._heat_capacity_solid, np.vectorize)
     assert isinstance(substance._heat_capacity_liquid, np.vectorize)
     assert isinstance(substance._heat_capacity_gas, np.vectorize)
@@ -364,7 +341,6 @@ def test_all_together_vectorized(name):
     substance_fusion_enthalpy = substance.fusion_enthalpy(temperature1)
     substance_volume_solid = substance.volume_solid(temperature1, pressure)
     substance_volume_liquid = substance.volume_liquid(temperature1, pressure)
-    substance_volume_gas = substance.volume_gas(temperature1, pressure)
     substance_heat_capacity_solid = substance.heat_capacity_solid(
         temperature1, pressure
     )
@@ -438,12 +414,6 @@ def test_all_together_vectorized(name):
         assert np.allclose(
             substance_viscosity_gas[idx],
             (chemical_obj.ViscosityGases[0].T_dependent_property(t)),
-        )
-
-    for idx, (t, p) in enumerate(zip(temperature1, pressure)):
-        method = chemical_obj.VolumeGases[0].method_P
-        assert substance_volume_gas[idx] == (
-            chemical_obj.VolumeGases[0].calculate_P(t, p, method)
         )
 
     for idx, (t1, t2) in enumerate(zip(temperature1, temperature2)):
@@ -493,7 +463,6 @@ def test_pickle(name):
     assert substance.acentric_factor == chemical_obj.constants.omegas[0]
     assert substance.formation_enthalpy == chemical_obj.constants.Hf_STPs[0]
     assert substance.formation_enthalpy_ig == chemical_obj.constants.Hfgs[0]
-    assert substance.formation_gibbs_ig == chemical_obj.constants.Gfgs[0]
     assert substance.vectorize_functions is True
 
     # Functions
@@ -501,7 +470,6 @@ def test_pickle(name):
     assert isinstance(substance._sublimation_enthalpy, np.vectorize)
     assert isinstance(substance._volume_solid, np.vectorize)
     assert isinstance(substance._volume_liquid, np.vectorize)
-    assert isinstance(substance._volume_gas, np.vectorize)
     assert isinstance(substance._heat_capacity_solid, np.vectorize)
     assert isinstance(substance._heat_capacity_liquid, np.vectorize)
     assert isinstance(substance._heat_capacity_gas, np.vectorize)
@@ -525,7 +493,6 @@ def test_pickle(name):
     substance_fusion_enthalpy = substance.fusion_enthalpy(temperature1)
     substance_volume_solid = substance.volume_solid(temperature1, pressure)
     substance_volume_liquid = substance.volume_liquid(temperature1, pressure)
-    substance_volume_gas = substance.volume_gas(temperature1, pressure)
     substance_heat_capacity_solid = substance.heat_capacity_solid(
         temperature1, pressure
     )
@@ -599,12 +566,6 @@ def test_pickle(name):
         assert np.allclose(
             substance_viscosity_gas[idx],
             (chemical_obj.ViscosityGases[0].T_dependent_property(t)),
-        )
-
-    for idx, (t, p) in enumerate(zip(temperature1, pressure)):
-        method = chemical_obj.VolumeGases[0].method_P
-        assert substance_volume_gas[idx] == (
-            chemical_obj.VolumeGases[0].calculate_P(t, p, method)
         )
 
     for idx, (t1, t2) in enumerate(zip(temperature1, temperature2)):

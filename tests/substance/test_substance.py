@@ -13,7 +13,6 @@ def test_constants():
         acentric_factor=0.34,
         formation_enthalpy=-100000,
         formation_enthalpy_ig=-110000,
-        formation_gibbs_ig=-50000,
         vectorize_functions=False,
     )
 
@@ -25,7 +24,6 @@ def test_constants():
     assert substance.acentric_factor == 0.34
     assert substance.formation_enthalpy == -100000
     assert substance.formation_enthalpy_ig == -110000
-    assert substance.formation_gibbs_ig == -50000
     assert substance.vectorize_functions is False
 
 
@@ -41,9 +39,6 @@ def test_functions_vectorize_false():
 
     def volume_liquid(temperature, pressure):
         return 7.31 * temperature / pressure
-
-    def volume_gas(temperature, pressure):
-        return 8.31 * temperature / pressure
 
     def heat_capacity_solid(temperature, pressure):
         return 6.31 * temperature + 3 * pressure
@@ -90,7 +85,6 @@ def test_functions_vectorize_false():
         sublimation_enthalpy=sublimation_enthalpy,
         volume_solid=volume_solid,
         volume_liquid=volume_liquid,
-        volume_gas=volume_gas,
         heat_capacity_solid=heat_capacity_solid,
         heat_capacity_liquid=heat_capacity_liquid,
         heat_capacity_gas=heat_capacity_gas,
@@ -108,7 +102,6 @@ def test_functions_vectorize_false():
     assert not isinstance(substance._sublimation_enthalpy, np.vectorize)
     assert not isinstance(substance._volume_solid, np.vectorize)
     assert not isinstance(substance._volume_liquid, np.vectorize)
-    assert not isinstance(substance._volume_gas, np.vectorize)
     assert not isinstance(substance._heat_capacity_solid, np.vectorize)
     assert not isinstance(substance._heat_capacity_liquid, np.vectorize)
     assert not isinstance(substance._heat_capacity_gas, np.vectorize)
@@ -152,9 +145,6 @@ def test_functions_vectorize_false():
     assert substance.volume_liquid(
         temperature1_scalar, pressure_scalar
     ) == volume_liquid(temperature1_scalar, pressure_scalar)
-    assert substance.volume_gas(
-        temperature1_scalar, pressure_scalar
-    ) == volume_gas(temperature1_scalar, pressure_scalar)
     assert substance.heat_capacity_solid(
         temperature1_scalar, pressure_scalar
     ) == heat_capacity_solid(temperature1_scalar, pressure_scalar)
@@ -213,10 +203,6 @@ def test_functions_vectorize_false():
     assert (
         substance.volume_liquid(temperature1, pressure)
         == volume_liquid(temperature1, pressure)
-    ).all()
-    assert (
-        substance.volume_gas(temperature1, pressure)
-        == volume_gas(temperature1, pressure)
     ).all()
     assert (
         substance.heat_capacity_solid(temperature1, pressure)
@@ -283,9 +269,6 @@ def test_functions_vectorize_true():
     def volume_liquid(temperature, pressure):
         return 7.31 * temperature / pressure
 
-    def volume_gas(temperature, pressure):
-        return 8.31 * temperature / pressure
-
     def heat_capacity_solid(temperature, pressure):
         return 6.31 * temperature + 3 * pressure
 
@@ -331,7 +314,6 @@ def test_functions_vectorize_true():
         sublimation_enthalpy=sublimation_enthalpy,
         volume_solid=volume_solid,
         volume_liquid=volume_liquid,
-        volume_gas=volume_gas,
         heat_capacity_solid=heat_capacity_solid,
         heat_capacity_liquid=heat_capacity_liquid,
         heat_capacity_gas=heat_capacity_gas,
@@ -349,7 +331,6 @@ def test_functions_vectorize_true():
     assert isinstance(substance._sublimation_enthalpy, np.vectorize)
     assert isinstance(substance._volume_solid, np.vectorize)
     assert isinstance(substance._volume_liquid, np.vectorize)
-    assert isinstance(substance._volume_gas, np.vectorize)
     assert isinstance(substance._heat_capacity_solid, np.vectorize)
     assert isinstance(substance._heat_capacity_liquid, np.vectorize)
     assert isinstance(substance._heat_capacity_gas, np.vectorize)
@@ -389,9 +370,6 @@ def test_functions_vectorize_true():
     assert substance.volume_liquid(
         temperature1_scalar, pressure_scalar
     ) == volume_liquid(temperature1_scalar, pressure_scalar)
-    assert substance.volume_gas(
-        temperature1_scalar, pressure_scalar
-    ) == volume_gas(temperature1_scalar, pressure_scalar)
     assert substance.heat_capacity_solid(
         temperature1_scalar, pressure_scalar
     ) == heat_capacity_solid(temperature1_scalar, pressure_scalar)
@@ -450,10 +428,6 @@ def test_functions_vectorize_true():
     assert (
         substance.volume_liquid(temperature1, pressure)
         == volume_liquid(temperature1, pressure)
-    ).all()
-    assert (
-        substance.volume_gas(temperature1, pressure)
-        == volume_gas(temperature1, pressure)
     ).all()
     assert (
         substance.heat_capacity_solid(temperature1, pressure)
@@ -520,9 +494,6 @@ def test_create_pickle_vectorized_false():
     def volume_liquid(temperature, pressure):
         return 7.31 * temperature / pressure
 
-    def volume_gas(temperature, pressure):
-        return 8.31 * temperature / pressure
-
     def heat_capacity_solid(temperature, pressure):
         return 6.31 * temperature + 3 * pressure
 
@@ -571,12 +542,10 @@ def test_create_pickle_vectorized_false():
         acentric_factor=0.34,
         formation_enthalpy=-100000,
         formation_enthalpy_ig=-110000,
-        formation_gibbs_ig=-50000,
         vaporization_enthalpy=vaporization_enthalpy,
         sublimation_enthalpy=sublimation_enthalpy,
         volume_solid=volume_solid,
         volume_liquid=volume_liquid,
-        volume_gas=volume_gas,
         heat_capacity_solid=heat_capacity_solid,
         heat_capacity_liquid=heat_capacity_liquid,
         heat_capacity_gas=heat_capacity_gas,
@@ -602,14 +571,12 @@ def test_create_pickle_vectorized_false():
     assert substance.acentric_factor == 0.34
     assert substance.formation_enthalpy == -100000
     assert substance.formation_enthalpy_ig == -110000
-    assert substance.formation_gibbs_ig == -50000
     assert substance.vectorize_functions is False
 
     assert not isinstance(substance._vaporization_enthalpy, np.vectorize)
     assert not isinstance(substance._sublimation_enthalpy, np.vectorize)
     assert not isinstance(substance._volume_solid, np.vectorize)
     assert not isinstance(substance._volume_liquid, np.vectorize)
-    assert not isinstance(substance._volume_gas, np.vectorize)
     assert not isinstance(substance._heat_capacity_solid, np.vectorize)
     assert not isinstance(substance._heat_capacity_liquid, np.vectorize)
     assert not isinstance(substance._heat_capacity_gas, np.vectorize)
@@ -653,9 +620,6 @@ def test_create_pickle_vectorized_false():
     assert substance.volume_liquid(
         temperature1_scalar, pressure_scalar
     ) == volume_liquid(temperature1_scalar, pressure_scalar)
-    assert substance.volume_gas(
-        temperature1_scalar, pressure_scalar
-    ) == volume_gas(temperature1_scalar, pressure_scalar)
     assert substance.heat_capacity_solid(
         temperature1_scalar, pressure_scalar
     ) == heat_capacity_solid(temperature1_scalar, pressure_scalar)
@@ -714,10 +678,6 @@ def test_create_pickle_vectorized_false():
     assert (
         substance.volume_liquid(temperature1, pressure)
         == volume_liquid(temperature1, pressure)
-    ).all()
-    assert (
-        substance.volume_gas(temperature1, pressure)
-        == volume_gas(temperature1, pressure)
     ).all()
     assert (
         substance.heat_capacity_solid(temperature1, pressure)
@@ -784,9 +744,6 @@ def test_create_pickle_vectorized_true():
     def volume_liquid(temperature, pressure):
         return 7.31 * temperature / pressure
 
-    def volume_gas(temperature, pressure):
-        return 8.31 * temperature / pressure
-
     def heat_capacity_solid(temperature, pressure):
         return 6.31 * temperature + 3 * pressure
 
@@ -835,12 +792,10 @@ def test_create_pickle_vectorized_true():
         acentric_factor=0.34,
         formation_enthalpy=-100000,
         formation_enthalpy_ig=-110000,
-        formation_gibbs_ig=-50000,
         vaporization_enthalpy=vaporization_enthalpy,
         sublimation_enthalpy=sublimation_enthalpy,
         volume_solid=volume_solid,
         volume_liquid=volume_liquid,
-        volume_gas=volume_gas,
         heat_capacity_solid=heat_capacity_solid,
         heat_capacity_liquid=heat_capacity_liquid,
         heat_capacity_gas=heat_capacity_gas,
@@ -866,14 +821,12 @@ def test_create_pickle_vectorized_true():
     assert substance.acentric_factor == 0.34
     assert substance.formation_enthalpy == -100000
     assert substance.formation_enthalpy_ig == -110000
-    assert substance.formation_gibbs_ig == -50000
     assert substance.vectorize_functions is True
 
     assert isinstance(substance._vaporization_enthalpy, np.vectorize)
     assert isinstance(substance._sublimation_enthalpy, np.vectorize)
     assert isinstance(substance._volume_solid, np.vectorize)
     assert isinstance(substance._volume_liquid, np.vectorize)
-    assert isinstance(substance._volume_gas, np.vectorize)
     assert isinstance(substance._heat_capacity_solid, np.vectorize)
     assert isinstance(substance._heat_capacity_liquid, np.vectorize)
     assert isinstance(substance._heat_capacity_gas, np.vectorize)
@@ -913,9 +866,6 @@ def test_create_pickle_vectorized_true():
     assert substance.volume_liquid(
         temperature1_scalar, pressure_scalar
     ) == volume_liquid(temperature1_scalar, pressure_scalar)
-    assert substance.volume_gas(
-        temperature1_scalar, pressure_scalar
-    ) == volume_gas(temperature1_scalar, pressure_scalar)
     assert substance.heat_capacity_solid(
         temperature1_scalar, pressure_scalar
     ) == heat_capacity_solid(temperature1_scalar, pressure_scalar)
@@ -974,10 +924,6 @@ def test_create_pickle_vectorized_true():
     assert (
         substance.volume_liquid(temperature1, pressure)
         == volume_liquid(temperature1, pressure)
-    ).all()
-    assert (
-        substance.volume_gas(temperature1, pressure)
-        == volume_gas(temperature1, pressure)
     ).all()
     assert (
         substance.heat_capacity_solid(temperature1, pressure)

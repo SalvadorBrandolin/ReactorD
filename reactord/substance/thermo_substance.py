@@ -5,13 +5,20 @@ Caleb Bell and Contributors (2016-2021). Thermo: Chemical properties component
 of Chemical Engineering Design Library (ChEDL)
 https://github.com/CalebBell/thermo.
 """
+from typing import TYPE_CHECKING
 
 from scipy.integrate import quad
 
 from thermo import ChemicalConstantsPackage
 
 
-def thermo_substance_constructor(cls, name: str, thermo_identification: str):
+if TYPE_CHECKING:
+    from .substance import Substance
+
+
+def thermo_substance_constructor(
+    substance: "Substance", name: str, thermo_identification: str
+):
     """Substance constructor from Thermo database.
 
     The functions of the Thermo library are all exclusively temperature
@@ -129,7 +136,7 @@ def thermo_substance_constructor(cls, name: str, thermo_identification: str):
         )[0]
         return integral
 
-    substance_object = cls(
+    substance_object = substance(
         name=name,
         molecular_weight=corr.constants.MWs[0],
         normal_boiling_point=corr.constants.Tbs[0],
