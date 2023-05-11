@@ -11,9 +11,8 @@ def test_fogler_p1_15a():
         n = np.size(temperature)
         return np.full(n, 1 / (fa_in / f_volumetric))
 
-    def kinetic(concentrations, temperature):
-        n = np.size(temperature)
-        return np.full(n, k)
+    def r_rate(c, t, cons):
+        return np.full(np.size(t), cons["k"])
 
     # Fogler's exact solution
     def fogler(vol):
@@ -30,41 +29,28 @@ def test_fogler_p1_15a():
     v_pfr = 99 * 0.001  # m3
 
     # Substance definition
-    substance_a = rd.Substance(
+    a = rd.Substance(
         name="A",
         volume_liquid=volume,
     )
-    substance_b = rd.Substance(
+    b = rd.Substance(
         name="B",
         volume_liquid=volume,
     )
 
-    # Mixture
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mix = rd.mix.IdealSolution([a, b])
 
-    # Kinetic
-    kinetics = rd.Kinetics(
-        mix=mixture,
-        list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        kinetic_argument="concentration",
+    kinetic = rd.Kinetic(
+        mix=mix,
+        reactions={"r1": {"eq": a > b, "rate": r_rate}},
+        kinetic_constants={"k": k},
     )
 
-    # Reactor
     mb = pfr.mass_balances.MolarFlow(molar_flows_in={"A": fa_in, "B": 0})
     eb = pfr.energy_balances.Isothermic(298.15)
     pb = pfr.pressure_balances.Isobaric(101325)
 
-    reactor = pfr.PFR(
-        mix=mixture,
-        kinetics=kinetics,
-        reactor_length=v_pfr,
-        transversal_area=1,
-        grid_size=5,
-        mass_balance=mb,
-        energy_balance=eb,
-        pressure_balance=pb,
-    )
+    reactor = pfr.PFR(mix, kinetic, v_pfr, 1, 100, mb, eb, pb)
 
     # Simulation
     reactor.simulate(verbose=0)
@@ -79,8 +65,12 @@ def test_fogler_p1_15a():
         reactor.pressure_profile,
     )
 
-    assert np.allclose(reactord_concentrations[0, :], fogler_a_concentration)
-    assert np.allclose(reactord_concentrations[1, :], fogler_b_concentration)
+    assert np.allclose(
+        reactord_concentrations[0, :], fogler_a_concentration, atol=1e-8
+    )
+    assert np.allclose(
+        reactord_concentrations[1, :], fogler_b_concentration, atol=1e-8
+    )
 
     # =========================================================================
     # Border value problem 1
@@ -95,8 +85,8 @@ def test_fogler_p1_15a():
     pb1 = pfr.pressure_balances.Isobaric(101325)
 
     reactor1 = pfr.PFR(
-        mix=mixture,
-        kinetics=kinetics,
+        mix=mix,
+        kinetic=kinetic,
         reactor_length=v_pfr,
         transversal_area=1,
         grid_size=100,
@@ -120,8 +110,12 @@ def test_fogler_p1_15a():
         reactor1.pressure_profile,
     )
 
-    assert np.allclose(reactord_concentrations1[0, :], fogler_a_concentration1)
-    assert np.allclose(reactord_concentrations1[1, :], fogler_b_concentration1)
+    assert np.allclose(
+        reactord_concentrations1[0, :], fogler_a_concentration1, atol=1e-8
+    )
+    assert np.allclose(
+        reactord_concentrations1[1, :], fogler_b_concentration1, atol=1e-8
+    )
 
     # =========================================================================
     # Border value problem 2
@@ -133,8 +127,8 @@ def test_fogler_p1_15a():
     pb2 = pfr.pressure_balances.Isobaric(101325)
 
     reactor2 = pfr.PFR(
-        mix=mixture,
-        kinetics=kinetics,
+        mix=mix,
+        kinetic=kinetic,
         reactor_length=v_pfr,
         transversal_area=1,
         grid_size=100,
@@ -158,8 +152,12 @@ def test_fogler_p1_15a():
         reactor2.pressure_profile,
     )
 
-    assert np.allclose(reactord_concentrations2[0, :], fogler_a_concentration2)
-    assert np.allclose(reactord_concentrations2[1, :], fogler_b_concentration2)
+    assert np.allclose(
+        reactord_concentrations2[0, :], fogler_a_concentration2, atol=1e-8
+    )
+    assert np.allclose(
+        reactord_concentrations2[1, :], fogler_b_concentration2, atol=1e-8
+    )
 
 
 def test_fogler_p1_15b():
@@ -169,8 +167,8 @@ def test_fogler_p1_15b():
         n = np.size(temperature)
         return np.full(n, 1 / (fa_in / f_volumetric))
 
-    def kinetic(concentrations, temperature):
-        return k * concentrations[0]
+    def r_rate(c, t, cons):
+        return cons["k"] * c["A"]
 
     # Fogler's exact solution
     def fogler(vol):
@@ -187,24 +185,23 @@ def test_fogler_p1_15b():
     v_pfr = 127.9 * 0.001  # m3
 
     # Substance definition
-    substance_a = rd.Substance(
+    a = rd.Substance(
         name="A",
         volume_liquid=volume,
     )
-    substance_b = rd.Substance(
+    b = rd.Substance(
         name="B",
         volume_liquid=volume,
     )
 
     # Mixture
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mixture = rd.mix.IdealSolution([a, b])
 
     # Kinetic
-    kinetics = rd.Kinetics(
+    kinetic = rd.Kinetic(
         mix=mixture,
-        list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        kinetic_argument="concentration",
+        reactions={"r1": {"eq": a > b, "rate": r_rate}},
+        kinetic_constants={"k": k},
     )
 
     # Reactor
@@ -214,17 +211,17 @@ def test_fogler_p1_15b():
 
     reactor = pfr.PFR(
         mix=mixture,
-        kinetics=kinetics,
+        kinetic=kinetic,
         reactor_length=v_pfr,
         transversal_area=1,
-        grid_size=5,
+        grid_size=20,
         mass_balance=mb,
         energy_balance=eb,
         pressure_balance=pb,
     )
 
     # Simulation
-    reactor.simulate(verbose=0)
+    reactor.simulate(tol=1e-8, verbose=0)
 
     # Comparisson
     fogler_a_concentration = fogler(reactor.z)
@@ -236,8 +233,12 @@ def test_fogler_p1_15b():
         reactor.pressure_profile,
     )
 
-    assert np.allclose(reactord_concentrations[0, :], fogler_a_concentration)
-    assert np.allclose(reactord_concentrations[1, :], fogler_b_concentration)
+    assert np.allclose(
+        reactord_concentrations[0, :], fogler_a_concentration, atol=1e-8
+    )
+    assert np.allclose(
+        reactord_concentrations[1, :], fogler_b_concentration, atol=1e-8
+    )
 
     # =========================================================================
     # Border value problem 1
@@ -253,7 +254,7 @@ def test_fogler_p1_15b():
 
     reactor1 = pfr.PFR(
         mix=mixture,
-        kinetics=kinetics,
+        kinetic=kinetic,
         reactor_length=v_pfr,
         transversal_area=1,
         grid_size=100,
@@ -263,7 +264,7 @@ def test_fogler_p1_15b():
     )
 
     # Simulation
-    reactor1.simulate(tol=0.0001, verbose=0, bc_tol=1e-3)
+    reactor1.simulate(tol=1e-10, verbose=0)
 
     # Comparisson
     fogler_a_concentration1 = fogler(reactor1.z)
@@ -277,9 +278,11 @@ def test_fogler_p1_15b():
         reactor1.pressure_profile,
     )
 
-    assert np.allclose(reactord_concentrations1[0, :], fogler_a_concentration1)
     assert np.allclose(
-        reactord_concentrations1[1, :], fogler_b_concentration1, atol=1e-5
+        reactord_concentrations1[0, :], fogler_a_concentration1, atol=1e-8
+    )
+    assert np.allclose(
+        reactord_concentrations1[1, :], fogler_b_concentration1, atol=1e-8
     )
 
     # =========================================================================
@@ -293,7 +296,7 @@ def test_fogler_p1_15b():
 
     reactor2 = pfr.PFR(
         mix=mixture,
-        kinetics=kinetics,
+        kinetic=kinetic,
         reactor_length=v_pfr,
         transversal_area=1,
         grid_size=100,
@@ -303,7 +306,7 @@ def test_fogler_p1_15b():
     )
 
     # Simulation
-    reactor2.simulate(tol=0.0001, verbose=0, bc_tol=1e-3)
+    reactor2.simulate(tol=1e-8, verbose=0, bc_tol=1e-3)
 
     # Comparisson
     fogler_a_concentration2 = fogler(reactor2.z)
@@ -315,9 +318,11 @@ def test_fogler_p1_15b():
         reactor2.pressure_profile,
     )
 
-    assert np.allclose(reactord_concentrations2[0, :], fogler_a_concentration2)
     assert np.allclose(
-        reactord_concentrations2[1, :], fogler_b_concentration2, atol=1e-6
+        reactord_concentrations2[0, :], fogler_a_concentration2, atol=1e-8
+    )
+    assert np.allclose(
+        reactord_concentrations2[1, :], fogler_b_concentration2, atol=1e-8
     )
 
 
@@ -328,8 +333,8 @@ def test_fogler_p1_15c():
         n = np.size(temperature)
         return np.full(n, 1 / (fa_in / f_volumetric))
 
-    def kinetic(concentrations, temperature):
-        return k * concentrations[0] ** 2
+    def r_rate(c, t, cons):
+        return cons["k"] * c["A"] ** 2
 
     # Fogler's exact solution
     def fogler(vol):
@@ -348,24 +353,23 @@ def test_fogler_p1_15c():
     v_pfr = 660 * 0.001  # m3
 
     # Substance definition
-    substance_a = rd.Substance(
+    a = rd.Substance(
         name="A",
         volume_liquid=volume,
     )
-    substance_b = rd.Substance(
+    b = rd.Substance(
         name="B",
         volume_liquid=volume,
     )
 
     # Mixture
-    mixture = rd.mix.IdealSolution([substance_a, substance_b])
+    mix = rd.mix.IdealSolution([a, b])
 
     # Kinetic
-    kinetics = rd.Kinetics(
-        mix=mixture,
-        list_of_reactions=[kinetic],
-        stoichiometry=np.array([-1, 1]),
-        kinetic_argument="concentration",
+    kinetic = rd.Kinetic(
+        mix=mix,
+        reactions={"r1": {"eq": a > b, "rate": r_rate}},
+        kinetic_constants={"k": k},
     )
 
     # Reactor
@@ -374,18 +378,18 @@ def test_fogler_p1_15c():
     pb = pfr.pressure_balances.Isobaric(101325)
 
     reactor = pfr.PFR(
-        mix=mixture,
-        kinetics=kinetics,
+        mix=mix,
+        kinetic=kinetic,
         reactor_length=v_pfr,
         transversal_area=1,
-        grid_size=5,
+        grid_size=20,
         mass_balance=mb,
         energy_balance=eb,
         pressure_balance=pb,
     )
 
     # Simulation
-    reactor.simulate(verbose=0)
+    reactor.simulate(tol=1e-8, verbose=0)
 
     # Comparisson
     fogler_a_concentration = fogler(reactor.z)
@@ -398,10 +402,10 @@ def test_fogler_p1_15c():
     )
 
     assert np.allclose(
-        reactord_concentrations[0, :], fogler_a_concentration, atol=1e-4
+        reactord_concentrations[0, :], fogler_a_concentration, atol=1e-8
     )
     assert np.allclose(
-        reactord_concentrations[1, :], fogler_b_concentration, atol=1e-4
+        reactord_concentrations[1, :], fogler_b_concentration, atol=1e-8
     )
 
     # =========================================================================
@@ -417,18 +421,21 @@ def test_fogler_p1_15c():
     pb1 = pfr.pressure_balances.Isobaric(101325)
 
     reactor1 = pfr.PFR(
-        mix=mixture,
-        kinetics=kinetics,
+        mix=mix,
+        kinetic=kinetic,
         reactor_length=v_pfr,
         transversal_area=1,
-        grid_size=100,
+        grid_size=20,
         mass_balance=mb1,
         energy_balance=eb1,
         pressure_balance=pb1,
     )
 
     # Simulation
-    reactor1.simulate(tol=0.0001, verbose=0, bc_tol=1e-3)
+    reactor1.simulate(
+        tol=1e-10,
+        verbose=0,
+    )
 
     # Comparisson
     fogler_a_concentration1 = fogler(reactor1.z)
@@ -443,10 +450,10 @@ def test_fogler_p1_15c():
     )
 
     assert np.allclose(
-        reactord_concentrations1[0, :], fogler_a_concentration1, atol=1e-3
+        reactord_concentrations1[0, :], fogler_a_concentration1, atol=1e-8
     )
     assert np.allclose(
-        reactord_concentrations1[1, :], fogler_b_concentration1, atol=1e-3
+        reactord_concentrations1[1, :], fogler_b_concentration1, atol=1e-8
     )
 
     # =========================================================================
@@ -459,18 +466,18 @@ def test_fogler_p1_15c():
     pb2 = pfr.pressure_balances.Isobaric(101325)
 
     reactor2 = pfr.PFR(
-        mix=mixture,
-        kinetics=kinetics,
+        mix=mix,
+        kinetic=kinetic,
         reactor_length=v_pfr,
         transversal_area=1,
-        grid_size=100,
+        grid_size=20,
         mass_balance=mb2,
         energy_balance=eb2,
         pressure_balance=pb2,
     )
 
     # Simulation
-    reactor2.simulate(tol=0.0001, verbose=0, bc_tol=1e-3)
+    reactor2.simulate(tol=1e-10, verbose=0, bc_tol=1e-3)
 
     # Comparisson
     fogler_a_concentration2 = fogler(reactor2.z)
@@ -483,24 +490,28 @@ def test_fogler_p1_15c():
     )
 
     assert np.allclose(
-        reactord_concentrations2[0, :], fogler_a_concentration2, atol=1e-4
+        reactord_concentrations2[0, :], fogler_a_concentration2, atol=1e-8
     )
     assert np.allclose(
-        reactord_concentrations2[1, :], fogler_b_concentration2, atol=1e-4
+        reactord_concentrations2[1, :], fogler_b_concentration2, atol=1e-8
     )
 
 
 def test_fogler_example_4_4():
     # Pressure border condition information is given at the reactor's inlet.
-    def ra(concentrations, temperature):
-        return np.zeros(np.size(temperature))
+    def ra(c, t, cons):
+        return np.zeros(np.size(t))
 
     n = rd.Substance.from_thermo_database("N", "nitrogen")
     o = rd.Substance.from_thermo_database("O", "oxygen")
 
-    mixture = rd.mix.IdealGas([n, o])
+    mix = rd.mix.IdealGas([n, o])
 
-    kinetic = rd.Kinetics(mixture, [ra], np.array([0, 0]))
+    kinetic = rd.Kinetic(
+        mix=mix,
+        reactions={"r1": {"eq": n + o, "rate": ra}},
+        kinetic_constants={},
+    )
 
     mb = pfr.mass_balances.MolarFlow(
         molar_flows_in={
@@ -514,11 +525,11 @@ def test_fogler_example_4_4():
     )
 
     reactor = pfr.PFR(
-        mix=mixture,
-        kinetics=kinetic,
+        mix=mix,
+        kinetic=kinetic,
         reactor_length=18.288,
         transversal_area=0.001313648986,
-        grid_size=100,
+        grid_size=20,
         mass_balance=mb,
         energy_balance=eb,
         pressure_balance=pb,
@@ -530,6 +541,4 @@ def test_fogler_example_4_4():
     fogler_pressures = np.array([10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65])
     reactord_pressures = reactor.ode_solution.sol(fogler_z)[-1] / 101325
 
-    assert np.allclose(
-        reactord_pressures, fogler_pressures, rtol=1e-05, atol=0.1
-    )
+    assert np.allclose(reactord_pressures, fogler_pressures, atol=0.1)

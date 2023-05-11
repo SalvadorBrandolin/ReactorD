@@ -2,7 +2,7 @@ import numpy as np
 
 import pandas as pd
 
-from reactord.kinetics_old import Kinetics
+from reactord.kinetic.kinetic import Kinetic
 from reactord.mix.abstract_mix import AbstractMix
 
 from scipy.integrate import solve_bvp
@@ -12,7 +12,7 @@ class PFR:
     def __init__(
         self,
         mix: AbstractMix,
-        kinetics: Kinetics,
+        kinetic: Kinetic,
         reactor_length: float,
         transversal_area: float,
         grid_size: int,
@@ -24,13 +24,13 @@ class PFR:
         # Core PFR information
         # =====================================================================
         self.mix = mix
-        self.kinetics = kinetics
+        self.kinetic = kinetic
         self.reactor_length = reactor_length
         self.transversal_area = transversal_area
         self._initial_grid_size = grid_size
         self.grid_size = grid_size
         self.subs_n = len(self.mix)
-        self.reac_n = len(self.kinetics)
+        self.reac_n = len(self.kinetic)
 
         # =====================================================================
         # Balances
@@ -113,7 +113,7 @@ class PFR:
 
         self.mole_fraction_profile = self.mix.mole_fractions(self.mass_profile)
 
-        self.r_rates_profile = self.kinetics.kinetic_eval(
+        self.r_rates_profile = self.kinetic.evaluate(
             self.mole_fraction_profile,
             self.temperature_profile,
             self.pressure_profile,
@@ -155,7 +155,7 @@ class PFR:
             self.mole_fraction_profile = self.mix.mole_fractions(
                 self.mass_profile
             )
-            self.r_rates_profile = self.kinetics.kinetic_eval(
+            self.r_rates_profile = self.kinetic.evaluate(
                 self.mole_fraction_profile,
                 self.temperature_profile,
                 self.pressure_profile,

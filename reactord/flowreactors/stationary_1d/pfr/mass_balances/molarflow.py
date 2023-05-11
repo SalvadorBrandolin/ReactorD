@@ -68,7 +68,7 @@ class MolarFlow:
     def evaluate_balance(self, reactor: PFR):
         # Reaction rate of each substance on each reactor's z
         ri = np.matmul(
-            reactor.kinetics.stoichiometry.T, reactor.r_rates_profile
+            reactor.kinetic.stoichiometry.T, reactor.r_rates_profile
         )
 
         return ri * reactor.transversal_area
