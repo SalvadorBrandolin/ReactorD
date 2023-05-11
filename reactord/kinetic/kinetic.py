@@ -28,8 +28,8 @@ class Kinetic:
         self.r_argument = rates_argument
         self.r_names: List[str] = list(reactions.keys())
         self.r_dics: List[dict] = [reactions[name] for name in self.r_names]
-        self.r_eqs: List[Symbolic] = [rdic.get("eq") for rdic in self.r_dics]
-        self.r_rates: List[Callable] = [rd.get("rate") for rd in self.r_dics]
+        self.r_eqs: List[Symbolic] = [rdi.get("eq") for rdi in self.r_dics]
+        self.r_rates: List[Callable] = [rdi.get("rate") for rdi in self.r_dics]
         self._user_r_dhs: List[float] = np.array(
             [rdict.get("DH") for rdict in self.r_dics]
         )
@@ -55,9 +55,6 @@ class Kinetic:
         # Kinetic compositional argument object
         self.comp_argument = CompositionalArgument(self.mix.names)
 
-        # Reaction rates state
-        self.r_rates = np.array([])
-
     @property
     def user_r_dh(self):
         return self._user_r_dhs
@@ -78,13 +75,13 @@ class Kinetic:
         self.comp_argument.values = self._arg_func(
             mole_fractions, temperature, pressure
         )
-        self.r_rates = np.array(
+        self.r_rates_profile = np.array(
             [
                 rate(self.comp_argument, temperature, self.kinetic_constants)
                 for rate in self.r_rates
             ]
         )
-        return self.r_rates
+        return self.r_rates_profile
 
     def dhs_evaluate(
         self,

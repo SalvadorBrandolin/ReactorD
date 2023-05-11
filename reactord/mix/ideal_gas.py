@@ -174,7 +174,7 @@ class IdealGas(AbstractMix):
         return correction_enthalpies
 
     def get_formation_enthalpies(self):
-        """Return the ideal gas formation enthalpies in a ordered ndarray.
+        """Return the ideal gas formation enthalpies in an ordered ndarray.
 
         Method that read the ideal gas formation enthalpies of the mix
         class and returns them in an ordered ndarray.
@@ -184,9 +184,4 @@ class IdealGas(AbstractMix):
         ndarray [float]
             Ideal gas formation enthalpies of each substance [J/mol/K]
         """
-        enthalpies = np.array([])
-
-        for substance in self.substances:
-            enthalpies = np.append(enthalpies, substance.formation_enthalpy_ig)
-
-        return enthalpies
+        return self.formation_enthalpies_ig
