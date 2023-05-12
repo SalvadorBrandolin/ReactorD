@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 
 from reactord.kinetic.kinetic import Kinetic
-from reactord.mix.abstract_mix import AbstractMix
 
 from scipy.integrate import solve_bvp
 
@@ -11,7 +10,6 @@ from scipy.integrate import solve_bvp
 class PFR:
     def __init__(
         self,
-        mix: AbstractMix,
         kinetic: Kinetic,
         reactor_length: float,
         transversal_area: float,
@@ -23,7 +21,6 @@ class PFR:
         # =====================================================================
         # Core PFR information
         # =====================================================================
-        self.mix = mix
         self.kinetic = kinetic
         self.reactor_length = reactor_length
         self.transversal_area = transversal_area
@@ -49,6 +46,10 @@ class PFR:
         self.refrigerant_temperature_profile = np.array([])
         self.pressure_profile = np.array([])
         self.r_rates_profile = np.array([])
+
+    @property
+    def mix(self):
+        return self.kinetic.mix
 
     def initial_profile_builder(self):
         self.z = np.linspace(0, self.reactor_length, self.grid_size)
