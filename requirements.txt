@@ -1,5 +1,7 @@
-dill>=0.3.6
-numpy>=1.21.4
-scipy>=1.7.3
-thermo>=0.2.21
-matplotlib>=3.5.3
+ipython
+dill >= 0.3.6
+numpy >= 1.24.3
+pandas >= 2.0.1 
+scipy >= 1.10.1
+sympy >= 1.12
+thermo >= 0.2.24

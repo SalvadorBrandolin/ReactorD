@@ -48,8 +48,9 @@ class MolarFlow:
 
         return initial_mass_profile
 
+    # TODO
     def update_profile(self, reactor: PFR, variables):
-        reactor.mass_profile = variables[0 : reactor.subs_n, :]
+        reactor.mass_profile = variables[0 : reactor.subs_n, :]  # noqa
 
     def border_conditions(self, reactor: PFR):
         flows_in = np.array([])
@@ -68,7 +69,7 @@ class MolarFlow:
     def evaluate_balance(self, reactor: PFR):
         # Reaction rate of each substance on each reactor's z
         ri = np.matmul(
-            reactor.kinetics.stoichiometry.T, reactor.r_rates_profile
+            reactor.kinetic.stoichiometry.T, reactor.r_rates_profile
         )
 
         return ri * reactor.transversal_area
