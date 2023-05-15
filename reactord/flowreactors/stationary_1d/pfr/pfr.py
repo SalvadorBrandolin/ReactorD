@@ -29,6 +29,8 @@ class PFR:
         self.subs_n = len(self.mix)
         self.reac_n = len(self.kinetic)
 
+        self.tube_radius = np.sqrt(self.transversal_area / np.pi)
+
         # =====================================================================
         # Balances
         # =====================================================================

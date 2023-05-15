@@ -56,8 +56,8 @@ class Adiabatic:
 
     def __repr__(self) -> str:
         latex = (
-            r"\frac{dT}{dz}=\frac{\sum \Delta {H_j}_{(T,P)} r_{j}} {{c_p}_{mi",
-            r"x} \sum F_i}",
+            r"\frac{dT}{dz}=\frac{-\sum\Delta{H_j}r_{j}}{{c_p}_{mix}\sum{F_i}"
+            "}",
             r"\frac{dT_r}{dz}=0",
         )
         return latex
