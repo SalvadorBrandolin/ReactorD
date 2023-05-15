@@ -10,26 +10,25 @@ from .noisothermic_all_constant import NoIsothermicAllConstant
 
 class NoIsothermicWithUConstant(NoIsothermicAllConstant):
     def __init__(
-        self, 
+        self,
         temperature_in_or_out: dict,
         refrigerant_mix: AbstractMix,
-        refrigerant_in_temperature: float, 
+        refrigerant_in_temperature: float,
         heat_exchange_coefficient: Callable,
-        exchange_operation: str = "cocurrent"
+        exchange_operation: str = "cocurrent",
     ) -> None:
-        
         super().__init__(
-            temperature_in_or_out, 
-            refrigerant_in_temperature, 
-            heat_exchange_coefficient, 
-            exchange_operation
+            temperature_in_or_out,
+            refrigerant_in_temperature,
+            heat_exchange_coefficient,
+            exchange_operation,
         )
-        
+
         self.ref_mix = refrigerant_mix
-        
+
     def evaluate_balance(self, reactor: PFR) -> NDArray:
         # =====================================================================
-        # Reactor energy balance 
+        # Reactor energy balance
         # =====================================================================
         delta_hs = reactor.kinetic.dhs_evaluate(
             reactor.temperature_profile, reactor.pressure_profile
@@ -47,11 +46,11 @@ class NoIsothermicWithUConstant(NoIsothermicAllConstant):
             reactor.refrigerant_temperature_profile
             - reactor.temperature_profile
         ) - np.multiply(delta_hs, reactor.r_rates_profile).sum(axis=0)
-        
+
         denominator = np.multiply(cps, total_mole_flows)
-        
+
         dt_dz = np.divide(numerator, denominator)
-        
+
         # =====================================================================
         # Refrigerant energy balance
         # =====================================================================
