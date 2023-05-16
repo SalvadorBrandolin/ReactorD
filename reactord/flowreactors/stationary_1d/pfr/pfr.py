@@ -1,3 +1,4 @@
+"PFR module."
 import numpy as np
 
 import pandas as pd
@@ -8,6 +9,25 @@ from scipy.integrate import solve_bvp
 
 
 class PFR:
+    """PFR class
+
+        Parameters
+        ----------
+        kinetic : Kinetic
+            kinetic object
+        reactor_length : float
+            Reactor length [m]
+        transversal_area : float
+            Reactor transversal area [m2]
+        grid_size : int
+            grid size
+        mass_balance : 
+            Mass balance setting
+        energy_balance : 
+            Energy balance setting
+        pressure_balance :
+            Pressure balance setting
+        """
     def __init__(
         self,
         kinetic: Kinetic,
@@ -18,6 +38,7 @@ class PFR:
         energy_balance,
         pressure_balance,
     ) -> None:
+        
         # =====================================================================
         # Core PFR information
         # =====================================================================
