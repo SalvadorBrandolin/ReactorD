@@ -14,7 +14,6 @@ class NoIsothermicAllConstant:
         temperature_in_or_out: dict,
         refrigerant_in_temperature: float,
         heat_exchange_coefficient: float,
-        exchange_operation: str = "cocurrent",
     ) -> None:
         self.t_in_or_out = temperature_in_or_out
 
@@ -31,17 +30,6 @@ class NoIsothermicAllConstant:
 
         self.refrigerant_in_temperature = refrigerant_in_temperature
         self.u = heat_exchange_coefficient
-        self.exchange_operation = exchange_operation
-
-        if self.exchange_operation == "cocurrent":
-            self.operation_coeff = 1
-        elif self.exchange_operation == "countercurrent":
-            self.operation_coeff = -1
-        else:
-            raise ValueError(
-                f"{self.exchange_operation} is not a valid heat exchange"
-                "operation. Use 'cocurrent' or 'countercurrent'."
-            )
 
     @property
     def irepr(self):
@@ -50,10 +38,10 @@ class NoIsothermicAllConstant:
 
     def initial_profile(self, reactor: PFR) -> NDArray:
         reactor.kinetic.set_dh_function()
-        initial_profile = np.array(
+        initial_profile = np.array([
             np.full(reactor.grid_size, self.t_value),
             np.full(reactor.grid_size, self.refrigerant_in_temperature),
-        )
+        ])
         return initial_profile
 
     def update_profile(self, reactor: PFR, variables: NDArray) -> None:
@@ -61,16 +49,10 @@ class NoIsothermicAllConstant:
         reactor.refrigerant_temperature_profile = variables[-2, :]
 
     def border_conditions(self, reactor: PFR):
-        if self.exchange_operation == "cocurrent":
-            in_border_cond = np.array(
-                [self.t_in_or_out.get("in"), self.refrigerant_in_temperature]
-            )
-            out_border_cond = np.array([self.t_in_or_out.get("out"), None])
-        else:
-            in_border_cond = np.array([self.t_in_or_out.get("in"), None])
-            out_border_cond = np.array(
-                [self.t_in_or_out.get("out"), self.refrigerant_in_temperature]
-            )
+        in_border_cond = np.array(
+            [self.t_in_or_out.get("in"), self.refrigerant_in_temperature]
+        )
+        out_border_cond = np.array([self.t_in_or_out.get("out"), None])
 
         return in_border_cond, out_border_cond
 
@@ -87,7 +69,7 @@ class NoIsothermicAllConstant:
 
         a = 4 / (2 * reactor.tube_radius)
 
-        numerator = self.operation_coeff * self.u * a * (
+        numerator = self.u * a * (
             reactor.refrigerant_temperature_profile
             - reactor.temperature_profile
         ) - np.multiply(delta_hs, reactor.r_rates_profile).sum(axis=0)
@@ -96,7 +78,10 @@ class NoIsothermicAllConstant:
         dt_dz = np.divide(numerator, denominator)
         dta_dz = np.zeros(reactor.grid_size)
 
-        return np.vstack(dt_dz, dta_dz)
+        import ipdb
+        ipdb.set_trace()
+
+        return np.vstack((dt_dz, dta_dz))
 
     def __repr__(self) -> str:
         latex = (

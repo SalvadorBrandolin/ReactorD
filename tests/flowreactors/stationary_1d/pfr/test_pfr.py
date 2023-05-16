@@ -683,169 +683,94 @@ def test_fogler_example_11_3():
     )
 
     rd_temps = reactor.ode_solution.sol(vol_temps)[-2]
-    rd_fbut = reactor.ode_solution.sol(vol_x)[-0]
+    rd_fbut = reactor.ode_solution.sol(vol_x)[0]
     rd_x = (f_mol * 0.9 - rd_fbut) / (f_mol * 0.9)
-
-    print(eb.__repr__())
 
     assert np.allclose(temps, rd_temps, atol=0.5)
     assert np.allclose(x, rd_x, atol=0.013)
+
+  
+def test_fogler_example_12_2_case2():
+    """Fogler 6th ed. example 12.2
+    """
+    def cpa(t, p):
+        return np.full(len(t), 163)
     
-def test_fogler_example_12_1():
-    """Fogler 6th ed. example 11.3"""
+    def cpb(t, p):
+        return np.full(len(t), 83)
+    
+    def cpc(t,p):
+        return np.full(len(t), 71)
 
-    def volume(temperature, pressure):
-        f_mol = 163 * 1000 / 3600  # mol / s
-        f_volumetric = 100_000 * 0.00378541 / 24 / 3600  # m3 / s
-
-        rho = f_mol / f_volumetric
-        v = 1 / rho  # m3 / mol
-        return np.full(np.size(temperature), v)
-
-    def cp_butane(temperature, pressure):
-        return np.full(np.size(temperature), 141)  # J / mol / K
-
-    def cp_pentane(temperature, pressure):
-        return np.full(np.size(temperature), 161)  # J / mol / K
+    def int_cpa(t1, t2, p):
+        return 163 * (t2 - t1)
+    
+    def int_cpb(t1, t2, p):
+        return 83 * (t2 - t1)
+    
+    def int_cpc(t1, t2, p):
+        return 71 * (t2 - t1)
 
     def r_rate(c, t, cons):
-        k360, e, keq60, dh = cons["k360"], cons["e"], cons["keq60"], cons["dh"]
+        k = np.exp(34.34 - 34222 / t) # 1/s
+        
+        return k * c["acetone"]
 
-        kd_t = k360 * np.exp(e / R * (1 / 360 - 1 / t))
-        keq_t = keq60 * np.exp(dh / R * (1 / (60 + 273.15) - 1 / t))
-
-        rd = kd_t * c["but"]
-        ri = kd_t / keq_t * c["i-but"]
-
-        return rd - ri
-
-    dh = -6900  # J / mol
-
-    but = rd.Substance(
-        "but", volume_liquid=volume, heat_capacity_liquid=cp_butane
+    a = rd.Substance(
+        "acetone", formation_enthalpy_ig=-216.67*1000, heat_capacity_gas=cpa, heat_capacity_gas_dt_integral=int_cpa
     )
 
-    ibut = rd.Substance(
-        "i-but", volume_liquid=volume, heat_capacity_liquid=cp_butane
+    b = rd.Substance(
+        "anhydride", formation_enthalpy_ig=-61.09*1000, heat_capacity_gas=cpb, heat_capacity_gas_dt_integral=int_cpb
     )
 
-    ipen = rd.Substance(
-        "i-pen", volume_liquid=volume, heat_capacity_liquid=cp_pentane
+    c = rd.Substance(
+        "methane", formation_enthalpy_ig=-74.81*1000, heat_capacity_gas=cpc, heat_capacity_gas_dt_integral=int_cpc
     )
 
-    mix = rd.mix.IdealSolution([but, ibut, ipen])
+    mix = rd.mix.IdealGas([a, b, c])
 
     kinetic = rd.Kinetic(
         mix=mix,
-        reactions={"r1": {"eq": but > ibut, "rate": r_rate, "DH": dh}},
-        kinetic_constants={
-            "k360": 31.1 / 3600,
-            "e": 65.7 * 1000,
-            "keq60": 3.03,
-            "dh": dh,
-        },
+        reactions={"r1": {"eq": a > b + c, "rate": r_rate}},
+        kinetic_constants={},
         rates_argument="concentration",
     )
 
-    f_mol = 163 * 1000 / 3600  # mol / s
-
     mb = pfr.mass_balances.MolarFlow(
-        molar_flows_in={"but": f_mol * 0.9, "i-but": 0, "i-pen": f_mol * 0.1},
+        molar_flows_in={"acetone": 0.0376, "anhydride": 0, "methane": 0},
     )
-    eb = pfr.energy_balances.NoIsothermicWithUConstant(
-        temperature_in_or_out={"in": 330},
-        refrigerant_in_temperature=250,
-        heat_exchange_coefficient=391.79832190816416, # J/m2.K.s
-        exchange_operation="cocurrent"
+    eb = pfr.energy_balances.NoIsothermicAllConstant(
+        temperature_in_or_out={"in": 1035},
+        refrigerant_in_temperature=1250,
+        heat_exchange_coefficient=110
     )
-    pb = pfr.pressure_balances.Isobaric(101325)
+    pb = pfr.pressure_balances.Isobaric(162 * 1000)
 
     reactor = pfr.PFR(
         kinetic=kinetic,
-        reactor_length=5,
-        transversal_area=1,
-        grid_size=100,
+        reactor_length=1.79,
+        transversal_area=0.001 / 1.79,
+        grid_size=300,
         mass_balance=mb,
         energy_balance=eb,
         pressure_balance=pb,
     )
 
-    reactor.simulate(1e-10)
+    reactor.simulate(1e-8)
 
-    # Fogler's data WebPlotDigitizer v4.6
-    vol_temps = np.array(
-        [
-            0.11963,
-            0.30367,
-            0.49701,
-            0.6535,
-            0.98498,
-            1.20608,
-            1.42704,
-            1.64792,
-            1.93304,
-            2.54816,
-            3.07124,
-            3.81441,
-            4.47502,
-            4.97954,
-        ]
-    )
-    temps = np.array(
-        [
-            331.69216,
-            334.0963,
-            337.03582,
-            339.35166,
-            344.60768,
-            348.61764,
-            352.0026,
-            355.03043,
-            358.14525,
-            360.08756,
-            360.69388,
-            360.9352,
-            361.17946,
-            360.89359,
-        ]
-    )
+    # Fogler data
+    t_z = np.array([0.0159,	0.0398,	0.0677,	0.0956,	0.1275,	0.1753,	0.2191,	0.259,	0.3028,	0.3506,	0.3904,	0.4382,	0.4821,	0.5498,	0.6215,	0.6773,	0.749,	0.8287,	0.8924,	0.9522,	0.996])
+    t = np.array([1033.93,	1030.44,	1030.44,	1031.31,	1032.62,	1035.24,	1037.86,	1040.49,	1043.54,	1047.04,	1050.10,	1053.59,	1057.09,	1062.33,	1068.45,	1073.25,	1080.24,	1088.98,	1097.28,	1106.46,	1113.88])
 
-    vol_x = np.array(
-        [
-            0.09158,
-            0.32051,
-            0.57692,
-            0.78755,
-            0.99817,
-            1.26374,
-            1.52015,
-            1.77656,
-            2.28938,
-            2.71978,
-            3.26923,
-        ]
-    )
-    x = np.array(
-        [
-            0.02487,
-            0.09767,
-            0.18291,
-            0.25216,
-            0.32674,
-            0.43504,
-            0.53092,
-            0.60551,
-            0.68551,
-            0.70163,
-            0.70892,
-        ]
-    )
+    x_z = np.array([0.0121,	0.0684,	0.1206,	0.193,	0.2814,	0.3537,	0.426,	0.4983,	0.5705,	0.6428,	0.719,	0.8073,	0.9036,	0.9958])
+    x = np.array([0.0194,	0.0922,	0.1553,	0.2427,	0.3398,	0.4223,	0.4951,	0.568,	0.6311,	0.6942,	0.7524,	0.8204,	0.8883,	0.9466])
+    
+    rd_temps = reactor.ode_solution.sol(t_z)[-3]
+    rd_facetone = reactor.ode_solution.sol(x_z)[0]
+    rd_x = (216.67*1000 - rd_facetone) / (216.67*1000)
 
-    rd_temps = reactor.ode_solution.sol(vol_temps)[-2]
-    rd_fbut = reactor.ode_solution.sol(vol_x)[-0]
-    rd_x = (f_mol * 0.9 - rd_fbut) / (f_mol * 0.9)
-
-    print(eb.__repr__())
-
-    assert np.allclose(temps, rd_temps, atol=0.5)
-    assert np.allclose(x, rd_x, atol=0.013)
+    assert np.allclose(t, rd_temps)
+    assert np.allclose(x, rd_x)
+    
+    
