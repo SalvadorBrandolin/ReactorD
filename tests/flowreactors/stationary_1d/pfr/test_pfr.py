@@ -591,19 +591,23 @@ def test_fogler_example_4_4():
         kinetic=kinetic,
         reactor_length=18.288,
         transversal_area=0.001313648986,
-        grid_size=20,
+        grid_size=100,
         mass_balance=mb,
         energy_balance=eb,
         pressure_balance=pb,
     )
 
-    reactor.simulate(tol=0.001)
+    reactor.simulate()
 
     fogler_z = np.array([0, 10, 20, 30, 40, 50, 60]) * 0.30480370641
     fogler_pressures = np.array([10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65])
-    reactord_pressures = reactor.ode_solution.sol(fogler_z)[-1] / 101325
-
-    assert np.allclose(reactord_pressures, fogler_pressures, atol=0.1)
+    
+    
+    fit = np.polyfit(reactor.z, reactor.pressure_profile, deg = 6, full=True)[0]
+    assert np.allclose(reactor.pressure_profile, np.polyval(fit, reactor.z))
+    
+    rd_pressures = np.polyval(fit, fogler_z) / 101325
+    assert np.allclose(rd_pressures, fogler_pressures, atol = 0.1)
 
 
 def test_fogler_example_11_3():
