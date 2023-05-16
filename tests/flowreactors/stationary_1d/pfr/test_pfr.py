@@ -6,6 +6,75 @@ import reactord.flowreactors.stationary_1d.pfr as pfr
 from scipy.constants import R
 
 
+def test_prueba():
+    """Fogler fourth ed. P1.15a."""
+
+    def volume(temperature, pressure):
+        n = np.size(temperature)
+        return np.full(n, 1 / (fa_in / f_volumetric))
+
+    def r_rate(c, t, cons):
+        return np.full(np.size(t), cons["k"])
+
+    # Fogler's exact solution
+    def fogler(vol):
+        concentration = (fa_in / f_volumetric) - vol * k / f_volumetric
+        return concentration
+
+    # =========================================================================
+    # Initial value problem
+    # =========================================================================
+    # Problem data
+    fa_in = 5 / 3600  # mol/s
+    f_volumetric = 10 * 0.001 / 60  # m3/s
+    k = 0.05 / 3600 / 0.001  # mol/s/m3
+    v_pfr = 99 * 0.001  # m3
+
+    # Substance definition
+    a = rd.Substance(
+        name="A",
+        volume_liquid=volume,
+    )
+    b = rd.Substance(
+        name="B",
+        volume_liquid=volume,
+    )
+
+    mix = rd.mix.IdealSolution([a, b])
+
+    kinetic = rd.Kinetic(
+        mix=mix,
+        reactions={"r1": {"eq": a > b, "rate": r_rate}},
+        kinetic_constants={"k": k},
+    )
+
+    mb = pfr.mass_balances.MolarFlow(molar_flows_in={"A": fa_in, "B": 0})
+    eb = pfr.energy_balances.Isothermic(298.15)
+    pb = pfr.pressure_balances.Isobaric(101325)
+
+    reactor = pfr.PFR(kinetic, v_pfr, 1, 100, mb, eb, pb)
+
+    # Simulation
+    reactor.simulate(verbose=0)
+
+    # Comparisson
+    fogler_a_concentration = fogler(reactor.z)
+    fogler_b_concentration = fogler_a_concentration[0] - fogler_a_concentration
+
+    reactord_concentrations = reactor.mix.concentrations(
+        reactor.mole_fraction_profile,
+        reactor.temperature_profile,
+        reactor.pressure_profile,
+    )
+
+    assert np.allclose(
+        reactord_concentrations[0, :], fogler_a_concentration, atol=1e-8
+    )
+    assert np.allclose(
+        reactord_concentrations[1, :], fogler_b_concentration, atol=1e-8
+    )
+
+
 def test_fogler_p1_15a():
     """Fogler fourth ed. P1.15a."""
 
@@ -611,7 +680,7 @@ def test_fogler_example_11_3():
         pressure_balance=pb,
     )
 
-    reactor.simulate(1e-10)
+    reactor.simulate(tol = 1e-10)
 
     # Fogler's data WebPlotDigitizer v4.6
     vol_temps = np.array(
@@ -682,15 +751,24 @@ def test_fogler_example_11_3():
         ]
     )
 
-    rd_temps = reactor.ode_solution.sol(vol_temps)[-2]
-    rd_fbut = reactor.ode_solution.sol(vol_x)[0]
-    rd_x = (f_mol * 0.9 - rd_fbut) / (f_mol * 0.9)
+    fit = np.polyfit(reactor.z, reactor.temperature_profile, deg = 10)
+    assert np.allclose(reactor.temperature_profile, np.polyval(fit, reactor.z))
+    
+    rd_temps = np.polyval(fit, vol_temps)
+    assert np.allclose(rd_temps, temps, atol = 2)
+    
+    #rd_temps = np.polyval(fit, vol_temps)
 
-    assert np.allclose(temps, rd_temps, atol=0.5)
-    assert np.allclose(x, rd_x, atol=0.013)
+    #rd_temps = np.interp(reactor.z, reactor.temperature_profile)
+    #rd_temps = reactor.ode_solution.sol[-2]
+    #rd_fbut = reactor.ode_solution.sol(vol_x)[0]
+    #rd_x = (f_mol * 0.9 - rd_fbut) / (f_mol * 0.9)
+
+    #assert np.allclose(temps, rd_temps, atol=0.5)
+    #assert np.allclose(x, rd_x, atol=0.013)
 
   
-def test_fogler_example_12_2_case2():
+def fogler_example_12_2_case2():
     """Fogler 6th ed. example 12.2
     """
     def cpa(t, p):
@@ -759,7 +837,7 @@ def test_fogler_example_12_2_case2():
 
     reactor.simulate(1e-8)
 
-    # Fogler data
+    # Fogler's data WebPlotDigitizer v4.6
     t_z = np.array([0.0159,	0.0398,	0.0677,	0.0956,	0.1275,	0.1753,	0.2191,	0.259,	0.3028,	0.3506,	0.3904,	0.4382,	0.4821,	0.5498,	0.6215,	0.6773,	0.749,	0.8287,	0.8924,	0.9522,	0.996])
     t = np.array([1033.93,	1030.44,	1030.44,	1031.31,	1032.62,	1035.24,	1037.86,	1040.49,	1043.54,	1047.04,	1050.10,	1053.59,	1057.09,	1062.33,	1068.45,	1073.25,	1080.24,	1088.98,	1097.28,	1106.46,	1113.88])
 

@@ -50,7 +50,7 @@ class MolarFlow:
 
     # TODO
     def update_profile(self, reactor: PFR, variables):
-        reactor.mass_profile = variables[0 : reactor.subs_n, :]  # noqa
+        reactor.mass_profile = variables[0 : reactor.subs_n]  # noqa
 
     def border_conditions(self, reactor: PFR):
         flows_in = np.array([])

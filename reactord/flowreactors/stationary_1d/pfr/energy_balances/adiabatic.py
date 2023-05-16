@@ -32,7 +32,7 @@ class Adiabatic:
         return np.full(reactor.grid_size, self.t_value)
 
     def update_profile(self, reactor: PFR, variables):
-        reactor.temperature_profile = variables[-2, :]
+        reactor.temperature_profile = variables[-2]
         reactor.refrigerant_temperature_profile = None
 
     def border_conditions(self, reactor: PFR):

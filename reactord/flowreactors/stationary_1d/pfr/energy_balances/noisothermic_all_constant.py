@@ -45,8 +45,8 @@ class NoIsothermicAllConstant:
         return initial_profile
 
     def update_profile(self, reactor: PFR, variables: NDArray) -> None:
-        reactor.temperature_profile = variables[-3, :]
-        reactor.refrigerant_temperature_profile = variables[-2, :]
+        reactor.temperature_profile = variables[-3]
+        reactor.refrigerant_temperature_profile = variables[-2]
 
     def border_conditions(self, reactor: PFR):
         in_border_cond = np.array(
@@ -77,9 +77,6 @@ class NoIsothermicAllConstant:
 
         dt_dz = np.divide(numerator, denominator)
         dta_dz = np.zeros(reactor.grid_size)
-
-        import ipdb
-        ipdb.set_trace()
 
         return np.vstack((dt_dz, dta_dz))
 

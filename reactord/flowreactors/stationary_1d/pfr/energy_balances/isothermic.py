@@ -20,7 +20,7 @@ class Isothermic:
         return np.full(reactor.grid_size, self.temperature)
 
     def update_profile(self, reactor: PFR, variables):
-        reactor.temperature_profile = variables[-2, :]
+        reactor.temperature_profile = variables[-2]
         reactor.refrigerant_temperature_profile = None
 
     def border_conditions(self, reactor: PFR):

@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 from reactord.kinetic.kinetic import Kinetic
+from .solvers import simulate_bvp_problem, simulate_ivp_problem
 
 from scipy.integrate import solve_bvp
 
@@ -30,6 +31,9 @@ class PFR:
         self.reac_n = len(self.kinetic)
 
         self.tube_radius = np.sqrt(self.transversal_area / np.pi)
+        self.ode_solution = None
+        self.sim_df = None
+        
 
         # =====================================================================
         # Balances
@@ -48,6 +52,18 @@ class PFR:
         self.refrigerant_temperature_profile = np.array([])
         self.pressure_profile = np.array([])
         self.r_rates_profile = np.array([])
+        
+        # =====================================================================
+        # Check if initial or border value problem
+        # =====================================================================
+        self.border_conditions_builder()
+        
+        if any(self.outlet_conditions):
+            self._simulate_function = simulate_bvp_problem
+        else:
+            self._simulate_function = simulate_ivp_problem
+            
+            
 
     @property
     def mix(self):
@@ -108,74 +124,34 @@ class PFR:
         return bc
 
     def evaluate_balances(self, z, variables):
-        self.z = z
-        self.grid_size = np.size(z)
-        self.mass_balance.update_profile(self, variables)
-        self.energy_balance.update_profile(self, variables)
-        self.pressure_balance.update_profile(self, variables)
+            self.z = z
+            self.grid_size = np.size(z)
+            self.mass_balance.update_profile(self, variables)
+            self.energy_balance.update_profile(self, variables)
+            self.pressure_balance.update_profile(self, variables)
 
-        self.mole_fraction_profile = self.mix.mole_fractions(self.mass_profile)
-
-        self.r_rates_profile = self.kinetic.evaluate(
-            self.mole_fraction_profile,
-            self.temperature_profile,
-            self.pressure_profile,
-        )
-
-        mass_gradient = self.mass_balance.evaluate_balance(self)
-        temperature_gradient = self.energy_balance.evaluate_balance(self)
-        pressure_gradient = self.pressure_balance.evaluate_balance(self)
-
-        gradients = np.vstack(
-            (mass_gradient, temperature_gradient, pressure_gradient)
-        )
-
-        return gradients
-
-    def simulate(self, tol=1e-3, max_nodes=1000, verbose=0, bc_tol=None):
-        self.grid_size = self._initial_grid_size
-        self.initial_profile_builder()
-        self.border_conditions_builder()
-
-        # Simualate
-        self.ode_solution = solve_bvp(
-            fun=self.evaluate_balances,
-            bc=self.border_conditions,
-            x=self.z,
-            y=self.initial_variables_profile,
-            tol=tol,
-            max_nodes=max_nodes,
-            verbose=verbose,
-            bc_tol=bc_tol,
-        )
-
-        # Update profiles with solution
-        self.z = self.ode_solution.x
-        self.mass_balance.update_profile(self, self.ode_solution.y)
-        self.energy_balance.update_profile(self, self.ode_solution.y)
-        self.pressure_balance.update_profile(self, self.ode_solution.y)
-        self.mole_fraction_profile = self.mix.mole_fractions(
-            self.mass_profile
-        )
-        self.r_rates_profile = self.kinetic.evaluate(
-            self.mole_fraction_profile,
-            self.temperature_profile,
-            self.pressure_profile,
-        )
-
-        # Build data frame
-        result = np.vstack((self.z, self.ode_solution.y))
-        z = np.array(["z"])
-        names = self.mix.names
-        if self.refrigerant_temperature_profile is not None:
-            last = np.array(
-                ["temperature", "refrigerant_temperature", "pressure"]
+            self.mole_fraction_profile = self.mix.mole_fractions(
+                self.mass_profile
             )
-        else:
-            last = np.array(["temperature", "pressure"])
 
-        columns = np.concatenate((z, names, last))
-        self.sim_df = pd.DataFrame(result.T, columns=columns, index=None)
+            self.r_rates_profile = self.kinetic.evaluate(
+                self.mole_fraction_profile,
+                self.temperature_profile,
+                self.pressure_profile,
+            )
+
+            mass_gradient = self.mass_balance.evaluate_balance(self)
+            temperature_gradient = self.energy_balance.evaluate_balance(self)
+            pressure_gradient = self.pressure_balance.evaluate_balance(self)
+
+            gradients = np.vstack(
+                (mass_gradient, temperature_gradient, pressure_gradient)
+            )
+
+            return gradients
+
+    def simulate(self, **options) -> None:    
+        self._simulate_function(self, options)
 
     @property
     def irepr(self):

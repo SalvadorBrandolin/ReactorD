@@ -33,7 +33,7 @@ class Ergun:
             return np.full(reactor.grid_size, self._outlet_pressure)
 
     def update_profile(self, reactor: PFR, variables):
-        reactor.pressure_profile = variables[-1, :]
+        reactor.pressure_profile = variables[-1]
 
     def border_conditions(self, reactor: PFR):
         if self._inlet_pressure:
