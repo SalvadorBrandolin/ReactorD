@@ -1,4 +1,4 @@
-"PFR construction."
+"""PFR construction."""
 from . import energy_balances, mass_balances, pressure_balances
 from .pfr import PFR
 

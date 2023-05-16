@@ -1,4 +1,4 @@
-"PFR module."
+"""PFR module."""
 import numpy as np
 
 import pandas as pd
@@ -9,25 +9,26 @@ from scipy.integrate import solve_bvp
 
 
 class PFR:
-    """PFR class
+    """PFR class.
 
-        Parameters
-        ----------
-        kinetic : Kinetic
-            kinetic object
-        reactor_length : float
-            Reactor length [m]
-        transversal_area : float
-            Reactor transversal area [m2]
-        grid_size : int
-            grid size
-        mass_balance : 
-            Mass balance setting
-        energy_balance : 
-            Energy balance setting
-        pressure_balance :
-            Pressure balance setting
-        """
+    Parameters
+    ----------
+    kinetic : Kinetic
+        kinetic object
+    reactor_length : float
+        Reactor length [m]
+    transversal_area : float
+        Reactor transversal area [m2]
+    grid_size : int
+        grid size
+    mass_balance :
+        Mass balance setting
+    energy_balance :
+        Energy balance setting
+    pressure_balance :
+        Pressure balance setting
+    """
+
     def __init__(
         self,
         kinetic: Kinetic,
@@ -38,7 +39,7 @@ class PFR:
         energy_balance,
         pressure_balance,
     ) -> None:
-        
+
         # =====================================================================
         # Core PFR information
         # =====================================================================
@@ -70,9 +71,19 @@ class PFR:
 
     @property
     def mix(self):
+        """Set mix of reaction."""
         return self.kinetic.mix
 
     def initial_profile_builder(self):
+        """Construct initial profile.
+
+        Constructs the initial profile calling the corresponding method
+        according to the balance.
+
+        Returns
+        -------
+        mass, temperature and pressure initial profile.
+        """
         self.z = np.linspace(0, self.reactor_length, self.grid_size)
         mass_profile = self.mass_balance.initial_profile(self)
         temperatures_profile = self.energy_balance.initial_profile(self)
@@ -87,6 +98,15 @@ class PFR:
         )
 
     def border_conditions_builder(self):
+        """Construct border conditions profile.
+
+        Constructs the border conditions profile calling the corresponding
+        method according to the balance.
+
+        Returns
+        -------
+        mass, temperature and pressure border conditions.
+        """
         self.mass_bc = self.mass_balance.border_conditions(self)
         self.temperature_bc = self.energy_balance.border_conditions(self)
         self.pressure_bc = self.pressure_balance.border_conditions(self)
@@ -116,6 +136,20 @@ class PFR:
         ).ravel()
 
     def border_conditions(self, ya, yb):
+        """Border condition builder for scipy.solve_bvp.
+
+        Parameters
+        ----------
+        ya : List[float]
+            Border conditions on reactor's inlet.
+        yb : List[float]
+            Border conditions on reactor's outlet.
+
+        Returns
+        -------
+        ndarray
+            Border conditions for scipy.solve_bvp.
+        """
         bc = np.array([])
 
         for idx in self._in_index:
@@ -127,6 +161,19 @@ class PFR:
         return bc
 
     def evaluate_balances(self, z, variables):
+        """Evaluate mass, energy and pressure balance.
+
+        Parameters
+        ----------
+        z: ndarray
+            Reactor length
+        Variables:
+
+        Returns
+        -------
+        ndarray
+            Evaluate balances in z.
+        """
         self.z = z
         self.grid_size = np.size(z)
         self.mass_balance.update_profile(self, variables)
@@ -152,6 +199,19 @@ class PFR:
         return gradients
 
     def simulate(self, tol=1e-3, max_nodes=1000, verbose=0, bc_tol=None):
+        """Simulate reactor.
+
+        Parameters
+        ----------
+        tol : _type_, optional
+            tolerance, by default 1e-3
+        max_nodes : int, optional
+            maximum nodes, by default 1000
+        verbose : int, optional
+            by default 0
+        bc_tol : optional
+            by default None
+        """
         self.grid_size = self._initial_grid_size
         self.initial_profile_builder()
         self.border_conditions_builder()
@@ -199,6 +259,7 @@ class PFR:
 
     @property
     def irepr(self):
+        """Represent for ipython."""
         print("Mass balance:")
         self.mass_balance.irepr
         print("Reactor and refrigerant energy balances:")
@@ -207,6 +268,7 @@ class PFR:
         self.pressure_balance.irepr
 
     def __repr__(self):
+        """Represent equation of PFR mass balance."""
         latex = (
             f"{self.mass_balance.__repr__()}\n"
             f"{self.energy_balance.__repr__()[0]}\n"

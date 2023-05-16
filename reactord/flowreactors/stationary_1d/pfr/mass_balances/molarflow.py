@@ -18,11 +18,11 @@ class MolarFlow:
     molar_flows_out : dict, optional
         Molar flow in the out reactor section
     """
-    
+
     def __init__(
         self, molar_flows_in: dict = {}, molar_flows_out: dict = {}
     ) -> None:
-        
+
         self.molar_flows_in = molar_flows_in
         self.molar_flows_out = molar_flows_out
 
@@ -37,7 +37,7 @@ class MolarFlow:
         Parameters
         ----------
         reactor : PFR
-            PFR object 
+            PFR object
 
         Returns
         -------
@@ -47,7 +47,8 @@ class MolarFlow:
         Raises
         ------
         ValueError
-            Raise to guarantee one condition (inlet or outlet) for each substance
+            Raise to guarantee one condition (inlet or outlet)
+            for each substance
         ValueError
              Raise to guarantee border condition
         """

@@ -25,20 +25,22 @@ class Kinetic:
     Parameters:
     -----------
     mix: AbstractMix
-        Mixture object. 
+        Mixture object.
     reactions: dict
         Dictionary with kinetic reaction function.
         Example:
         reactions={"r1": {"eq": a + b > c + d, "rate": r1_rate}}
-        where r1:rate is defined function of concentration of a and b 
-        callable(concentration: dictionary, temperature: float, constants: dictionary)
+        where r1:rate is defined function of concentration of a and b
+        callable(concentration: dictionary,
+        temperature: float, constants: dictionary)
           --> rate: float
     kinetic_constants: dict
-        Dictionary with kinetic constants. There are two keys for each reaction. 
-        "a" key is pre-exponential number and "e" key is activation energy. 
+        Dictionary with kinetic constants.
+        There are two keys for each reaction.
+        "a" key is pre-exponential number and "e" key is activation energy.
         Example:
         kinetic_constants={"a": 10, "e": 10000}
-    rates_argument: str 
+    rates_argument: str
         This argument is used to define how to evaluate the composition
         of the reactive mixture inside the reactor.
         Options:
@@ -156,7 +158,7 @@ class Kinetic:
 
     def set_dh_function(self):
         """Set enthalpy function.
-        
+
         Check if all enthalpy are specified.
         """
         # Check if all dh are specified, else raise error.
@@ -171,8 +173,9 @@ class Kinetic:
     @property
     def irepr(self):
         """Represent kinetics equations.
-        
-        Latex format representation of kinetics equation for use en jupyer notebook
+
+        Latex format representation of kinetics equation
+        for use en jupyer notebook
         """
         for r_name, eq in zip(self.r_names, self.r_eqs):
             ltx = latex(eq._chem_equality).replace("=", r"\rightarrow")

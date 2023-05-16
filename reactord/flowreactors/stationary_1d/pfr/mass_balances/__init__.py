@@ -1,4 +1,4 @@
-"""PFR mass balance"""
+"""PFR mass balance."""
 from .molarflow import MolarFlow
 
 

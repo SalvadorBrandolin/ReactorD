@@ -1,4 +1,4 @@
-"""PFR adiabatic energy balance module"""
+"""PFR adiabatic energy balance module."""
 from IPython.display import display
 
 import numpy as np
@@ -11,16 +11,17 @@ from sympy import symbols
 class Adiabatic:
     """PFR Adiabatic energy balance class.
 
-        Parameters
-        ----------
-        temperature_in_or_out : dict
-            temperature of each substance in the inlet or outlet position. 
+    Parameters
+    ----------
+    temperature_in_or_out : dict
+    temperature of each substance in the inlet or outlet position.
 
-        Raises
-        ------
-        NotImplementedError
-            Both in and out border condition for temperature not implemented.
-        """
+    Raises
+    ------
+    NotImplementedError
+    Both in and out border condition for temperature not implemented.
+    """
+
     def __init__(self, temperature_in_or_out: dict) -> None:
         self.t_in_or_out = temperature_in_or_out
 
@@ -42,12 +43,12 @@ class Adiabatic:
         display(symbols(self.__repr__()[1]))
 
     def initial_profile(self, reactor: PFR):
-        """Set initial energy profile in PFR.
+        """Set initial energy profile in adiabatic PFR.
 
         Parameters
         ----------
         reactor : PFR
-            PFR object 
+            PFR object
 
         Returns
         -------
@@ -58,7 +59,7 @@ class Adiabatic:
         return np.full(reactor.grid_size, self.t_value)
 
     def update_profile(self, reactor: PFR, variables):
-         """Update profile."""
+        """Update profile."""
         reactor.temperature_profile = variables[-2, :]
         reactor.refrigerant_temperature_profile = None
 

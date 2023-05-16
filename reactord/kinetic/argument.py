@@ -7,11 +7,11 @@ import numpy as np
 class CompositionalArgument:
     """
     Class to define kinetic compositional argument object.
-    
+
     Parameters
     ----------
         names : List[str]
-            List with the name of the substances. 
+            List with the name of the substances.
     """
 
     def __init__(self, names: List[str]) -> None:

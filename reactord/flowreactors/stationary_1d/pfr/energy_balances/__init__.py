@@ -1,4 +1,4 @@
-"""PFR energy balance"""
+"""PFR energy balance."""
 from .adiabatic import Adiabatic
 from .isothermic import Isothermic
 

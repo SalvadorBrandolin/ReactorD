@@ -16,7 +16,7 @@ def stoichiometry_matrix_builder(mix: AbstractMix, equations: List[Symbolic]):
     ----------
     mix : AbstractMix
     equations : List[Symbolic]
-        
+
 
     Returns
     -------
