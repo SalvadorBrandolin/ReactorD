@@ -62,7 +62,7 @@ class Kinetic:
     @user_r_dh.setter
     def user_r_dh(self, new_dhs: NDArray):
         raise ValueError(
-            "User reaction enthalpies not mutable, instantiate a new "
+            "User reaction enthalpies are not mutable, instantiate a new "
             "kinetic object."
         )
 
@@ -72,6 +72,7 @@ class Kinetic:
         temperature: Union[NDArray, float],
         pressure: Union[NDArray, float],
     ) -> np.ndarray:
+
         self.comp_argument.values = self._arg_func(
             mole_fractions, temperature, pressure
         )
