@@ -1,3 +1,4 @@
+"""Herning-Zipperer mixing rule."""
 import numpy as np
 
 
@@ -54,7 +55,6 @@ def herning_zipperer(
         Pure viscosity (liquid or gas) defined on each mix's Substance.
         molecular_weight defined on each mix's Substance.
     """
-
     sqrt_molecular_weights = np.sqrt(mixture.molecular_weights)[:, np.newaxis]
 
     # Take pure viscosities

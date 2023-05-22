@@ -1,3 +1,4 @@
+"""Linear mixing rule."""
 import numpy as np
 
 
@@ -45,7 +46,6 @@ def linear(
     --------
         Pure viscosity (liquid or gas) defined on each mix's Substance.
     """
-
     # Take pure viscosities
     if mixture.phase_nature == "liquid":
         pure_viscosities = np.array(

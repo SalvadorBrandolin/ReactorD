@@ -685,7 +685,7 @@ def test_fogler_example_11_3():
     rd_temps = reactor.ode_solution.sol(vol_temps)[-2]
     rd_fbut = reactor.ode_solution.sol(vol_x)[-0]
     rd_x = (f_mol * 0.9 - rd_fbut) / (f_mol * 0.9)
-    
+
     print(eb.__repr__())
 
     assert np.allclose(temps, rd_temps, atol=0.5)

@@ -1,3 +1,4 @@
+"""Kinetic module."""
 from .argument import CompositionalArgument
 from .kinetic import Kinetic
 from .matrix_builder import stoichiometry_matrix_builder

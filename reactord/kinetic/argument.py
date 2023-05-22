@@ -1,9 +1,19 @@
+"""Argument module for kinetics class."""
 from typing import List
 
 import numpy as np
 
 
 class CompositionalArgument:
+    """
+    Class to define kinetic compositional argument object.
+
+    Parameters
+    ----------
+        names : List[str]
+            List with the name of the substances.
+    """
+
     def __init__(self, names: List[str]) -> None:
         # Dictionary with substances' index
         self.ref_dict = {}
@@ -13,6 +23,7 @@ class CompositionalArgument:
         self.values = np.full(np.size(names), None)
 
     def __getitem__(self, key: str):
+        """Return the substance index."""
         try:
             return self.values[self.ref_dict[key]]
         except KeyError:
