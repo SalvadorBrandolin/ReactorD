@@ -1,10 +1,14 @@
-import reactord as rd
-import numpy as np
-import reactord.flowreactors.stationary_1d.pfr as pfr
-from scipy.constants import R
 import matplotlib.pyplot as plt
 
+import numpy as np
+
+import reactord as rd
+import reactord.flowreactors.stationary_1d.pfr as pfr
+
+from scipy.constants import R
+
 """Fogler 6th ed. example 11.3"""
+
 
 def volume(temperature, pressure):
     f_mol = 163 * 1000 / 3600  # mol / s
@@ -14,11 +18,14 @@ def volume(temperature, pressure):
     v = 1 / rho  # m3 / mol
     return np.full(np.size(temperature), v)
 
+
 def cp_butane(temperature, pressure):
     return np.full(np.size(temperature), 141)  # J / mol / K
 
+
 def cp_pentane(temperature, pressure):
     return np.full(np.size(temperature), 161)  # J / mol / K
+
 
 def r_rate(c, t, cons):
     k360, e, keq60, dh = cons["k360"], cons["e"], cons["keq60"], cons["dh"]
@@ -31,11 +38,10 @@ def r_rate(c, t, cons):
 
     return rd - ri
 
+
 dh = -6900  # J / mol
 
-but = rd.Substance(
-    "but", volume_liquid=volume, heat_capacity_liquid=cp_butane
-)
+but = rd.Substance("but", volume_liquid=volume, heat_capacity_liquid=cp_butane)
 
 ibut = rd.Substance(
     "i-but", volume_liquid=volume, heat_capacity_liquid=cp_butane
@@ -153,7 +159,7 @@ rd_fbut = reactor.ode_solution.sol(vol_x)[-0]
 rd_x = (f_mol * 0.9 - rd_fbut) / (f_mol * 0.9)
 
 print(eb.__repr__())
-results = reactor.sim_df    
+results = reactor.sim_df
 print(results)
 print(results.columns)
 
@@ -161,25 +167,31 @@ print(results.columns)
 # ============================================================
 #       Results plotting
 # ============================================================
-fig1, (ax1, ax2, ax3) = plt.subplots (1,3)
+fig1, (ax1, ax2, ax3) = plt.subplots(1, 3)
 
-ax1.set_xlabel ("Reactor Volume [$m^{3}$]")
-ax1.set_ylabel ("Concentrations (mol/$m^{3}$)")
-ax1.set_title ("Concentrations")
-ax1.plot (results.z, results["but"], "-k", label="butane", linewidth=2.5)
-ax1.plot (results.z, results["i-but"], "-g", label="iso-butane",  linewidth=2.5)
-ax1.plot (results.z, results["i-pen"], "--c", label="iso-pentane", linewidth=1.8)
+ax1.set_xlabel("Reactor Volume [$m^{3}$]")
+ax1.set_ylabel("Concentrations (mol/$m^{3}$)")
+ax1.set_title("Concentrations")
+ax1.plot(results.z, results["but"], "-k", label="butane", linewidth=2.5)
+ax1.plot(results.z, results["i-but"], "-g", label="iso-butane", linewidth=2.5)
+ax1.plot(
+    results.z, results["i-pen"], "--c", label="iso-pentane", linewidth=1.8
+)
 ax1.legend()
-         
 
-ax2.set_xlabel ("Reactor Volume [$m^{3}$]")
-ax2.set_ylabel ("Temperature (K)")
-ax2.set_title ("Temperature")
-ax2.plot (results.z, results.temperature, "-r")
 
-ax3.set_xlabel ("Reactor Volume [$m^{3}$]")
-ax3.set_ylabel ("Pressure (K)")
-ax3.set_title ("Pressure")
-ax3.plot (results.z, results.pressure, "-b",)
+ax2.set_xlabel("Reactor Volume [$m^{3}$]")
+ax2.set_ylabel("Temperature (K)")
+ax2.set_title("Temperature")
+ax2.plot(results.z, results.temperature, "-r")
+
+ax3.set_xlabel("Reactor Volume [$m^{3}$]")
+ax3.set_ylabel("Pressure (K)")
+ax3.set_title("Pressure")
+ax3.plot(
+    results.z,
+    results.pressure,
+    "-b",
+)
 
 plt.show()
