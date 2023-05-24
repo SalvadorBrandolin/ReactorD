@@ -29,6 +29,6 @@ class CompositionalArgument:
         except KeyError:
             raise KeyError(
                 f"There is no substance named '{key}' in the Kinetic object."
-                " Please, check if the was some typing error in the"
+                " Please, check if it was some typing error in the"
                 " substances' names in the reaction rate functions."
             )
