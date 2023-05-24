@@ -83,9 +83,10 @@ class NoIsothermicAllConstant:
         return np.vstack((dt_dz, dta_dz))
 
     def __repr__(self) -> str:
-        latex = (
+        latex1 = (
             r"\frac{dT}{dz}=\frac{Ua(T_a-T)+\sum\Delta{H_j}r_{j}}{{c_p}_{mix}"
-            r"\sum{F_i}}",
-            r"\frac{dT_r}{dz}=0",
+            r"{\sum}F_i}"
         )
-        return latex
+        latex2 = r"\frac{dT_r}{dz}=0"
+        
+        return latex1, latex2
