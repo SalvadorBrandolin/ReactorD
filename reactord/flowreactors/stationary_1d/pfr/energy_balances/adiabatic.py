@@ -55,9 +55,6 @@ class Adiabatic:
         return np.divide(numerator, denominator)
 
     def __repr__(self) -> str:
-        latex = (
-            r"\frac{dT}{dz}=\frac{\sum \Delta {H_j}_{(T,P)} r_{j}} {{c_p}_{mi",
-            r"x} \sum F_i}",
-            r"\frac{dT_r}{dz}=0",
-        )
-        return latex
+        latex1 = r"\frac{dT}{dz}=\frac{\sum\Delta{H_j}_{(TP)}r_{j}}{{c_p}_{mix}{\sum}F_i}"
+        latex2 = r"\frac{dT_r}{dz}=0"
+        return latex1, latex2

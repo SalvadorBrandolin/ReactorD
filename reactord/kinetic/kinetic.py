@@ -121,6 +121,6 @@ class Kinetic:
 
         for r_name, eq in zip(self.r_names, self.r_eqs):
             ltx = latex(eq._chem_equality).replace("=", r"\rightarrow")
-            output = output + f"{r_name}: {ltx} \n"
+            output += f"{r_name}: {ltx} \n"
 
         return output

@@ -30,5 +30,6 @@ class Isothermic:
         return np.zeros(reactor.grid_size)
 
     def __repr__(self) -> str:
-        latex = (r"\frac{dT}{dz}=0", r"\frac{dT_r}{dz}=0")
-        return latex
+        latex1 = r"\frac{dT}{dz}=0"
+        latex2= r"\frac{dT_r}{dz}=0"
+        return latex1, latex2
