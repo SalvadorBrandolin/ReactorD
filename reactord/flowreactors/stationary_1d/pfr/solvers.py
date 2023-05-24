@@ -30,7 +30,7 @@ def simulate_ivp_problem(reactor: "PFR", options:dict = {}):
     fun = reactor.evaluate_balances,
     t_span = np.array([0, reactor.reactor_length]),
     y0 = reactor.inlet_conditions,
-    method = "RK45",
+    method = method,
     t_eval = t_eval,
     vectorized=True
     )

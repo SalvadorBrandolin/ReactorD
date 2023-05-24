@@ -73,9 +73,13 @@ class NoIsothermicAllConstant:
             reactor.refrigerant_temperature_profile
             - reactor.temperature_profile
         ) - np.multiply(delta_hs, reactor.r_rates_profile).sum(axis=0)
+        
         denominator = np.multiply(cps, total_mole_flows)
 
         dt_dz = np.divide(numerator, denominator)
+        #import ipdb
+        #ipdb.set_trace()
+        
         dta_dz = np.zeros(reactor.grid_size)
 
         return np.vstack((dt_dz, dta_dz))
