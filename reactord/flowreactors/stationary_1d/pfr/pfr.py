@@ -139,7 +139,7 @@ class PFR:
                 self.temperature_profile,
                 self.pressure_profile,
             )
-
+            
             mass_gradient = self.mass_balance.evaluate_balance(self)
             temperature_gradient = self.energy_balance.evaluate_balance(self)
             pressure_gradient = self.pressure_balance.evaluate_balance(self)

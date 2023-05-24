@@ -76,11 +76,12 @@ class NoIsothermicAllConstant:
         
         denominator = np.multiply(cps, total_mole_flows)
 
-        dt_dz = np.divide(numerator, denominator)
-        #import ipdb
-        #ipdb.set_trace()
+        dt_dz = np.divide(numerator, denominator) * reactor.transversal_area
         
         dta_dz = np.zeros(reactor.grid_size)
+        
+        #import ipdb
+        #ipdb.set_trace()
 
         return np.vstack((dt_dz, dta_dz))
 

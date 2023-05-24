@@ -32,7 +32,10 @@ def simulate_ivp_problem(reactor: "PFR", options:dict = {}):
     y0 = reactor.inlet_conditions,
     method = method,
     t_eval = t_eval,
-    vectorized=True
+    vectorized=True,
+    #dense_output=True,
+    #first_step=1e-10,
+    #max_step=1e-4,
     )
     
     # Update profiles with solution
