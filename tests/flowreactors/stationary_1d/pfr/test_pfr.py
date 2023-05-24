@@ -696,32 +696,25 @@ def test_fogler_example_12_2_case2():
     def cpa(t, p):
         return np.full(len(t), 163)
 
-
     def cpb(t, p):
         return np.full(len(t), 83)
-
 
     def cpc(t, p):
         return np.full(len(t), 71)
 
-
     def int_cpa(t1, t2, p):
         return 163 * (t2 - t1)
-
 
     def int_cpb(t1, t2, p):
         return 83 * (t2 - t1)
 
-
     def int_cpc(t1, t2, p):
         return 71 * (t2 - t1)
-
 
     def r_rate(c, t, cons):
         k = 8.2e14 * np.exp(-34222 / t)  # 1/s
 
         return k * c["acetone"]
-
 
     a = rd.Substance(
         "acetone",

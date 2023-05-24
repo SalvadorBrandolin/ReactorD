@@ -88,5 +88,5 @@ class NoIsothermicAllConstant:
             r"{\sum}F_i}"
         )
         latex2 = r"\frac{dT_r}{dz}=0"
-        
+
         return latex1, latex2
