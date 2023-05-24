@@ -1,3 +1,4 @@
+"""PFR non-isobaric pressure balance module."""
 from IPython.display import display
 
 import numpy as np
@@ -8,6 +9,23 @@ from sympy import symbols
 
 
 class Ergun:
+    """PFR Ergun energy balance class.
+
+    Parameters
+    ----------
+    pressure : dict
+        pressure of each substance in the inlet or outlet position.
+    porosity : float
+        Packed bed porosity float between 0 and 1.
+    particle_diameter : float
+        Diameter of particle of packed bed. [m]
+
+    Raises
+    ------
+    ValueError
+        Only inlet or outlet border condition for pressure are allowed.
+    """
+
     def __init__(
         self, pressure: dict, porosity: float, particle_diameter: float
     ) -> None:
@@ -24,24 +42,62 @@ class Ergun:
 
     @property
     def irepr(self):
+        """Represent for ipython."""
         display(symbols(self.__repr__()))
 
     def initial_profile(self, reactor: PFR):
+        """Set initial pressure profile in non-isobaric PFR.
+
+        Parameters
+        ----------
+        reactor : PFR
+            PFR object
+
+        Returns
+        -------
+        ndarray
+            initial pressure profile in all grid
+        """
         if self._inlet_pressure:
             return np.full(reactor.grid_size, self._inlet_pressure)
         else:
             return np.full(reactor.grid_size, self._outlet_pressure)
 
     def update_profile(self, reactor: PFR, variables):
+        """Update profile."""
         reactor.pressure_profile = variables[-1, :]
 
     def border_conditions(self, reactor: PFR):
+        """Set border conditions.
+
+        Parameters
+        ----------
+        reactor : PFR
+            PFR object
+
+        Returns
+        -------
+        ndarray
+            array with pressure in the inlet and outlet reactor
+        """
         if self._inlet_pressure:
             return self._inlet_pressure, None
         else:
             return None, self._outlet_pressure
 
     def evaluate_balance(self, reactor: PFR):
+        """Evaluate pressure balance.
+
+        Parameters
+        ----------
+        reactor : PFR
+            PFR object
+
+        Returns
+        -------
+        ndarray
+            Pressure rate of each substance on each reactor's z
+        """
         phi = self.porosity
         dp = self.particle_diameter
 
@@ -75,6 +131,7 @@ class Ergun:
         return pressure_gradient
 
     def __repr__(self):
+        """Represent equation of PFR non-isobaric pressure balance."""
         latex = (
             r"\frac{dP}{dz}=-\frac{G}{{\rho}D_p}\left(\frac{1-\phi}{\phi^3}"
             r"\right)\left[\frac{150(1-\phi)\mu}{D_p}+1.75G\right]"

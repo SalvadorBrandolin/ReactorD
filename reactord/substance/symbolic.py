@@ -1,3 +1,7 @@
+"""Parent class of Substance.
+
+Class to redefines algebraic operators.
+"""
 from typing import Union
 
 import numpy as np

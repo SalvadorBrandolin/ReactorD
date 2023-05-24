@@ -308,7 +308,6 @@ class AbstractMix(metaclass=ABCMeta):
         float
             Mixture's viscosity. [Pa s]
         """
-
         mixture_viscosities = self._viscosity_mixing_rule_function(
             self, mole_fractions, temperature, pressure
         )

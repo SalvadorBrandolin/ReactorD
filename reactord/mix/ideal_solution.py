@@ -82,7 +82,6 @@ class IdealSolution(AbstractMix):
         --------
             volume_liquid defined on each mix's Substance.
         """
-
         pure_volumes = np.array(
             [
                 substance.volume_liquid(temperature, pressure)
