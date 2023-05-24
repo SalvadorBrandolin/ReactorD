@@ -52,7 +52,7 @@ class Adiabatic:
         numerator = -np.multiply(delta_hs, reactor.r_rates_profile).sum(axis=0)
         denominator = np.multiply(cps, total_mole_flows)
 
-        return np.divide(numerator, denominator)
+        return np.divide(numerator, denominator) * reactor.transversal_area
 
     def __repr__(self) -> str:
         latex = (

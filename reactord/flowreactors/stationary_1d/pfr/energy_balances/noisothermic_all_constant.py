@@ -38,10 +38,12 @@ class NoIsothermicAllConstant:
 
     def initial_profile(self, reactor: PFR) -> NDArray:
         reactor.kinetic.set_dh_function()
-        initial_profile = np.array([
-            np.full(reactor.grid_size, self.t_value),
-            np.full(reactor.grid_size, self.refrigerant_in_temperature),
-        ])
+        initial_profile = np.array(
+            [
+                np.full(reactor.grid_size, self.t_value),
+                np.full(reactor.grid_size, self.refrigerant_in_temperature),
+            ]
+        )
         return initial_profile
 
     def update_profile(self, reactor: PFR, variables: NDArray) -> None:
@@ -75,11 +77,8 @@ class NoIsothermicAllConstant:
         ) - np.multiply(delta_hs, reactor.r_rates_profile).sum(axis=0)
         denominator = np.multiply(cps, total_mole_flows)
 
-        dt_dz = np.divide(numerator, denominator)
+        dt_dz = np.divide(numerator, denominator) * reactor.transversal_area
         dta_dz = np.zeros(reactor.grid_size)
-
-        import ipdb
-        ipdb.set_trace()
 
         return np.vstack((dt_dz, dta_dz))
 

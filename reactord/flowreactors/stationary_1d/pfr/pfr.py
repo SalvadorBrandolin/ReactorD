@@ -154,9 +154,7 @@ class PFR:
         self.mass_balance.update_profile(self, self.ode_solution.y)
         self.energy_balance.update_profile(self, self.ode_solution.y)
         self.pressure_balance.update_profile(self, self.ode_solution.y)
-        self.mole_fraction_profile = self.mix.mole_fractions(
-            self.mass_profile
-        )
+        self.mole_fraction_profile = self.mix.mole_fractions(self.mass_profile)
         self.r_rates_profile = self.kinetic.evaluate(
             self.mole_fraction_profile,
             self.temperature_profile,
