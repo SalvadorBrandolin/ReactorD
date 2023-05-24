@@ -1,3 +1,4 @@
+"""Module to construct stoichiometry matrix."""
 from typing import List
 
 import numpy as np
@@ -9,6 +10,19 @@ from sympy import linear_eq_to_matrix, symbols
 
 
 def stoichiometry_matrix_builder(mix: AbstractMix, equations: List[Symbolic]):
+    """Build stoichiometry matrix.
+
+    Parameters
+    ----------
+    mix : AbstractMix
+    equations : List[Symbolic]
+
+
+    Returns
+    -------
+    ndarray
+        Stoichiometry matrix
+    """
     n_reactions = np.size(equations)
     n_substances = len(mix)
 
