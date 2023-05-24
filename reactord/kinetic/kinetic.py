@@ -22,8 +22,8 @@ class Kinetic:
     """
     Kinetic object builder.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     mix: AbstractMix
         Mixture object.
     reactions: dict

@@ -1,3 +1,4 @@
+"""Configuration Sphinx Module."""
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -84,6 +85,7 @@ release = "0.0.1a1"
 
 # -- Options for HTML output ----------------------------------------------
 
+"""Configuration Module."""
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
