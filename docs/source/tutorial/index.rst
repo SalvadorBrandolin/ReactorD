@@ -8,4 +8,5 @@ Contents:
 
    substance.ipynb
    ideal_gas.ipynb
-   presentation/presentation.ipynb
+   kinetic.ipynb
+   stationary_pfr.ipynb

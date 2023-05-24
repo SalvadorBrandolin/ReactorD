@@ -33,7 +33,7 @@ class Kinetic:
         where r1:rate is defined function of concentration of a and b
         callable(concentration: dictionary,
         temperature: float, constants: dictionary)
-          --> rate: float
+        --> rate: float
     kinetic_constants: dict
         Dictionary with kinetic constants.
         There are two keys for each reaction.

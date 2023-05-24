@@ -22,7 +22,6 @@ class MolarFlow:
     def __init__(
         self, molar_flows_in: dict = {}, molar_flows_out: dict = {}
     ) -> None:
-
         self.molar_flows_in = molar_flows_in
         self.molar_flows_out = molar_flows_out
 

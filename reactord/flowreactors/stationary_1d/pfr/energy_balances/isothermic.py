@@ -14,7 +14,7 @@ class Isothermic:
     Parameters
     ----------
     temperature: float
-    Isothermic temperature
+        Isothermic temperature
     """
 
     def __init__(self, temperature: float) -> None:
@@ -78,6 +78,5 @@ class Isothermic:
 
     def __repr__(self) -> str:
         latex1 = r"\frac{dT}{dz}=0"
-        latex2= r"\frac{dT_r}{dz}=0"
+        latex2 = r"\frac{dT_r}{dz}=0"
         return latex1, latex2
-

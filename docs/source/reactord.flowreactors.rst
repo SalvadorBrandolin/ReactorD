@@ -4,7 +4,7 @@ reactord.idealreactor package
 Module contents
 ---------------
 
-.. automodule:: reactord.idealreactor
+.. automodule:: reactord.flowreactors
    :members:
    :undoc-members:
    :show-inheritance:

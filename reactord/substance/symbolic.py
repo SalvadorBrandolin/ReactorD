@@ -16,20 +16,20 @@ class Symbolic:
     __add__, __mul__, __rmul__ and __gt__ methods to allow the construction of
     chemical equations from algebraic operations with Substance objects.
 
-        Parameters
-        ----------
-        names : Union[str, np.ndarray]
-            Array that stores the name attribute of the substances that
-            participates in a chemical equation.
-        expression : Symbol, optional
-            Full chemical expression as a SymPy symbol, by default None.
-        chem_equality : Equality, optional
-            Full cheical expression as a SymPy Equality, by default None.
+    Parameters
+    ----------
+    names : Union[str, np.ndarray]
+        Array that stores the name attribute of the substances that
+        participates in a chemical equation.
+    expression : Symbol, optional
+        Full chemical expression as a SymPy symbol, by default None.
+    chem_equality : Equality, optional
+        Full cheical expression as a SymPy Equality, by default None.
 
-        Raises
-        ------
-        TypeError
-            "Substance's name must be a string."
+    Raises
+    ------
+    TypeError
+        "Substance's name must be a string."
     """
 
     def __init__(

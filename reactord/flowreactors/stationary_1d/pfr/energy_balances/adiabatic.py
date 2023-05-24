@@ -107,6 +107,9 @@ class Adiabatic:
         return np.divide(numerator, denominator) * reactor.transversal_area
 
     def __repr__(self) -> str:
-        latex1 = r"\frac{dT}{dz}=\frac{\sum\Delta{H_j}_{(TP)}r_{j}}{{c_p}_{mix}{\sum}F_i}"
+        latex1 = (
+            r"\frac{dT}{dz}=\frac{\sum\Delta{H_j}_{(TP)}r_{j}}{{c_p}_{mi"
+            r"x}{\sum}F_i}"
+        )
         latex2 = r"\frac{dT_r}{dz}=0"
         return latex1, latex2

@@ -27,15 +27,6 @@ class AbstractMix(metaclass=ABCMeta):
         Viscosity mixing rule method. Options available: "linear",
         "grunberg_nissan", "herning_zipperer".
 
-    Attributes
-    ----------
-    phase_nature : str
-        Liquid or gas.
-    substances : list [Substance]
-        List of substances.
-    viscosity_mixing_rule : str
-        Viscosity mixing rule method.
-
     Raises
     ------
     NotImplementedError
