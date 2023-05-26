@@ -5,6 +5,19 @@ import pytest
 import reactord as rd
 
 
+def test_duplicate_substance_names():
+    a = rd.Substance(name="methane")
+    b = rd.Substance(name="ethanol")
+    c = rd.Substance(name="water")
+    d = rd.Substance(name="ethanol")
+
+    with pytest.raises(ValueError):
+        rd.mix.IdealGas([a, b, c, d])
+
+    with pytest.raises(ValueError):
+        rd.mix.IdealSolution([a, b, c, d])
+
+
 def test_abstract_class_type_error():
     with pytest.raises(TypeError):
         rd.mix.AbstractMix()

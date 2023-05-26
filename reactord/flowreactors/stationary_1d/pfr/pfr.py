@@ -258,6 +258,7 @@ class PFR:
     @property
     def irepr(self):
         """Represent for ipython."""
+        self.kinetic.irepr
         print("Mass balance:")
         self.mass_balance.irepr
         print("Reactor and refrigerant energy balances:")
@@ -268,6 +269,7 @@ class PFR:
     def __repr__(self):
         """Represent equation of PFR mass balance."""
         latex = (
+            f"{self.kinetic.__repr__()}\n"
             f"{self.mass_balance.__repr__()}\n"
             f"{self.energy_balance.__repr__()[0]}\n"
             f"{self.energy_balance.__repr__()[1]}\n"

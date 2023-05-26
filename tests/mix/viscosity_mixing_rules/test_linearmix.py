@@ -1,8 +1,8 @@
 import numpy as np
 
-import reactord as rd
-
 import pytest
+
+import reactord as rd
 
 
 def test_linear():
@@ -53,8 +53,8 @@ def test_linear():
         gas.mix_viscosity(mole_fractions, temperatures, pressures)
         == mix_v_by_hand
     ).all()
-    
+
     gas.phase_nature = "Kratos"
-    
+
     with pytest.raises(ValueError):
         gas.mix_viscosity(mole_fractions, temperatures, pressures)

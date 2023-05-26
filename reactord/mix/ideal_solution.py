@@ -200,9 +200,4 @@ class IdealSolution(AbstractMix):
         ndarray [float]
             Formation enthalpies of each substance
         """
-        enthalpies = np.array([])
-
-        for substance in self.substances:
-            enthalpies = np.append(enthalpies, substance.formation_enthalpy)
-
-        return enthalpies
+        return self.formation_enthalpies

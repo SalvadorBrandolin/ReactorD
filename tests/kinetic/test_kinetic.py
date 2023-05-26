@@ -7,6 +7,45 @@ import reactord as rd
 from scipy.constants import R
 
 
+def test_repr():
+    def rate():
+        ...
+
+    a = rd.Substance("A")
+    b = rd.Substance("B")
+    c = rd.Substance("C")
+    d = rd.Substance("D")
+    e = rd.Substance("E")
+
+    mix = rd.mix.IdealGas([a, b, c, d, e])
+
+    kinetic = rd.Kinetic(
+        mix=mix,
+        reactions={
+            "r1": {"eq": a > b, "rate": rate},
+            "r2": {"eq": b + 2 * c > d, "rate": rate},
+            "r3": {"eq": 2 * d + a > 2 * e, "rate": rate},
+        },
+        kinetic_constants={},
+    )
+
+    text = (
+        "Mixture's substances: \n"
+        "  * A \n"
+        "  * B \n"
+        "  * C \n"
+        "  * D \n"
+        "  * E \n"
+        "\n"
+        "System's reactions: \n"
+        "r1: A \\rightarrow B \n"
+        "r2: B + 2 C \\rightarrow D \n"
+        "r3: A + 2 D \\rightarrow 2 E \n"
+    )
+
+    assert text == kinetic.__repr__()
+
+
 def test_one_reaction1():
     """NOT REAL KINETIC PARAMETERS."""
     a = rd.Substance.from_thermo_database("etol", "ethanol")
@@ -323,3 +362,13 @@ def test_raises():
 
     with pytest.raises(ValueError):
         kinetic.user_r_dh = np.array([3, 4])
+
+    with pytest.raises(NotImplementedError):
+        rd.Kinetic(
+            mix=mix,
+            reactions={
+                "r1": {"eq": a + b > c, "rate": rate},
+                "r2": {"eq": 2 * a + b > 3 * c, "rate": rate, "DH": 2},
+            },
+            kinetic_constants={},
+        )

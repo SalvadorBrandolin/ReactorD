@@ -6,6 +6,49 @@ import reactord.flowreactors.stationary_1d.pfr as pfr
 from scipy.constants import R
 
 
+def test_repr():
+    def r_rate():
+        ...
+
+    a = rd.Substance("A")
+    b = rd.Substance("B")
+    c = rd.Substance("C")
+
+    mix = rd.mix.IdealGas([a, b, c])
+
+    kinetic = rd.Kinetic(
+        mix=mix,
+        reactions={"r1": {"eq": a + b > c, "rate": r_rate}},
+        kinetic_constants={},
+    )
+
+    mb = pfr.mass_balances.MolarFlow(molar_flows_in={"A": 10, "B": 10, "C": 0})
+
+    eb = pfr.energy_balances.Adiabatic(temperature_in_or_out={"in": 303.15})
+
+    pb = pfr.pressure_balances.Isobaric(pressure=101325)
+
+    reactor = pfr.PFR(
+        kinetic=kinetic,
+        reactor_length=10,
+        transversal_area=1,
+        grid_size=10,
+        mass_balance=mb,
+        energy_balance=eb,
+        pressure_balance=pb,
+    )
+
+    text = (
+        f"{kinetic.__repr__()}\n"
+        f"{mb.__repr__()}\n"
+        f"{eb.__repr__()[0]}\n"
+        f"{eb.__repr__()[1]}\n"
+        f"{pb.__repr__()}\n"
+    )
+
+    assert text == reactor.__repr__()
+
+
 def test_fogler_p1_15a():
     """Fogler fourth ed. P1.15a."""
 
@@ -536,10 +579,36 @@ def test_fogler_example_4_4():
 
     assert np.allclose(reactord_pressures, fogler_pressures, atol=0.1)
 
+    # Pressure border condition information is given at the reactor's outlet.
+    pb_out = pfr.pressure_balances.Ergun(
+        pressure={"out": 2.65 * 101325},
+        porosity=0.45,
+        particle_diameter=0.00635,
+    )
+
+    reactor2 = pfr.PFR(
+        kinetic=kinetic,
+        reactor_length=18.288,
+        transversal_area=0.001313648986,
+        grid_size=20,
+        mass_balance=mb,
+        energy_balance=eb,
+        pressure_balance=pb_out,
+    )
+
+    reactor2.simulate(tol=0.001)
+
+    fogler_z = np.array([0, 10, 20, 30, 40, 50, 60]) * 0.30480370641
+    fogler_pressures = np.array([10, 9.2, 8.3, 7.3, 6.2, 4.7, 2.65])
+    reactord_pressures = reactor2.ode_solution.sol(fogler_z)[-1] / 101325
+
+    assert np.allclose(reactord_pressures, fogler_pressures, atol=0.1)
+
 
 def test_fogler_example_11_3():
     """Fogler 6th ed. example 11.3"""
 
+    # temperature as initial value
     def volume(temperature, pressure):
         f_mol = 163 * 1000 / 3600  # mol / s
         f_volumetric = 100_000 * 0.00378541 / 24 / 3600  # m3 / s
@@ -689,10 +758,35 @@ def test_fogler_example_11_3():
     assert np.allclose(temps, rd_temps, atol=0.5)
     assert np.allclose(x, rd_x, atol=0.013)
 
+    # with temperature as border value
+    eb = pfr.energy_balances.Adiabatic(
+        temperature_in_or_out={"out": 360.89359}
+    )
+
+    reactor = pfr.PFR(
+        kinetic=kinetic,
+        reactor_length=4.97954,
+        transversal_area=1,
+        grid_size=100,
+        mass_balance=mb,
+        energy_balance=eb,
+        pressure_balance=pb,
+    )
+
+    reactor.simulate(1e-10)
+
+    rd_temps = reactor.ode_solution.sol(vol_temps)[-2]
+    rd_fbut = reactor.ode_solution.sol(vol_x)[0]
+    rd_x = (f_mol * 0.9 - rd_fbut) / (f_mol * 0.9)
+
+    assert np.allclose(temps, rd_temps, atol=0.7)
+    assert np.allclose(x, rd_x, atol=0.013)
+
 
 def test_fogler_example_12_2_case2():
     """Fogler 6th ed. example 12.2"""
 
+    # temperature as in value
     def cpa(t, p):
         return np.full(len(t), 163)
 
@@ -762,7 +856,7 @@ def test_fogler_example_12_2_case2():
         kinetic=kinetic,
         reactor_length=1 / 1000 / area,
         transversal_area=area,
-        grid_size=1000,
+        grid_size=100,
         mass_balance=mb,
         energy_balance=eb,
         pressure_balance=pb,
@@ -866,6 +960,32 @@ def test_fogler_example_12_2_case2():
             0.9466,
         ]
     )
+
+    rd_temps = reactor.ode_solution.sol(t_z)[-3]
+    rd_facetone = reactor.ode_solution.sol(x_z)[0]
+    rd_x = (0.0376 - rd_facetone) / (0.0376)
+
+    assert np.allclose(t, rd_temps, atol=2)
+    assert np.allclose(x, rd_x, atol=0.02)
+
+    # temperature as out value
+    eb2 = pfr.energy_balances.NoIsothermicAllConstant(
+        temperature_in_or_out={"out": 1113.88},
+        refrigerant_in_temperature=1250,
+        heat_exchange_coefficient=110,
+    )
+
+    reactor = pfr.PFR(
+        kinetic=kinetic,
+        reactor_length=0.996 / 1000 / area,
+        transversal_area=area,
+        grid_size=100,
+        mass_balance=mb,
+        energy_balance=eb2,
+        pressure_balance=pb,
+    )
+
+    reactor.simulate(1e-8, bc_tol=1e-5, max_nodes=10_000)
 
     rd_temps = reactor.ode_solution.sol(t_z)[-3]
     rd_facetone = reactor.ode_solution.sol(x_z)[0]

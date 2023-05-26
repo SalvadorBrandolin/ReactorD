@@ -60,6 +60,17 @@ def test_three_substance_mix():
 
     mixture = rd.mix.IdealSolution([hexane, toluene, butanol])
 
+    # Formation enthalpies
+    fh = np.array(
+        [
+            hexane.formation_enthalpy,
+            toluene.formation_enthalpy,
+            butanol.formation_enthalpy,
+        ]
+    )
+
+    assert (fh == mixture.get_formation_enthalpies()).all()
+
     compositions = np.array(
         [
             [1, 5, 8],
