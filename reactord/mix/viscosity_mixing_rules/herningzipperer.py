@@ -1,9 +1,15 @@
 """Herning-Zipperer mixing rule."""
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 
+if TYPE_CHECKING:
+    from reactord.mix.abstract_mix import AbstractMix
+
+
 def herning_zipperer(
-    mixture,
+    mixture: "AbstractMix",
     molar_fractions: np.ndarray,
     temperature: float,
     pressure: float,
@@ -23,7 +29,7 @@ def herning_zipperer(
 
     .. math::
            ln({\mu_{mix}}_{(T,P)}) =
-           \frac {\sum z_i \mu_i_{(T,P)} \sqrt(M_i)} {\sum z_i \sqrt(M_i)}
+           \frac {\sum z_i {\mu_i}_{(T,P)} \sqrt(M_i)} {\sum z_i \sqrt(M_i)}
 
     | :math:`\mu_{mix}`: mix's viscosity.
     | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.

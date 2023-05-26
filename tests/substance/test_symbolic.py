@@ -37,6 +37,10 @@ def test_errors():
     with pytest.raises(TypeError):
         b + a > "nana"
 
+    # __truediv__
+    with pytest.raises(TypeError):
+        a / "2" > b
+
 
 def test_initial_symbol():
     a = rd.Substance("a")
