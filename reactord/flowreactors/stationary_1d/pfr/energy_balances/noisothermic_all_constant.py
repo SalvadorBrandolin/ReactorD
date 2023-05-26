@@ -18,7 +18,7 @@ class NoIsothermicAllConstant:
     refrigerant_in_temperature: float
     heat_exchange_coefficient: float
     """
-    
+
     def __init__(
         self,
         temperature_in_or_out: dict,
