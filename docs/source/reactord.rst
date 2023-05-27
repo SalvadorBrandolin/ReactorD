@@ -2,16 +2,9 @@ reactord package
 ================
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 1
 
-   reactord.flowreactors
-   reactord.mix
    reactord.substance
-
-Module contents
----------------
-
-.. automodule:: reactord.kinetic
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   reactord.mix
+   reactord.kinetic
+   reactord.flowreactors

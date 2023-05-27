@@ -4,7 +4,7 @@ flake8-nb
 flake8-black
 flake8-builtins
 flake8-import-order
-
+Commitizen
 pep8-naming
 pydocstyle
 

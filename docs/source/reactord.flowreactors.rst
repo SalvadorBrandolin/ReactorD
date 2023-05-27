@@ -1,10 +1,7 @@
-reactord.idealreactor package
+reactord.flowreactors package
 =============================
 
-Module contents
----------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: reactord.flowreactors
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   flowreactors/stationary_1d

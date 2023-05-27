@@ -1,10 +1,12 @@
 """Parent class of Substance.
 
-Class to redefines algebraic operators.
+Class to redefine algebraic operators.
 """
+
 from typing import Union
 
 import numpy as np
+from numpy.typing import NDArray
 
 from sympy import Eq, Equality, Symbol, symbols
 
@@ -13,8 +15,9 @@ class Symbolic:
     """Parent class of Substance. Redefines algebraic operators.
 
     This class is created as a parent class of Substance and redefines the
-    __add__, __mul__, __rmul__ and __gt__ methods to allow the construction of
-    chemical equations from algebraic operations with Substance objects.
+    __add__, __mul__, __rmul__, __gt__ and __truediv__ methods to allow the
+    construction of chemical equations from algebraic operations with Substance
+    objects.
 
     Parameters
     ----------
@@ -24,7 +27,7 @@ class Symbolic:
     expression : Symbol, optional
         Full chemical expression as a SymPy symbol, by default None.
     chem_equality : Equality, optional
-        Full cheical expression as a SymPy Equality, by default None.
+        Full chemical expression as a SymPy Equality, by default None.
 
     Raises
     ------
@@ -34,7 +37,7 @@ class Symbolic:
 
     def __init__(
         self,
-        names: Union[str, np.ndarray],
+        names: Union[str, NDArray],
         expression: Symbol = None,
         chem_equality: Equality = None,
     ) -> None:

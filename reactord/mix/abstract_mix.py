@@ -1,8 +1,9 @@
 """Abstract_mix Module."""
 from abc import ABCMeta, abstractmethod
-from typing import Callable, List
+from typing import Callable, List, Union
 
 import numpy as np
+from numpy.typing import NDArray
 
 from reactord.mix.viscosity_mixing_rules.grunbergnissan import grunberg_nissan
 from reactord.mix.viscosity_mixing_rules.herningzipperer import (
@@ -26,6 +27,29 @@ class AbstractMix(metaclass=ABCMeta):
     viscosity_mixing_rule : str
         Viscosity mixing rule method. Options available: "linear",
         "grunberg_nissan", "herning_zipperer".
+
+    Attributes
+    ----------
+    names : NDArray
+       Names of the mixture's substances.
+    molecular_weights : NDArray
+        The molecular weights of the mixture's substances. [g/mol]
+    normal_boiling_points : NDArray
+        The normal boiling points of the mixture's substances. [K]
+    normal_melting_points : NDArray
+        The normal melting points of the mixture's substances. [K]
+    critical_temperatures : NDArray
+        The critical temperatures of the mixture's substances. [K].
+    critical_pressures : NDArray
+        The critical pressures of the mixture's substances. [Pa]
+    acentric_factors : NDArray
+        The acentric factors of the mixture's substances.
+    formation_enthalpies : float, optional
+        Standard state molar enthalpies of formation of the mixture's 
+        substances. [J/mol]
+    formation_enthalpies_ig : NDArray
+        Ideal-gas molar enthalpies of formation of the mixture's substances. 
+        [J/mol]
 
     Raises
     ------
@@ -122,7 +146,9 @@ class AbstractMix(metaclass=ABCMeta):
     # =========================================================================
     # Mixtures' common methods
     # =========================================================================
-    def mole_fractions(self, moles: np.ndarray) -> np.ndarray:
+    def mole_fractions(
+        self, moles: Union[float, NDArray]
+    ) -> Union[float, NDArray]:
         r"""Calculate the mole fractions of the mixture's substances.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
@@ -138,13 +164,13 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        moles: np.ndarray [float]
+        moles: Union[float, NDArray]
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
 
         Returns
         -------
-        ndarray
+        Union[float, NDArray]
             The array of the molar fractions of the mix's substances. Each
             column of the matrix represents each mixture and each row represent
             each substance's mole fraction.
@@ -154,7 +180,9 @@ class AbstractMix(metaclass=ABCMeta):
 
         return mole_fractions
 
-    def mix_molecular_weight(self, mole_fractions: np.ndarray) -> float:
+    def mix_molecular_weight(
+        self, mole_fractions: Union[float, NDArray]
+    ) -> Union[float, NDArray]:
         r"""Calculate the molecular weight of the mixture.
 
         Multiple mixture compositions can be specified by a mole_fractions
@@ -172,13 +200,13 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : Union[float, NDArray]
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
 
         Returns
         -------
-        float
+        Union[float, NDArray]
             The molecular weight of the mixture. [kg/kmol]
 
 
@@ -189,8 +217,11 @@ class AbstractMix(metaclass=ABCMeta):
         return np.dot(self.molecular_weights, mole_fractions)
 
     def molar_density(
-        self, mole_fractions: np.ndarray, temperature: float, pressure: float
-    ) -> float:
+        self,
+        mole_fractions: Union[float, NDArray],
+        temperature: Union[float, NDArray],
+        pressure: Union[float, NDArray],
+    ) -> Union[float, NDArray]:
         r"""Calculate the mixture's molar density.
 
         Multiple mixture compositions can be specified by a mole_fractions
@@ -209,17 +240,17 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : Union[float, NDArray]
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray]
             Pressure. [Pa]
 
         Returns
         -------
-        float
+        Union[float, NDArray]
             Mixture's molar density. [mol/m3]
         """
         molar_volume = self.volume(mole_fractions, temperature, pressure)
@@ -227,8 +258,11 @@ class AbstractMix(metaclass=ABCMeta):
         return np.divide(1, molar_volume)
 
     def mass_density(
-        self, mole_fractions: np.ndarray, temperature: float, pressure: float
-    ) -> float:
+        self,
+        mole_fractions: Union[float, NDArray],
+        temperature: Union[float, NDArray],
+        pressure: Union[float, NDArray],
+    ) -> Union[float, NDArray]:
         r"""Calculate the mixture's mass density.
 
         Multiple mixture compositions can be specified by a mole_fractions
@@ -245,17 +279,17 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : Union[float, NDArray]
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray]
             Pressure. [Pa]
 
         Returns
         -------
-        float
+        Union[float, NDArray]
             Mixture's mass density. [kg/m3]
 
 
@@ -273,10 +307,10 @@ class AbstractMix(metaclass=ABCMeta):
 
     def mix_viscosity(
         self,
-        mole_fractions: np.ndarray,
-        temperature: float,
-        pressure: float,
-    ) -> float:
+        mole_fractions: NDArray,
+        temperature: Union[float, NDArray],
+        pressure: Union[float, NDArray],
+    ) -> Union[float, NDArray]:
         """Evaluate the viscosity of the mixture with the chosen mixing rule.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
@@ -286,17 +320,17 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : NDArray
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray]
             Pressure. [Pa]
 
         Returns
         -------
-        float
+        Union[float, NDArray]
             Mixture's viscosity. [Pa s]
         """
         mixture_viscosities = self._viscosity_mixing_rule_function(
@@ -308,10 +342,10 @@ class AbstractMix(metaclass=ABCMeta):
     # Compositional measure functions
     def partial_pressures(
         self,
-        mole_fractions: np.ndarray,
-        temperature: float,
-        pressure: float,
-    ) -> np.ndarray:
+        mole_fractions: NDArray,
+        temperature: Union[float, NDArray],
+        pressure: Union[float, NDArray],
+    ) -> Union[float, NDArray]:
         """Calculate the partial pressures of the mixture's substances.
 
         Multiple mixture compositions can be specified by a mole_fractions
@@ -328,17 +362,17 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : NDArray
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray]
             Pressure. [Pa]
 
         Returns
         -------
-        ndarray [float]
+        Union[float, NDArray]
             An array that contains the partial pressures of mix's substances.
             Each column of the matrix represents each mixture and each row
             represent each substance's partial pressure. [Pa]
@@ -348,8 +382,11 @@ class AbstractMix(metaclass=ABCMeta):
         return partial_pressures
 
     def concentrations(
-        self, mole_fractions: np.ndarray, temperature: float, pressure: float
-    ) -> np.ndarray:
+        self,
+        mole_fractions: NDArray,
+        temperature: Union[float, NDArray],
+        pressure: Union[float, NDArray],
+    ) -> Union[float, NDArray]:
         r"""Concentrations of the mixture's substances.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
@@ -366,17 +403,17 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : NDArray
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray]
             Pressure. [Pa]
 
         Returns
         -------
-        ndarray [float]
+        Union[float, NDArray]
             An array that contains the concentrations of the mixture's
             substances. [mol/m³]
         """
@@ -386,7 +423,7 @@ class AbstractMix(metaclass=ABCMeta):
 
         return np.multiply(molar_densities, mole_fractions)
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the number of substances in the mixture.
 
         Redifine the magic method __len__
@@ -403,8 +440,11 @@ class AbstractMix(metaclass=ABCMeta):
     # =========================================================================
     @abstractmethod
     def volume(
-        self, mole_fractions: np.ndarray, temperature: float, pressure: float
-    ) -> None:
+        self,
+        mole_fractions: NDArray,
+        temperature: Union[float, NDArray],
+        pressure: Union[float, NDArray],
+    ) -> Union[float, NDArray]:
         """Return the molar volume of the mixture.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
@@ -414,13 +454,18 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : NDArray
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray]
             Pressure. [Pa]
+
+        Returns
+        -------
+        Union[float, NDArray]
+            Mixture's molar volume. [m³/mol]
 
         Raises
         ------
@@ -431,8 +476,11 @@ class AbstractMix(metaclass=ABCMeta):
 
     @abstractmethod
     def mix_heat_capacity(
-        self, mole_fractions: np.ndarray, temperature: float, pressure: float
-    ) -> None:
+        self,
+        mole_fractions: NDArray,
+        temperature: Union[float, NDArray],
+        pressure: Union[float, NDArray],
+    ) -> Union[float, NDArray]:
         """Calculate the mixture's heat capacity.
 
         Multiple mixture compositions can be specified by a moles matrix. Each
@@ -442,13 +490,18 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : NDArray
             Mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray]
             Pressure. [Pa]
+
+        Returns
+        -------
+        Union[float, NDArray]
+            Mixture's heat capacity. [J/mol]
 
         Raises
         ------
@@ -460,9 +513,9 @@ class AbstractMix(metaclass=ABCMeta):
     @abstractmethod
     def formation_enthalpies_correction(
         self,
-        temperature: float,
-        pressure: float,
-    ) -> None:
+        temperature: Union[float, NDArray],
+        pressure: Union[float, NDArray],
+    ) -> Union[float, NDArray]:
         """Calculate the correction term for the formation enthalpy.
 
         Method that calculates the correction term for the formation enthalpies
@@ -472,14 +525,14 @@ class AbstractMix(metaclass=ABCMeta):
 
         Parameters
         ----------
-        temperature : float
+        temperature : Union[float, NDArray]
             Temperature at which formation enthalpies are to be calculated. [K]
-        pressure : float
+        pressure : Union[float, NDArray]
             Pressure at which formation enthalpies are to be calculated. [Pa]
 
         Returns
         -------
-        ndarray [float]
+        Union[float, NDArray]
             Formation enthalpies correction for each mix's substance. [J/mol/K]
 
         Raises
@@ -490,6 +543,17 @@ class AbstractMix(metaclass=ABCMeta):
         raise NotImplementedError("Abstract method not implemented")
 
     @abstractmethod
-    def get_formation_enthalpies(self) -> None:
-        """Calculate the formation enthalpy of the mixture's substances."""
+    def get_formation_enthalpies(self) -> Union[float, NDArray]:
+        """Calculate the formation enthalpy of the mixture's substances.
+
+        Returns
+        -------
+        Union[float, NDArray]
+            Formation enthalpies of the mixture's substances. [J/mol]
+
+        Raises
+        ------
+        NotImplementedError
+            Abstract method not implemented.
+        """
         raise NotImplementedError("Abstract method not implemented")

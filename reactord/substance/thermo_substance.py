@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 def thermo_substance_constructor(
     substance: "Substance", name: str, thermo_identification: str
-):
+) -> "Substance":
     """Substance constructor from Thermo database.
 
     The functions of the Thermo library are all exclusively temperature
