@@ -21,11 +21,11 @@ class Substance(Symbolic):
     Class to define a substance object. Specific attributes definition will be
     required for the reactors, described in each reactor documentation. For
     example, an adiabatic reactor will require that substances define a heat
-    capacity function, on the other hand, when using isothermic reactors this
-    won't be necessary. Substance has the from_thermo_data_base alternative
-    construction method. Substances objects can be saved as pickle files with
-    the method to_pickle. substances can be loaded from a pickle file with the
-    method from_pickle.
+    capacity function for the substances, on the other hand, when using
+    isothermic reactors this won't be necessary. Substance has the
+    from_thermo_data_base alternative construction method. Substances objects
+    can be saved as pickle files with the method to_pickle. substances can be
+    loaded from a pickle file with the method from_pickle.
 
     Example:
 
@@ -35,8 +35,8 @@ class Substance(Symbolic):
 
     Parameters
     ----------
-    name : str, optional
-       Name of the substance, by default None.
+    name : str
+       Name of the substance.
     molecular_weight : float, optional
         The molecular weight of the substance [g/mol], by default None.
     normal_boiling_point : float, optional
@@ -112,25 +112,25 @@ class Substance(Symbolic):
 
     Attributes
     ----------
-    name : str, optional
+    name : str
        Name of the substance, by default None.
-    molecular_weight : float, optional
+    molecular_weight : float
         The molecular weight of the substance [g/mol], by default None.
-    normal_boiling_point : float, optional
+    normal_boiling_point : float
         The normal boiling point of the substance [K], by default None.
-    normal_melting_point : float, optional
+    normal_melting_point : float
         The normal melting point of the substance [K], by default None.
-    critical_temperature : float, optional
+    critical_temperature : float
         The critical temperature of the substance [K], by default None.
-    critical_pressure : float, optional
+    critical_pressure : float
         The critical pressure of the substance [Pa], by default None.
-    acentric_factor : float, optional
+    acentric_factor : float
         The acentric factor of the substance, by default None.
-    formation_enthalpy : float, optional
+    formation_enthalpy : float
         Standard state molar enthalpy of formation [J/mol], by default None.
-    formation_enthalpy_ig : float, optional
+    formation_enthalpy_ig : float
         Ideal-gas molar enthalpy of formation [J/mol], by default None.
-    vectorize_functions: bool, optional
+    vectorize_functions: bool
         When True, numpy.vectorize() is applied to the temperature and pressure
         Substance functions on Substance object init, by default False.
     """
@@ -296,7 +296,7 @@ class Substance(Symbolic):
         Parameters
         ----------
         name_file : str
-            Name of the file.
+            path/to/file.
 
         Returns
         -------
@@ -325,42 +325,42 @@ class Substance(Symbolic):
             f.write(dumps(self))
 
     def vaporization_enthalpy(
-        self, temperature: Union[float, NDArray]
-    ) -> Union[float, NDArray]:
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the vaporization enthalpy at a given temperature.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Vaporization enthalpy. [J/mol]
         """
         return self._vaporization_enthalpy(temperature)
 
     def sublimation_enthalpy(
-        self, temperature: Union[float, NDArray]
-    ) -> Union[float, NDArray]:
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the sublimation enthalpy at a given temperature.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Sublimation enthalpy. [J/mol]
         """
         return self._sublimation_enthalpy(temperature)
 
     def fusion_enthalpy(
-        self, temperature: Union[float, NDArray]
-    ) -> Union[float, NDArray]:
+        self, temperature: Union[float, NDArray[np.float64]]
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the fusion enthalpy at a given temperature.
 
         Uses the sublimation and vaporization enthalpy functions for the fusion
@@ -369,12 +369,12 @@ class Substance(Symbolic):
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Fusion enthalpy. [J/mol]
         """
         fusion_h = self._sublimation_enthalpy(
@@ -384,203 +384,203 @@ class Substance(Symbolic):
 
     def volume_solid(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the solid molar volume at a given temperature and pressure.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Solid molar volume. [m³/mol]
         """
         return self._volume_solid(temperature, pressure)
 
     def volume_liquid(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the liquid molar volume at a given temperature and pressure.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Liquid molar volume. [m³/mol]
         """
         return self._volume_liquid(temperature, pressure)
 
     def heat_capacity_solid(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the pure solid heat capacity at a given temperature.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Solid heat capacity. [J/mol/K]
         """
         return self._heat_capacity_solid(temperature, pressure)
 
     def heat_capacity_liquid(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the pure liquid heat capacity at a given temperature.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Liquid heat capacity. [J/mol/K]
         """
         return self._heat_capacity_liquid(temperature, pressure)
 
     def heat_capacity_gas(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the ideal gas heat capacity at a given temperature.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Ideal gas heat capacity. [J/mol/K]
         """
         return self._heat_capacity_gas(temperature, pressure)
 
     def thermal_conductivity_liquid(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the liquid thermal conductivity.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Liquid thermal conductivity. [W/m/K]
         """
         return self._thermal_conductivity_liquid(temperature, pressure)
 
     def thermal_conductivity_gas(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the gas thermal conductivity.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Gas thermal conductivity. [W/m/K]
         """
         return self._thermal_conductivity_gas(temperature, pressure)
 
     def viscosity_liquid(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the pure liquid viscosity.
 
         Pure liquid viscosity at a given temperature and pressure.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Liquid viscosity. [Pa s]
         """
         return self._viscosity_liquid(temperature, pressure)
 
     def viscosity_gas(
         self,
-        temperature: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         """Return the pure gas viscosity.
 
          Pure gas viscosity at a given temperature and pressure.
 
         Parameters
         ----------
-        temperature : Union[float, NDArray]
-            Temperature in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature : Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Gas viscosity. [Pa s]
         """
         return self._viscosity_gas(temperature, pressure)
 
     def heat_capacity_solid_dt_integral(
         self,
-        temperature1: Union[float, NDArray],
-        temperature2: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature1: Union[float, NDArray[np.float64]],
+        temperature2: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         r"""Return the integral of solid heat capacity.
 
         Calculate the integral of solid heat capacity between temperature1
@@ -595,16 +595,16 @@ class Substance(Symbolic):
 
         Parameters
         ----------
-        temperature1 : Union[float, NDArray]
-            Lower temperature integral bound in Kelvin degrees. [K]
-        temperature2 : Union[float, NDArray]
-            Upper temperature integral bound in Kelvin degrees. [K]
-        pressure: Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature1 : Union[float, NDArray[np.float64]]
+            Lower temperature integral bound. [K]
+        temperature2 : Union[float, NDArray[np.float64]]
+            Upper temperature integral bound. [K]
+        pressure: Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Integral of solid heat capacity between temperature1 and
             temperature2. [J/mol]
         """
@@ -615,10 +615,10 @@ class Substance(Symbolic):
 
     def heat_capacity_liquid_dt_integral(
         self,
-        temperature1: Union[float, NDArray],
-        temperature2: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature1: Union[float, NDArray[np.float64]],
+        temperature2: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         r"""Return the integral of liquid heat capacity.
 
         Calculate the definite integral of liquid heat capacity between
@@ -633,16 +633,16 @@ class Substance(Symbolic):
 
         Parameters
         ----------
-        temperature1 : Union[float, NDArray]
-            Lower temperature integral bound in Kelvin degrees [K]
-        temperature2 : Union[float, NDArray]
-            Upper temperature integral bound in Kelvin degrees [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature1 : Union[float, NDArray[np.float64]]
+            Lower temperature integral bound. [K]
+        temperature2 : Union[float, NDArray[np.float64]]
+            Upper temperature integral bound. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Definite integral of liquid heat capacity between temperature1
             and temperature2. [J/mol]
         """
@@ -653,10 +653,10 @@ class Substance(Symbolic):
 
     def heat_capacity_gas_dt_integral(
         self,
-        temperature1: Union[float, NDArray],
-        temperature2: Union[float, NDArray],
-        pressure: Union[float, NDArray],
-    ) -> Union[float, NDArray]:
+        temperature1: Union[float, NDArray[np.float64]],
+        temperature2: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
+    ) -> Union[float, NDArray[np.float64]]:
         r"""Return the integral of gas heat capacity.
 
         Calculate the definite integral of gas heat capacity between
@@ -671,16 +671,16 @@ class Substance(Symbolic):
 
         Parameters
         ----------
-        temperature1 : Union[float, NDArray]
-            Lower temperature integral bound in Kelvin degrees. [K]
-        temperature2 : Union[float, NDArray]
-            Upper temperature integral bound in Kelvin degrees. [K]
-        pressure : Union[float, NDArray]
-            Pressure in Pascal. [Pa]
+        temperature1 : Union[float, NDArray[np.float64]]
+            Lower temperature integral bound. [K]
+        temperature2 : Union[float, NDArray[np.float64]]
+            Upper temperature integral bound. [K]
+        pressure : Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        Union[float, NDArray]
+        Union[float, NDArray[np.float64]]
             Definite integral of gas heat capacity between temperature1 and
             temperature2. [J/mol]
         """

@@ -2,6 +2,7 @@
 from IPython.display import display
 
 import numpy as np
+from numpy.typing import NDArray
 
 from reactord.flowreactors.stationary_1d.pfr.pfr import PFR
 
@@ -9,7 +10,17 @@ from sympy import symbols
 
 
 class Isothermic:
-    """PFR isothermic energy balance class.
+    r"""PFR isothermic energy balance.
+
+    .. math::
+        \frac{dT}{dz}=0
+
+    .. math::
+        \frac{dT_r}{dz}=0
+
+    | :math:`T`: reactor's temperature.
+    | :math:`T_r`: refrigerant's temperature.
+    | :math:`z`: reactor's length coordinate.
 
     Parameters
     ----------
@@ -26,7 +37,7 @@ class Isothermic:
         display(symbols(self.__repr__()[0]))
         display(symbols(self.__repr__()[1]))
 
-    def initial_profile(self, reactor: PFR):
+    def initial_profile(self, reactor: PFR) -> NDArray[np.float64]:
         """Set initial energy profile in isothermic PFR.
 
         Parameters
@@ -36,17 +47,27 @@ class Isothermic:
 
         Returns
         -------
-        ndarray
+        NDArray[np.float64]
             initial temperature profile in all grid
         """
         return np.full(reactor.grid_size, self.temperature)
 
-    def update_profile(self, reactor: PFR, variables):
-        """Update profile."""
+    def update_profile(
+        self, reactor: PFR, variables: NDArray[np.float64]
+    ) -> None:
+        """Update PFR's temperature profile.
+
+        Parameters
+        ----------
+        reactor : PFR
+            PFR object.
+        variables : NDArray[np.float64]
+            Variables of solve_bvp ode solver.
+        """
         reactor.temperature_profile = variables[-2, :]
         reactor.refrigerant_temperature_profile = None
 
-    def border_conditions(self, reactor: PFR):
+    def border_conditions(self, reactor: PFR) -> tuple:
         """Set border conditions.
 
         Parameters
@@ -60,7 +81,7 @@ class Isothermic:
         """
         return self.temperature, None
 
-    def evaluate_balance(self, reactor: PFR):
+    def evaluate_balance(self, reactor: PFR) -> NDArray[np.float64]:
         """Evaluate energy balance.
 
         Parameters
@@ -70,7 +91,7 @@ class Isothermic:
 
         Returns
         -------
-        ndarray
+        NDArray[np.float64]
             Temperature rate of each substance on each reactor's z
             This is zero in a isothermic balance.
         """

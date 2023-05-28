@@ -10,18 +10,18 @@ if TYPE_CHECKING:
 
 def dh_specified(
     kinetic: "Kinetic",
-    temperature: Union[NDArray, float],
-    pressure: Union[NDArray, float],
-) -> NDArray:
-    """Calculate of specified enthalpies.
+    temperature: Union[NDArray[np.float64], float],
+    pressure: Union[NDArray[np.float64], float],
+) -> NDArray[np.float64]:
+    """Return the user specified reaction enthalpies.
 
     Parameters
     ----------
     kinetic : Kinetic
         kinetic object
-    temperature : Union[NDArray, float]
+    temperature : Union[NDArray[np.float64], float]
         Temperature [K]
-    pressure : Union[NDArray, float]
+    pressure : Union[NDArray[np.float64], float]
         Pressure [Pa]
 
     Returns
@@ -39,18 +39,21 @@ def dh_specified(
 
 def dh_not_specified(
     kinetic: "Kinetic",
-    temperature: Union[NDArray, float],
-    pressure: Union[NDArray, float],
-) -> NDArray:
-    """Calculate of not specified enthalpies.
+    temperature: Union[NDArray[np.float64], float],
+    pressure: Union[NDArray[np.float64], float],
+) -> NDArray[np.float64]:
+    """Calculate the reaction enthalpies.
+
+    Uses standard formation enthalpies and heat capacities to calculate the
+    reaction enthalpies.
 
     Parameters
     ----------
     kinetic : Kinetic
         kinetic object
-    temperature : Union[NDArray, float]
+    temperature : Union[NDArray[np.float64], float]
         Temperature [K]
-    pressure : Union[NDArray, float]
+    pressure : Union[NDArray[np.float64], float]
         Pressure [Pa]
 
     Returns

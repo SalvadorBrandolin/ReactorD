@@ -9,7 +9,16 @@ from sympy import symbols
 
 
 class MolarFlow:
-    """PFR Molar Flow class.
+    r"""PFR Molar Flow class.
+
+    .. math::
+        \frac{1}{a_t}\frac{dF_i}{dz}=r_i
+
+    | :math:`a_t`: reactor's transversal area.
+    | :math:`F_i`: molar flow of the `i`-th substance.
+    | :math:`z`: reactor's length coordinate.
+    | :math:`r_i`: reaction rate of the `i`-th substance.
+
 
     Parameters
     ----------

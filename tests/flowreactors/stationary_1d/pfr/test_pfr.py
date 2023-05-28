@@ -970,14 +970,14 @@ def test_fogler_example_12_2_case2():
 
     # temperature as out value
     eb2 = pfr.energy_balances.NoIsothermicAllConstant(
-        temperature_in_or_out={"out": 1113.88},
+        temperature_in_or_out={"out": 1114.093},
         refrigerant_in_temperature=1250,
         heat_exchange_coefficient=110,
     )
 
     reactor = pfr.PFR(
         kinetic=kinetic,
-        reactor_length=0.996 / 1000 / area,
+        reactor_length=1 / 1000 / area,
         transversal_area=area,
         grid_size=100,
         mass_balance=mb,
@@ -993,3 +993,449 @@ def test_fogler_example_12_2_case2():
 
     assert np.allclose(t, rd_temps, atol=2)
     assert np.allclose(x, rd_x, atol=0.02)
+
+
+def test_fogler_example_12_2_case3():
+    """Fogler 6th ed. example 12.2"""
+
+    # temperature as in value
+    def cpa(t, p):
+        return np.full(len(t), 163)
+
+    def cpb(t, p):
+        return np.full(len(t), 83)
+
+    def cpc(t, p):
+        return np.full(len(t), 71)
+
+    def cp_ref(t, p):
+        return np.full(len(t), 34.5)
+
+    def int_cpa(t1, t2, p):
+        return 163 * (t2 - t1)
+
+    def int_cpb(t1, t2, p):
+        return 83 * (t2 - t1)
+
+    def int_cpc(t1, t2, p):
+        return 71 * (t2 - t1)
+
+    def r_rate(c, t, cons):
+        k = 8.2e14 * np.exp(-34222 / t)  # 1/s
+
+        return k * c["acetone"]
+
+    a = rd.Substance(
+        "acetone",
+        formation_enthalpy_ig=-216.67 * 1000,
+        heat_capacity_gas=cpa,
+        heat_capacity_gas_dt_integral=int_cpa,
+    )
+
+    b = rd.Substance(
+        "anhydride",
+        formation_enthalpy_ig=-61.09 * 1000,
+        heat_capacity_gas=cpb,
+        heat_capacity_gas_dt_integral=int_cpb,
+    )
+
+    c = rd.Substance(
+        "methane",
+        formation_enthalpy_ig=-74.81 * 1000,
+        heat_capacity_gas=cpc,
+        heat_capacity_gas_dt_integral=int_cpc,
+    )
+
+    ref = rd.Substance("refrigerant", heat_capacity_gas=cp_ref)
+
+    mix = rd.mix.IdealGas([a, b, c])
+    mix_ref = rd.mix.IdealGas([ref])
+
+    kinetic = rd.Kinetic(
+        mix=mix,
+        reactions={"r1": {"eq": a > b + c, "rate": r_rate}},
+        kinetic_constants={},
+        rates_argument="concentration",
+    )
+
+    mb = pfr.mass_balances.MolarFlow(
+        molar_flows_in={"acetone": 0.0376, "anhydride": 0, "methane": 0},
+    )
+    eb = pfr.energy_balances.NoIsothermicUConstant(
+        temperature_in_or_out={"in": 1035},
+        refrigerant_in_temperature=1250,
+        heat_exchange_coefficient=110,
+        refrigerant_mix=mix_ref,
+        refrigerant_composition=np.array([1]),
+        refrigerant_pressure=101325,
+        refrigerant_molar_flow=0.111,
+        heat_exchange_arrangement="co-current",
+    )
+    pb = pfr.pressure_balances.Isobaric(162 * 1000)
+
+    area = np.pi * (4 / (16500 / 110)) ** 2 / 4
+
+    reactor = pfr.PFR(
+        kinetic=kinetic,
+        reactor_length=1 / 1000 / area,
+        transversal_area=area,
+        grid_size=100,
+        mass_balance=mb,
+        energy_balance=eb,
+        pressure_balance=pb,
+    )
+
+    reactor.simulate(1e-8, bc_tol=1e-5, max_nodes=10_000)
+
+    # Fogler data
+    tr_z = (
+        np.array(
+            [
+                0.002445,
+                0.070905,
+                0.163814,
+                0.286064,
+                0.427873,
+                0.586797,
+                0.792176,
+                0.982885,
+            ]
+        )
+        / 1000
+        / area
+    )
+    tr = np.array(
+        [
+            1246.768,
+            1187.812,
+            1136.959,
+            1090.980,
+            1053.909,
+            1025.744,
+            1004.892,
+            996.154,
+        ]
+    )
+
+    t_z = np.array([0.029, 0.203, 0.367, 0.550, 0.782, 0.988]) / 1000 / area
+    t = np.array([1031.760, 1018.966, 1009.398, 1000.654, 991.141, 984.840])
+
+    x_z = (
+        np.array(
+            [
+                0.0196,
+                0.0685,
+                0.1443,
+                0.2518,
+                0.3888,
+                0.5330,
+                0.7237,
+                0.9218,
+                0.9927,
+            ]
+        )
+        / 1000
+        / area
+    )
+    x = np.array(
+        [
+            0.0275,
+            0.0879,
+            0.1579,
+            0.2307,
+            0.2993,
+            0.3529,
+            0.4023,
+            0.4325,
+            0.4394,
+        ]
+    )
+
+    rd_ref_temps = reactor.ode_solution.sol(tr_z)[-2]
+    rd_temps = reactor.ode_solution.sol(t_z)[-3]
+    rd_facetone = reactor.ode_solution.sol(x_z)[0]
+    rd_x = (0.0376 - rd_facetone) / (0.0376)
+
+    assert np.allclose(tr, rd_ref_temps, atol=5)
+    assert np.allclose(t, rd_temps, atol=2)
+    assert np.allclose(x, rd_x, atol=0.017)
+
+    # temperature as out value
+    eb2 = pfr.energy_balances.NoIsothermicUConstant(
+        temperature_in_or_out={"out": 984.8171},
+        refrigerant_in_temperature=1250,
+        heat_exchange_coefficient=110,
+        refrigerant_mix=mix_ref,
+        refrigerant_composition=np.array([1]),
+        refrigerant_pressure=101325,
+        refrigerant_molar_flow=0.111,
+        heat_exchange_arrangement="co-current",
+    )
+
+    reactor = pfr.PFR(
+        kinetic=kinetic,
+        reactor_length=1 / 1000 / area,
+        transversal_area=area,
+        grid_size=1000,
+        mass_balance=mb,
+        energy_balance=eb2,
+        pressure_balance=pb,
+    )
+
+    reactor.simulate(1e-8, bc_tol=1e-5, max_nodes=10_000)
+
+    rd_ref_temps = reactor.ode_solution.sol(tr_z)[-2]
+    rd_temps = reactor.ode_solution.sol(t_z)[-3]
+    rd_facetone = reactor.ode_solution.sol(x_z)[0]
+    rd_x = (0.0376 - rd_facetone) / (0.0376)
+
+    assert np.allclose(tr, rd_ref_temps, atol=5)
+    assert np.allclose(t, rd_temps, atol=4)
+    assert np.allclose(x, rd_x, atol=0.017)
+
+
+def test_fogler_example_12_2_case4():
+    """Fogler 6th ed. example 12.2"""
+
+    # temperature as in value
+    def cpa(t, p):
+        return np.full(len(t), 163)
+
+    def cpb(t, p):
+        return np.full(len(t), 83)
+
+    def cpc(t, p):
+        return np.full(len(t), 71)
+
+    def cp_ref(t, p):
+        return np.full(len(t), 34.5)
+
+    def int_cpa(t1, t2, p):
+        return 163 * (t2 - t1)
+
+    def int_cpb(t1, t2, p):
+        return 83 * (t2 - t1)
+
+    def int_cpc(t1, t2, p):
+        return 71 * (t2 - t1)
+
+    def r_rate(c, t, cons):
+        k = 8.2e14 * np.exp(-34222 / t)  # 1/s
+
+        return k * c["acetone"]
+
+    a = rd.Substance(
+        "acetone",
+        formation_enthalpy_ig=-216.67 * 1000,
+        heat_capacity_gas=cpa,
+        heat_capacity_gas_dt_integral=int_cpa,
+    )
+
+    b = rd.Substance(
+        "anhydride",
+        formation_enthalpy_ig=-61.09 * 1000,
+        heat_capacity_gas=cpb,
+        heat_capacity_gas_dt_integral=int_cpb,
+    )
+
+    c = rd.Substance(
+        "methane",
+        formation_enthalpy_ig=-74.81 * 1000,
+        heat_capacity_gas=cpc,
+        heat_capacity_gas_dt_integral=int_cpc,
+    )
+
+    ref = rd.Substance("refrigerant", heat_capacity_gas=cp_ref)
+
+    mix = rd.mix.IdealGas([a, b, c])
+    mix_ref = rd.mix.IdealGas([ref])
+
+    kinetic = rd.Kinetic(
+        mix=mix,
+        reactions={"r1": {"eq": a > b + c, "rate": r_rate}},
+        kinetic_constants={},
+        rates_argument="concentration",
+    )
+
+    mb = pfr.mass_balances.MolarFlow(
+        molar_flows_in={"acetone": 0.0376, "anhydride": 0, "methane": 0},
+    )
+    eb = pfr.energy_balances.NoIsothermicUConstant(
+        temperature_in_or_out={"in": 1035},
+        refrigerant_in_temperature=1250,
+        heat_exchange_coefficient=110,
+        refrigerant_mix=mix_ref,
+        refrigerant_composition=np.array([1]),
+        refrigerant_pressure=101325,
+        refrigerant_molar_flow=0.111,
+        heat_exchange_arrangement="counter-current",
+    )
+    pb = pfr.pressure_balances.Isobaric(162 * 1000)
+
+    area = np.pi * (4 / (16500 / 110)) ** 2 / 4
+
+    reactor = pfr.PFR(
+        kinetic=kinetic,
+        reactor_length=1 / 1000 / area,
+        transversal_area=area,
+        grid_size=100,
+        mass_balance=mb,
+        energy_balance=eb,
+        pressure_balance=pb,
+    )
+
+    reactor.simulate(1e-8, bc_tol=1e-5, max_nodes=10_000)
+
+    # Fogler data
+    tr_z = (
+        np.array(
+            [
+                0.020,
+                0.107,
+                0.173,
+                0.261,
+                0.322,
+                0.410,
+                0.515,
+                0.615,
+                0.720,
+                0.812,
+                0.907,
+                0.978,
+            ]
+        )
+        / 1000
+        / area
+    )
+    tr = np.array(
+        [
+            993.134,
+            985.970,
+            984.776,
+            985.970,
+            990.746,
+            1001.493,
+            1021.791,
+            1049.254,
+            1083.881,
+            1124.478,
+            1178.209,
+            1231.940,
+        ]
+    )
+
+    t_z = (
+        np.array(
+            [
+                0.0146,
+                0.0927,
+                0.1537,
+                0.2732,
+                0.4073,
+                0.5098,
+                0.6293,
+                0.7220,
+                0.8366,
+                0.9415,
+                0.9878,
+            ]
+        )
+        / 1000
+        / area
+    )
+    t = np.array(
+        [
+            1024.1791,
+            995.5224,
+            984.7761,
+            974.0299,
+            972.8358,
+            976.4179,
+            984.7761,
+            993.1343,
+            1007.4627,
+            1024.1791,
+            1032.5373,
+        ]
+    )
+
+    x_z = (
+        np.array(
+            [
+                0.0073,
+                0.0636,
+                0.1540,
+                0.2225,
+                0.3105,
+                0.4352,
+                0.5452,
+                0.6577,
+                0.7531,
+                0.8289,
+                0.8875,
+                0.9584,
+                0.9878,
+            ]
+        )
+        / 1000
+        / area
+    )
+    x = np.array(
+        [
+            0.0143,
+            0.0537,
+            0.0955,
+            0.1146,
+            0.1313,
+            0.1528,
+            0.1731,
+            0.1982,
+            0.2245,
+            0.2496,
+            0.2782,
+            0.3212,
+            0.3415,
+        ]
+    )
+
+    rd_ref_temps = reactor.ode_solution.sol(tr_z)[-2]
+    rd_temps = reactor.ode_solution.sol(t_z)[-3]
+    rd_facetone = reactor.ode_solution.sol(x_z)[0]
+    rd_x = (0.0376 - rd_facetone) / (0.0376)
+
+    assert np.allclose(tr, rd_ref_temps, atol=5)
+    assert np.allclose(t, rd_temps, atol=3)
+    assert np.allclose(x, rd_x, atol=0.01)
+
+    # temperature as out value
+    eb2 = pfr.energy_balances.NoIsothermicUConstant(
+        temperature_in_or_out={"out": 1034.475},
+        refrigerant_in_temperature=1250,
+        heat_exchange_coefficient=110,
+        refrigerant_mix=mix_ref,
+        refrigerant_composition=np.array([1]),
+        refrigerant_pressure=101325,
+        refrigerant_molar_flow=0.111,
+        heat_exchange_arrangement="counter-current",
+    )
+
+    reactor = pfr.PFR(
+        kinetic=kinetic,
+        reactor_length=1 / 1000 / area,
+        transversal_area=area,
+        grid_size=1000,
+        mass_balance=mb,
+        energy_balance=eb2,
+        pressure_balance=pb,
+    )
+
+    reactor.simulate(1e-8, bc_tol=1e-10, max_nodes=10_000)
+
+    rd_ref_temps = reactor.ode_solution.sol(tr_z)[-2]
+    rd_temps = reactor.ode_solution.sol(t_z)[-3]
+    rd_facetone = reactor.ode_solution.sol(x_z)[0]
+    rd_x = (0.0376 - rd_facetone) / (0.0376)
+
+    assert np.allclose(tr, rd_ref_temps, atol=5)
+    assert np.allclose(t, rd_temps, atol=4)
+    assert np.allclose(x, rd_x, atol=0.015)

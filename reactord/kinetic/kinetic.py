@@ -30,16 +30,17 @@ class Kinetic:
         Dictionary with kinetic reaction function.
         Example:
         reactions={"r1": {"eq": a + b > c + d, "rate": r1_rate}}
-        where r1:rate is defined function of concentration of a and b
-        callable(concentration: dictionary,
-        temperature: float, constants: dictionary)
+        where "r1" is the reaction name, "eq" is the chemical equation and
+        r1_rate is defined function of concentration of a and b (in this case)
+        callable(composition: CompositionalArgument,
+        temperature: float, constants: dict)
         --> rate: float
     kinetic_constants: dict
         Dictionary with kinetic constants.
-        There are two keys for each reaction.
-        "a" key is pre-exponential number and "e" key is activation energy.
-        Example:
-        kinetic_constants={"a": 10, "e": 10000}
+        There are two keys for each reaction. "a" key is pre-exponential number
+        and "e" key is activation energy. This dictionary is passed to the
+        reaction rates functions. Example: kinetic_constants=
+        {"a": 10, "e": 10000}
     rates_argument: str
         This argument is used to define how to evaluate the composition
         of the reactive mixture inside the reactor.
@@ -104,24 +105,24 @@ class Kinetic:
 
     def evaluate(
         self,
-        mole_fractions: Union[NDArray, float],
-        temperature: Union[NDArray, float],
-        pressure: Union[NDArray, float],
-    ) -> np.ndarray:
-        """Evaluate reaction rate.
+        mole_fractions: Union[NDArray[np.float64], float],
+        temperature: Union[NDArray[np.float64], float],
+        pressure: Union[NDArray[np.float64], float],
+    ) -> NDArray[np.float64]:
+        """Evaluate reaction rates.
 
         Parameters
         ----------
-        mole_fractions : Union[NDArray, float]
+        mole_fractions : Union[NDArray[np.float64], float]
             moles of each substance
-        temperature : Union[NDArray, float]
+        temperature : Union[NDArray[np.float64], float]
             Temperature [K]
-        pressure : Union[NDArray, float]
+        pressure : Union[NDArray[np.float64], float]
             Pressure [Pa]
 
         Returns
         -------
-        np.ndarray
+        NDArray[np.float64]
             The rate for each reaction.
         """
         self.comp_argument.values = self._arg_func(
@@ -137,21 +138,21 @@ class Kinetic:
 
     def dhs_evaluate(
         self,
-        temperature: Union[NDArray, float],
-        pressure: Union[NDArray, float],
+        temperature: Union[NDArray[np.float64], float],
+        pressure: Union[NDArray[np.float64], float],
     ):
-        """Evaluate enthalpy reaction.
+        """Evaluate reactions' enthalpies.
 
         Parameters
         ----------
-        temperature : Union[NDArray, float]
+        temperature : Union[NDArray[np.float64], float]
             Temperature [K]
-        pressure : Union[NDArray, float]
+        pressure : Union[NDArray[np.float64], float]
             Pressure [Pa]
 
         Returns
         -------
-         np.ndarray
+        NDArray[np.float64]
             The enthalpy for each reaction.
         """
         return self._enthalpy_func(self, temperature, pressure)
@@ -181,21 +182,23 @@ class Kinetic:
             ltx = latex(eq._chem_equality).replace("=", r"\rightarrow")
             display(Math(f"{r_name}: {ltx}"))
 
-    def __len__(self):
-        """Count of substances.
+    def __len__(self) -> int:
+        """Count of reactions.
 
         Returns
         -------
-        Number of substances in reactions
+        int
+            Number of reactions.
         """
         return len(self.r_names)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Represent Mixture's substances and System's reactions.
 
         Returns
         -------
-        string
+        str
+            Latex of reactive system.
         """
         output = "Mixture's substances: \n"
 

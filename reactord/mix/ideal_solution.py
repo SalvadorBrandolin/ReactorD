@@ -1,7 +1,8 @@
 """Ideal solution Module."""
-from typing import List
+from typing import List, Union
 
 import numpy as np
+from numpy.typing import NDArray
 
 from reactord.substance import Substance
 
@@ -43,7 +44,10 @@ class IdealSolution(AbstractMix):
         )
 
     def volume(
-        self, mole_fractions: List[float], temperature: float, pressure: float
+        self,
+        mole_fractions: List[float],
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
     ) -> float:
         r"""Return the molar volume of the mixture.
 
@@ -64,12 +68,12 @@ class IdealSolution(AbstractMix):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : np.Union[float, NDArray[np.float64]]
             mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray[np.float64]]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray[np.float64]]
             Pressure. [Pa]
 
         Returns
@@ -94,7 +98,10 @@ class IdealSolution(AbstractMix):
         return mix_volumes
 
     def mix_heat_capacity(
-        self, mole_fractions: List[float], temperature: float, pressure: float
+        self,
+        mole_fractions: List[float],
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
     ):
         r"""Calculate the mixture's heat capacity [J/mol].
 
@@ -114,12 +121,12 @@ class IdealSolution(AbstractMix):
 
         Parameters
         ----------
-        mole_fractions : np.ndarray [float]
+        mole_fractions : np.Union[float, NDArray[np.float64]]
             mole fractions of each substance specified in the same order as the
             mix's substances order.
-        temperature: float
+        temperature: Union[float, NDArray[np.float64]]
             Temperature. [K]
-        pressure: float
+        pressure: Union[float, NDArray[np.float64]]
             Pressure. [Pa]
 
         Returns
@@ -144,7 +151,9 @@ class IdealSolution(AbstractMix):
         return mix_cp
 
     def formation_enthalpies_correction(
-        self, temperature: float, pressure: float
+        self,
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
     ):
         """Calculate the correction term for the formation enthalpy.
 
@@ -156,14 +165,14 @@ class IdealSolution(AbstractMix):
 
         Parameters
         ----------
-        temperature : float
+        temperature : Union[float, NDArray[np.float64]]
             Temperature at which formation enthalpies are to be calculated. [K]
-        pressure : float
+        pressure : Union[float, NDArray[np.float64]]
             Pressure at which formation enthalpies are to be calculated. [Pa]
 
         Returns
         -------
-        correction_enthalpies : ndarray [float]
+        correction_enthalpies : Union[float, NDArray[np.float64]]
             Formation enthalpies correction for each substance (J/mol/K)
         """
         correction_enthalpies = np.array([])
@@ -197,7 +206,7 @@ class IdealSolution(AbstractMix):
 
         Returns
         -------
-        ndarray [float]
+        Union[float, NDArray[np.float64]]
             Formation enthalpies of each substance
         """
         return self.formation_enthalpies

@@ -1,6 +1,8 @@
 Piston Flow Reactor package
 ===========================
 
+Reactor
+-------
 .. automodule:: reactord.flowreactors.stationary_1d.pfr
    :members:
    :undoc-members:

@@ -2,6 +2,7 @@
 from typing import List
 
 import numpy as np
+from numpy.typing import NDArray
 
 from reactord.mix.abstract_mix import AbstractMix
 from reactord.substance.symbolic import Symbolic
@@ -9,7 +10,9 @@ from reactord.substance.symbolic import Symbolic
 from sympy import linear_eq_to_matrix, symbols
 
 
-def stoichiometry_matrix_builder(mix: AbstractMix, equations: List[Symbolic]):
+def stoichiometry_matrix_builder(
+    mix: AbstractMix, equations: List[Symbolic]
+) -> NDArray[np.float64]:
     """Build stoichiometry matrix.
 
     Parameters

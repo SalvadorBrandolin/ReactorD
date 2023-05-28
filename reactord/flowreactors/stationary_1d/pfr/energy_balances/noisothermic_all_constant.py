@@ -10,13 +10,37 @@ from sympy import symbols
 
 
 class NoIsothermicAllConstant:
-    """PFR noisothermic energy balance class.
+    r"""PFR noisothermic energy balance.
+
+    Refrigerant's temperature and heat exchange coefficient U remains constant.
+
+    .. math::
+        \frac{1}{a_t}\frac{dT}{dz}=\frac{Ua(T_r-T)+\sum\Delta{H_j}r_{j}}{{c_p}_
+        {mix}{\sum}F_i}
+
+    .. math::
+        \frac{dT_r}{dz}=0
+
+    | :math:`a_t`: reactor's transversal area.
+    | :math:`U`: heat exchange coefficient.
+    | :math:`a`: reactor's heat exchange area per reactor's volume.
+    | :math:`T`: reactor's temperature.
+    | :math:`T_r`: refrigerant's temperature.
+    | :math:`z`: reactor's length coordinate.
+    | :math:`\Delta{H_j}_{(TP)}`: enthalpy of `j`-th reaction.
+    | :math:`r_{j}`: rate of `j`-th reaction.
+    | :math:`{c_p}_{mix}`: mixture's heat capacity.
+    | :math:`F_i`: molar flow of the `i`-th substance.
 
     Parameters
     ----------
     temperature_in_or_out: dict
+        Temperature of reactive mixture in the inlet or outlet position. Use
+        {"in": 200} for 200 K at inlet or {"out": 200} for 200 K at outlet.
     refrigerant_in_temperature: float
+        Refrigerant temperature. [K]
     heat_exchange_coefficient: float
+        Heat exchange coefficient. [J/K/s/m²]
     """
 
     def __init__(
@@ -47,7 +71,7 @@ class NoIsothermicAllConstant:
         display(symbols(self.__repr__()[0]))
         display(symbols(self.__repr__()[1]))
 
-    def initial_profile(self, reactor: PFR) -> NDArray:
+    def initial_profile(self, reactor: PFR) -> NDArray[np.float64]:
         """Set initial energy profile in noisothermic PFR.
 
         Parameters
@@ -57,7 +81,7 @@ class NoIsothermicAllConstant:
 
         Returns
         -------
-        ndarray
+        NDArray[np.float64]
             initial temperature profile in all grid
         """
         reactor.kinetic.set_dh_function()
@@ -69,12 +93,22 @@ class NoIsothermicAllConstant:
         )
         return initial_profile
 
-    def update_profile(self, reactor: PFR, variables: NDArray) -> None:
-        """Update profile."""
+    def update_profile(
+        self, reactor: PFR, variables: NDArray[np.float64]
+    ) -> None:
+        """Update the reactor's temperature profile.
+
+        Parameters
+        ----------
+        reactor : PFR
+            PFR object.
+        variables : NDArray[np.float64]
+            Variables of solve_bvp ode solver.
+        """
         reactor.temperature_profile = variables[-3, :]
         reactor.refrigerant_temperature_profile = variables[-2, :]
 
-    def border_conditions(self, reactor: PFR):
+    def border_conditions(self, reactor: PFR) -> tuple:
         """Set border conditions.
 
         Parameters
@@ -93,7 +127,7 @@ class NoIsothermicAllConstant:
 
         return in_border_cond, out_border_cond
 
-    def evaluate_balance(self, reactor: PFR) -> NDArray:
+    def evaluate_balance(self, reactor: PFR) -> NDArray[np.float64]:
         """Evaluate energy balance.
 
         Parameters
@@ -103,8 +137,8 @@ class NoIsothermicAllConstant:
 
         Returns
         -------
-        ndarray
-            Temperature rate of each substance on each reactor's z
+        NDArray[np.float64]
+            Temperature rate of each substance on each reactor's z.
         """
         delta_hs = reactor.kinetic.dhs_evaluate(
             reactor.temperature_profile, reactor.pressure_profile
@@ -132,8 +166,8 @@ class NoIsothermicAllConstant:
     def __repr__(self) -> str:
         """Print LaTex representation."""
         latex1 = (
-            r"\frac{dT}{dz}=\frac{Ua(T_a-T)+\sum\Delta{H_j}r_{j}}{{c_p}_{mix}"
-            r"{\sum}F_i}"
+            r"\frac{1}{a_t}\frac{dT}{dz}=\frac{Ua(T_a-T)+\sum\Delta{H_j}r_{j}}"
+            r"{{c_p}_{mix}{\sum}F_i}"
         )
         latex2 = r"\frac{dT_r}{dz}=0"
 

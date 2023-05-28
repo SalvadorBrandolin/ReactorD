@@ -2,6 +2,7 @@
 from IPython.display import display
 
 import numpy as np
+from numpy.typing import NDArray
 
 from reactord.flowreactors.stationary_1d.pfr.pfr import PFR
 
@@ -9,7 +10,11 @@ from sympy import symbols
 
 
 class Ergun:
-    """PFR Ergun energy balance class.
+    r"""PFR Ergun energy balance class.
+
+    .. math::
+        \frac{dP}{dz}=-\frac{G}{{\rho}D_p}\left(\frac{1-\phi}{\phi^3}
+        \right)\left[\frac{150(1-\phi)\mu}{D_p}+1.75G\right]
 
     Parameters
     ----------
@@ -45,7 +50,7 @@ class Ergun:
         """Represent for ipython."""
         display(symbols(self.__repr__()))
 
-    def initial_profile(self, reactor: PFR):
+    def initial_profile(self, reactor: PFR) -> NDArray[np.float64]:
         """Set initial pressure profile in non-isobaric PFR.
 
         Parameters
@@ -55,7 +60,7 @@ class Ergun:
 
         Returns
         -------
-        ndarray
+        NDArray[np.float64]
             initial pressure profile in all grid
         """
         if self._inlet_pressure:
@@ -63,11 +68,21 @@ class Ergun:
         else:
             return np.full(reactor.grid_size, self._outlet_pressure)
 
-    def update_profile(self, reactor: PFR, variables):
-        """Update profile."""
+    def update_profile(
+        self, reactor: PFR, variables: NDArray[np.float64]
+    ) -> None:
+        """Update th reactor's presure profile.
+
+        Parameters
+        ----------
+        reactor : PFR
+            PFR object.
+        variables : NDArray[np.float64]
+            Variables of solve_bvp ode solver.
+        """
         reactor.pressure_profile = variables[-1, :]
 
-    def border_conditions(self, reactor: PFR):
+    def border_conditions(self, reactor: PFR) -> NDArray[np.float64]:
         """Set border conditions.
 
         Parameters
@@ -77,15 +92,15 @@ class Ergun:
 
         Returns
         -------
-        ndarray
-            array with pressure in the inlet and outlet reactor
+        NDArray[np.float64]
+            array with pressure in the inlet and outlet reactor.
         """
         if self._inlet_pressure:
             return self._inlet_pressure, None
         else:
             return None, self._outlet_pressure
 
-    def evaluate_balance(self, reactor: PFR):
+    def evaluate_balance(self, reactor: PFR) -> NDArray[np.float64]:
         """Evaluate pressure balance.
 
         Parameters
@@ -95,8 +110,8 @@ class Ergun:
 
         Returns
         -------
-        ndarray
-            Pressure rate of each substance on each reactor's z
+        NDArray[np.float64]
+            Pressure rate of each substance on each reactor's z.
         """
         phi = self.porosity
         dp = self.particle_diameter

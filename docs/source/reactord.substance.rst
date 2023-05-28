@@ -7,3 +7,4 @@ Module contents
 .. automodule:: reactord.substance
    :members:
    :undoc-members:
+   :show-inheritance:

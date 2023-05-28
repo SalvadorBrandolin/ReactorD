@@ -22,8 +22,7 @@ def thermo_substance_constructor(
     """Substance constructor from Thermo database.
 
     The functions of the Thermo library are all exclusively temperature
-    functions (pressure is not used), except the volume_gas method which it
-    uses both temperature and pressure.
+    functions (pressure is not used).
 
     Parameters
     ----------
