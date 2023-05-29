@@ -7,6 +7,6 @@ Contents:
    :maxdepth: 1
 
    substance.ipynb
-   ideal_gas.ipynb
+   mix.ipynb
    kinetic.ipynb
    stationary_pfr.ipynb
