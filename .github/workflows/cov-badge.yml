@@ -24,15 +24,9 @@ jobs:
         pip install pytest
         pip install pytest-cov
         coverage erase
-        pytest tests/ --cov=reactord/ --cov-report=xml
+        pytest tests/ --cov=reactord/ --cov-append --cov-report=term-missing --cov-report=xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: ./coverage/reports/
-        env_vars: OS,PYTHON
-        fail_ci_if_error: true
         files: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
-        verbose: true
