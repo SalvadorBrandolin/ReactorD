@@ -12,7 +12,7 @@
 
 ===========
 
-|mybinder| |image1| |image2| |image3| |image4| |image5| |License| |Python 3.7+| |coverage|
+|mybinder| |image1| |image2| |image3| |image4| |image5| |License| |Python 3.8+| |coverage|
 
 .. |mybinder| image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/SalvadorBrandolin/ReactorD/HEAD
@@ -53,7 +53,7 @@ and design reactors for multiple-reaction systems. The intention is to solve
 the following reactor types in stationary or not-stationary conditions: Plug 
 flow (PFR) and Stirred tank (STR) 
 
-Available in version 0.0.1b3
+Available in version 0.0.1b4
 ----------------------------
 
 - PFR (Border and initial value problems)
