@@ -1,19 +1,10 @@
 reactord package
 ================
 
-Subpackages
------------
-
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 1
 
-   reactord.idealreactor
+   reactord.substance
    reactord.mix
-
-Module contents
----------------
-
-.. automodule:: reactord
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   reactord.kinetic
+   reactord.flowreactors
