@@ -24,7 +24,8 @@ jobs:
         pip install pytest
         pip install pytest-cov
         coverage erase
-        pytest ./tests --cov=reactord/ --cov-report=xml
+        pytest ./tests --cov=reactord/
+        coverage xml
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:
