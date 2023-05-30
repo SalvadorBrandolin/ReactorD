@@ -2,17 +2,15 @@
 
 Chemical Reactor Simulations and Design.
 """
-from . import idealreactor, mix
-from .kinetics import Kinetics
-from .reactorbase import ReactorBase
+from . import flowreactors, kinetic, mix, substance
+from .kinetic import Kinetic
 from .substance import Substance
-from .utils import vectorize
 
 __all__ = [
-    "idealreactor",
+    "flowreactors",
+    "kinetic",
     "mix",
-    "Kinetics",
-    "ReactorBase",
+    "substance",
+    "Kinetic",
     "Substance",
-    "vectorize",
 ]

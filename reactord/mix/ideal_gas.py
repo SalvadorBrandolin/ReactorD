@@ -1,12 +1,14 @@
 """Ideal gas Module."""
-from typing import List
-
-import chemicals
+from typing import List, Union
 
 import numpy as np
+from numpy.typing import NDArray
 
-from reactord.mix.abstract_mix import AbstractMix
 from reactord.substance import Substance
+
+from scipy.constants import R
+
+from .abstract_mix import AbstractMix
 
 
 class IdealGas(AbstractMix):
@@ -18,137 +20,161 @@ class IdealGas(AbstractMix):
     ----------
     substance_list : list[Substance]
         list of substance objects
+    viscosity_mixing_rule : str, optional
+        Viscosity mixing rule method. Options available: "linear",
+        "grunberg_nissan", "herning_zipperer"., by default "herning_zipperer"
 
     Attributes
     ----------
-    substances : list[Substance]
-        list of substance objects
+    phase_nature : str
+        gas.
+    substances : List [Substance]
+        List of substances.
+    viscosity_mixing_rule : str
+        Viscosity mixing rule method.
     """
 
-    def __init__(self, **substance_dict) -> None:
-        substance_list = [
-            value
-            if isinstance(value, Substance)
-            else Substance.from_thermo_database(value)
-            for value in substance_dict.values()
-        ]
-        self.substances: List[Substance] = substance_list
-
-    def concentrations(
-        self, moles: List[float], temperature: float, pressure: float
-    ) -> List[float]:
-        """Calculate concentrations of the mixture.
-
-        Parameters
-        ----------
-        moles : ndarray or list [float]
-            Moles of each substance
-        temperature : float
-            System temperature [K]
-        pressure : float
-            System pressure [Pa]
-
-        Returns
-        -------
-        ndarray or list [float]
-            Concentration of each substance [mol/m³]
-        """
-        mol_fractions = self.mol_fractions(moles)
-
-        r = 8.31446261815324  # m³⋅Pa/K/mol
-        density = pressure / (r * temperature)
-        return np.multiply(mol_fractions, density)
+    def __init__(
+        self,
+        substance_list: List[Substance],
+        viscosity_mixing_rule: str = "herning_zipperer",
+    ) -> None:
+        super().__init__(
+            substance_list=substance_list,
+            phase_nature="gas",
+            viscosity_mixing_rule=viscosity_mixing_rule,
+        )
 
     def volume(
-        self, moles: List[float], temperature: float, pressure: float
+        self,
+        mole_fractions: np.ndarray,
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
     ) -> float:
-        """Calculate the volume of the mixture.
+        r"""Return the molar volume of the mixture.
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure
+        vectors following de NumPy broadcasting rules.
+
+        .. math::
+            v = \frac {R T} {P}
+
+        | :math:`v`: mix's molar volume.
+        | :math:`R`: Ideal gas constant = 8.31446261815324
+          :math:`\frac {m^3 Pa} {K mol}`
+        | :math:`T`: temperature.
+        | :math:`P`: pressure.
 
         Parameters
         ----------
-        moles : ndarray or list[float]
-            Moles of each substance
-        temperature : float
-            System temperature [K]
-        pressure : float
-            System pressure [Pa]
+        mole_fractions : NDArray[np.float64]
+            mole fractions of each substance specified in the same order as the
+            mix's substances order.
+        temperature: Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure: Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        float
-            Volume of the mixture [m³]
+        Union[float, NDArray[np.float64]]
+            Mixture's molar volume. [m³/mol]
         """
-        total_moles = np.sum(moles)
-
-        r = 8.31446261815324  # m3⋅Pa/K/mol
-        volume = total_moles * r * temperature / pressure
+        volume = R * np.divide(temperature, pressure)
         return volume
 
     def mix_heat_capacity(
-        self, moles: List[float], temperature: float, pressure: float
+        self,
+        mole_fractions: np.ndarray,
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
     ) -> float:
-        """Calculate heat capacity of th mixture.
+        r"""Calculate the mixture's heat capacity [J/mol].
+
+        Multiple mixture compositions can be specified by a moles matrix. Each
+        column of the matrix represents each mixture and each row represents
+        each substance's mole fractions. Also with temperature and pressure
+        vectors following de NumPy broadcasting rules.
+
+        .. math::
+            C_{p_{mix}} = \sum_{i=0}^{N} z_i C_{p_i}
+
+        | :math:`C_{p_{mix}}`: mix's heat capacity.
+        | :math:`N`: total number of substances in the mixture.
+        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's
+          :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
 
         Parameters
         ----------
-        moles : ndarray or list [float]
-            Moles of each substance
-        temperature : float
-            System temperature [K]
+        mole_fractions : np.ndarray [float]
+            mole fractions of each substance specified in the same order as the
+            mix's substances order.
+        temperature: Union[float, NDArray[np.float64]]
+            Temperature. [K]
+        pressure: Union[float, NDArray[np.float64]]
+            Pressure. [Pa]
 
         Returns
         -------
-        float
-            Heat capacity of the mixture [J/K]
-        """
-        mol_fractions = self.mol_fractions(moles)
+        Union[float, NDArray[np.float64]]
+            Mixture's heat capacity. [J/mol]
 
+        Requires
+        --------
+            heat_capacity_gas defined on each mix's Substance.
+        """
         pure_cp = np.array(
             [
                 substance.heat_capacity_gas(temperature, pressure)
                 for substance in self.substances
             ]
         )
-        mix_cp = np.dot(mol_fractions, pure_cp)
+
+        # The next line is equal to a column-wise dot product of the two arrays
+        mix_cp = np.multiply(mole_fractions, pure_cp).sum(axis=0)
         return mix_cp
 
-    def _formation_enthalpies_set(self):
-        """Return the ideal gas formation enthalpies in a ordered ndarray.
-
-        Method that read the ideal gas formation enthalpies of the mix
-        class and returns them in a ordered ndarray.
-
-        Returns
-        -------
-        ndarray [float]
-            Ideal gas formation enthalpies of each substance [J/mol/K]
-        """
-        enthalpies = np.array([])
-
-        for substance in self.substances:
-            enthalpies = np.append(enthalpies, substance.formation_enthalpy_ig)
-
-        return enthalpies
-
     def formation_enthalpies_correction(
-        self, temperature: float, pressure: float
+        self,
+        temperature: Union[float, NDArray[np.float64]],
+        pressure: Union[float, NDArray[np.float64]],
     ):
-        """Calculate the correction term for the formation enthalpy.
+        r"""Calculate the correction term for the formation enthalpy.
 
-        Method that calculates the correction term for the formation
-        enthalpies of the pure substances from 298.15 K and 101325 Pa to
-        the given temperature and pressure using Kirchhoff's equation.
+        Method that calculates the correction term for the formation enthalpies
+        of the pure substances from 298.15 K and 101325 Pa to the given
+        temperature and pressure.
+
+        .. math::
+           \Delta H_{f T_{(g)}} = \Delta H_{f 298.15_{(g)}}^0 + \sum_{i=0}^{N}
+           \int_{298.15}^{T} v_i C_{p_i} dT
+
+           CT = \sum_{i=0}^{N} \int_{298.15}^{T} v_i C_{p_i} dT
+
+        | :math:`\Delta H_{f T_{(g)}}`: reaction enthalpy.
+        | :math:`\Delta H_{f 298.15_{(g)}}^0`: ideal gas standard reaction
+          enthalpy.
+        | :math:`N`: total number of substances in the mixture.
+        | :math:`C_{p_i}`: ideal gas heat capacity of the mix's
+          :math:`i`-th substance.
+        | :math:`z_i`: mole fraction of the mix's :math:`i`-th substance.
+        | :math:`v_i`: stoichiometric coefficient of the mix's :math:`i`-th
+          substance.
+        | :math:`CT`: correction term.
 
         Parameters
         ----------
-        temperature : float
+        temperature : Union[float, NDArray[np.float64]]
             Temperature at which formation enthalpies are to be calculated. [K]
-        pressure : float
+        pressure : Union[float, NDArray[np.float64]]
             Pressure at which formation enthalpies are to be calculated. [Pa]
 
         Returns
         -------
-        correction_enthalpies : ndarray [float]
+        Union[float, NDArray[np.float64]]
             Formation enthalpies of each substance (J/mol/K)
         """
         correction_enthalpies = np.array([])
@@ -163,37 +189,15 @@ class IdealGas(AbstractMix):
 
         return correction_enthalpies
 
-    def mixture_viscosity(
-        self,
-        moles: List[float],
-        temperature: float,
-        pressure: float,
-    ) -> float:
-        """
-        Evaluate the viscosity of the mixture.
+    def get_formation_enthalpies(self):
+        """Return the ideal gas formation enthalpies in an ordered ndarray.
 
-        Parameters
-        ----------
-        temperature : float
-            Temperature at which formation enthalpies are to be calculated. [K]
-        pressure : float
-            Pressure at which formation enthalpies are to be calculated. [Pa]
-        moles: list
-        |   List of moles substance in the mixture
+        Method that read the ideal gas formation enthalpies of the mix
+        class and returns them in an ordered ndarray.
+
         Returns
         -------
-         mixture_viscosity: float
-            Viscosity of the mixture
+        Union[float, NDArray[np.float64]]
+            Ideal gas formation enthalpies of each substance [J/mol/K]
         """
-        mol_fractions = self.mol_fractions(moles)
-        viscosity_pure = []
-        molecular_weight = []
-        for substance in self.substances:
-            viscosity_pure.append(
-                substance.viscosity_gas(temperature, pressure)
-            )
-            molecular_weight.append(substance.molecular_weight)
-
-        return chemicals.viscosity.Herning_Zipperer(
-            mol_fractions, viscosity_pure, molecular_weight
-        )
+        return self.formation_enthalpies_ig

@@ -18,7 +18,7 @@ testpaths = [
 
 [project]
 name = "reactord"
-version = "0.0.1a2"
+version = "0.0.1b1"
 authors = [{name = "Brandolín, Salvador Eduardo", email = "salvadorebrandolin@mi.unc.edu.ar"},
            {name = "Parodi, Adrián", email = "adrian.parodi@mi.unc.edu.ar"},
            {name = "Rovezzi, Juan Pablo", email = "juan.rovezzi@mi.unc.edu.ar"},
@@ -29,7 +29,7 @@ readme = "README.md"
 description = "Package for the simulation and design of chemical reactors"
 keywords = ["chemical reactor", "reactor design", "reactor simulation", "chemical engineering"]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Education",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
@@ -42,8 +42,11 @@ classifiers = [
 urls = {Homepage = "https://github.com/SalvadorBrandolin/reactord"}
 
 dependencies = [
-    "dill>=0.3.6",
-    "numpy>=1.21.4",
-    "scipy>=1.7.3", 
-    "thermo>=0.2.21"
+    'ipython',
+    'dill >= 0.3.6',
+    'numpy >= 1.24.3',
+    'pandas >= 2.0.1', 
+    'scipy >= 1.10.1',
+    'sympy >= 1.12',
+    'thermo >= 0.2.24',
 ]
