@@ -14,7 +14,7 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 <img src='https://img.shields.io/pypi/v/reactord'>
 </a>
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
-![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)
+![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue)
 [![codecov](https://codecov.io/gh/SalvadorBrandolin/ReactorD/branch/main/graph/badge.svg?token=6E0U0F9AYU)](https://codecov.io/gh/SalvadorBrandolin/ReactorD)
 
 ReactorD (Reactor Design) is a `Python` package whose proposal is to simulate 

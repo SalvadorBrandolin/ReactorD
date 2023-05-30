@@ -3,17 +3,16 @@ include README.md
 include requirements.txt
 include pyproject.toml
 
-recursive-include reactord *
+recursive-include reactord *.py
 
 exclude tox.ini
 exclude .readthedocs.yml
-exclude requirements_dev.txt
+exclude requirements-dev.txt
 exclude *.png
 exclude name_file *
 recursive-exclude examples *
 recursive-exclude dist *
-recursive-exclude reactord *.mod *.log *.pyc 
 recursive-exclude tests *
 recursive-exclude docs *
-recursive-exclude presentation *
-recursive-exlcude .vscode *
+recursive-exclude .vscode *
+

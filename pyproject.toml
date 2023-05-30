@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = ["setuptools"]
+requires = ["setuptools", "wheel"]
 
 [tool.black]
 line-length = 79
@@ -18,7 +18,7 @@ testpaths = [
 
 [project]
 name = "reactord"
-version = "0.0.1b1"
+version = "0.0.1b"
 authors = [{name = "Brandolín, Salvador Eduardo", email = "salvadorebrandolin@mi.unc.edu.ar"},
            {name = "Parodi, Adrián", email = "adrian.parodi@mi.unc.edu.ar"},
            {name = "Rovezzi, Juan Pablo", email = "juan.rovezzi@mi.unc.edu.ar"},
