@@ -53,7 +53,7 @@ and design reactors for multiple-reaction systems. The intention is to solve
 the following reactor types in stationary or not-stationary conditions: Plug 
 flow (PFR) and Stirred tank (STR) 
 
-Available in version 0.0.1b1
+Available in version 0.0.1b3
 ----------------------------
 
 - PFR (Border and initial value problems)
