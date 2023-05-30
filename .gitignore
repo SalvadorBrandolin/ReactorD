@@ -9,6 +9,8 @@
 *substance_file*
 *water_file*
 *settings.json*
+*build*
+*dist*
 
 /docs/build
 /docs/{envbuild
