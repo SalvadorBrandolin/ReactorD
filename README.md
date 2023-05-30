@@ -17,40 +17,41 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 ![Python 3.7+](https://img.shields.io/badge/python-3.7+-blue.svg)
 [![codecov](https://codecov.io/gh/SalvadorBrandolin/ReactorD/branch/main/graph/badge.svg?token=6E0U0F9AYU)](https://codecov.io/gh/SalvadorBrandolin/ReactorD)
 
-ReactorD (Reactor Design) is a python package whose proposal is to simulate and design reactors for multiple-reaction systems. The intention is to solve the following reactor types in stationary or not-stationary conditions: Plug flow (PFR) and Stirred tank (STR) 
+ReactorD (Reactor Design) is a `Python` package whose proposal is to simulate 
+and design reactors for multiple-reaction systems. The intention is to solve 
+the following reactor types in stationary or not-stationary conditions: Plug 
+flow (PFR) and Stirred tank (STR) 
 
-According to requirements, the operation settings can change as follows; 
-
-- Mass Balance:
-	- Homogeneous
-    - Heterogeneous
-    - Continuous
-    - Discontinuous
-    
-- Energy Balance:
-	- Isothermic
-    - Non-isothermic
-    - Adiabatic
-
-- Pressure Balance:
-	- Isobaric
-    - Non-isobaric
-      - Packed bed reactor
-      - Gas phase reaction
-
-
-## Available in version 0.0.1a2
-- Stationary PFR Isothermic - Isobaric Operation
-- Stationary PFR Isothermic - Non-isobaric packed bed reactor Operation
-- Stationary PFR Adiabatic  - Isobaric Operation
-- Stationary PFR Adiabatic  - Non-isobaric packed bed reactor Operation
+## Available in version 0.0.1b1
+- PFR (Border and initial value problems)
+    - Mass Balances
+        - MolarFlow
+    - Energy Balances
+        - Isothermic
+        - Adiabatic
+        - No isothermic (constant U coefficient and refrigerant temperature)
+        - No isothermic (constant U coefficient)
+    - Pressure Balances
+        - Isobaric
+        - Ergun
 
 
 ## Motivation
-Chemical reaction engineering has as its main objective the study and optimization of reactive processes, usually, with a chemical reactor as the protagonist equipment. To design a chemical reactor, it is necessary to consider several physical and chemical phenomena simultaneously, such as the inlet and outlet molar flow of chemical substances, mass transfer, heat transfer, and reaction kinetics. All these contributions to the system's complexity, commonly lead to coupled non-linear algebraic problems, coupled differential equations, or either both coupled algebraic-differential equations that must be solved by numeric algorithms. ReactorD provides an interphase to configure the necessary information for the simulation of the chemical reactors. Also, ReactorD implements the mathematical representations of mass and energy balances of specific reactors for a numerical resolution.
+Chemical reaction engineering has as its main objective the study and 
+optimization of reactive processes, usually, with a chemical reactor as the 
+protagonist equipment. To design a chemical reactor, it is necessary to 
+consider several physical and chemical phenomena simultaneously, such as the 
+inlet and outlet molar flow of chemical substances, mass transfer, heat 
+transfer, and reaction kinetics. All these contributions to the system's 
+complexity, commonly lead to coupled non-linear algebraic problems, coupled 
+differential equations, or either both coupled algebraic-differential 
+equations that must be solved by numeric algorithms. ReactorD provides an 
+interphase to configure the necessary information for the simulation of the 
+chemical reactors. Also, ReactorD implements the mathematical representations 
+of mass and energy balances of specific reactors for a numerical resolution.
 
 ## Requirements
-You need Python 3.7+ to run ReactorD.
+You need Python 3.8+ to run ReactorD.
 
 ## Instalation
 For installing _ReactorD_ you just need to:
@@ -70,17 +71,3 @@ Santos, Maricel Del Valle
 (<a href=maricel.santos@mi.unc.edu.ar>maricel.santos@mi.unc.edu.ar</a>)
 Scilipoti, José Antonio
 (<a href=jscilipoti@mi.unc.edu.ar>jscilipoti@mi.unc.edu.ar</a>)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
