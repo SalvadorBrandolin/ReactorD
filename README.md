@@ -15,7 +15,6 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 </a>
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
 ![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue)
-[![codecov](https://codecov.io/gh/SalvadorBrandolin/ReactorD/branch/main/graph/badge.svg?token=6E0U0F9AYU)](https://codecov.io/gh/SalvadorBrandolin/ReactorD)
 
 ReactorD (Reactor Design) is a `Python` package whose proposal is to simulate 
 and design reactors for multiple-reaction systems. The intention is to solve 
