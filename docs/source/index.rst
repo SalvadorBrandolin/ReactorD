@@ -12,7 +12,7 @@
 
 ===========
 
-|mybinder| |image1| |image2| |image3| |image4| |image5| |License| |Python 3.8+| |coverage|
+|mybinder| |image1| |image2| |image3| |image4| |image5| |License| |Python 3.8+|
 
 .. |mybinder| image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/SalvadorBrandolin/ReactorD/HEAD
