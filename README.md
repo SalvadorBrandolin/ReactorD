@@ -19,7 +19,10 @@ alt='Documentation Status'/></a> <a href="https://github.com/leliel12/diseno_sci
 ReactorD (Reactor Design) is a `Python` package whose proposal is to simulate 
 and design reactors for multiple-reaction systems. The intention is to solve 
 the following reactor types in stationary or not-stationary conditions: Plug 
-flow (PFR) and Stirred tank (STR) 
+flow (PFR) and Stirred tank (STR)
+
+## Check our documentation here!  
+https://reactord.readthedocs.io/en/latest/?badge=latest
 
 ## Available in version 0.0.1b4
 - PFR (Border and initial value problems)
